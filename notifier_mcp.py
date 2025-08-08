@@ -45,5 +45,10 @@ def send_discord(message: str) -> dict:
     return {"status": r.status_code, "result_text": r.text}
 
 if __name__ == "__main__":
-    print("Starting notifier_mcp on http://127.0.0.1:7005/mcp — Crypto MCP Server – Produced by Corax CoLAB")
-    mcp.run("streamable-http", "127.0.0.1", 7005, "/mcp")
+    print("Starting coingecko_mcp on http://127.0.0.1:7005/mcp — Crypto MCP Server (Corax CoLAB)")
+    mcp.run(
+        "streamable-http",    # transport kan vara positionellt
+        host="127.0.0.1",     # namngiven
+        port=7005,            # namngiven
+        path="/mcp",          # OBS: inte mount_path utan path
+    )

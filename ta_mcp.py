@@ -54,5 +54,10 @@ def compute_indicators(exchange: str, symbol: str, timeframe: str = "1h", limit:
     return {"symbol": symbol, "timeframe": timeframe, "rsi": rsi, "macd_hist": macd_hist, "sma50": last.get("sma50"), "bb_lower": last.get("bb_lower"), "bb_upper": last.get("bb_upper"), "signal": signal }
 
 if __name__ == "__main__":
-    print("Starting ta_mcp on http://127.0.0.1:7003/mcp — Crypto MCP Server – Produced by Corax CoLAB")
-    mcp.run(transport="streamable-http", host="127.0.0.1", port=7003, mount_path="/mcp")
+    print("Starting coingecko_mcp on http://127.0.0.1:7003/mcp — Crypto MCP Server (Corax CoLAB)")
+    mcp.run(
+        "streamable-http",    # transport kan vara positionellt
+        host="127.0.0.1",     # namngiven
+        port=7003,            # namngiven
+        path="/mcp",          # OBS: inte mount_path utan path
+    )

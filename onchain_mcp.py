@@ -65,4 +65,4 @@ def tx_info(txhash: str, rpc_url: Optional[str] = None) -> dict:
 
 if __name__ == "__main__":
     print("Starting onchain_mcp on http://127.0.0.1:7002/mcp — Crypto MCP Server – Produced by Corax CoLAB")
-    mcp.run(transport="streamable-http", host="127.0.0.1", port=7002, mount_path="/mcp")
+    mcp.run("streamable-http", "127.0.0.1", 7002, "/mcp")

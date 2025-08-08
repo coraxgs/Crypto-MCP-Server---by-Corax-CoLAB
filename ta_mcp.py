@@ -17,7 +17,7 @@ load_dotenv(dotenv_path="/home/pelle/cryptomcpserver/.env")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ta_mcp")
 
-mcp = FastMCP(name="ta", stateless_http=True, json_response=True)
+mcp = FastMCP(name="ta", stateless_http=True, json_response=True, host="127.0.0.1", port=7003)
 
 def _fetch_ohlcv(exchange_id: str, symbol: str, timeframe: str, limit: int = 200):
     exchange_id = exchange_id.lower()

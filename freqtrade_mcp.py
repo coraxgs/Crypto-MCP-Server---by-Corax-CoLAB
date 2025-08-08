@@ -65,9 +65,5 @@ def trades(limit: int = 20) -> Dict[str, Any]:
 
 if __name__ == "__main__":
     print("Starting coingecko_mcp on http://127.0.0.1:7011/mcp — Crypto MCP Server (Corax CoLAB)")
-    mcp.run(
-        "streamable-http",    # transport kan vara positionellt
-        host="127.0.0.1",     # namngiven
-        port=7011,            # namngiven
-        path="/mcp",          # OBS: inte mount_path utan path
-    )
+    # transport, bind (address:port), mount_path
+    mcp.run("streamable-http", "127.0.0.1:7011", "/mcp")

@@ -18,7 +18,7 @@ logger = logging.getLogger("coingecko_mcp")
 
 requests_cache.install_cache("cg_cache", expire_after=60)
 
-mcp = FastMCP(name="coingecko", stateless_http=True, json_response=True)
+mcp = FastMCP(name="coingecko", stateless_http=True, json_response=True, host="127.0.0.1", port=7010)
 cg = CoinGeckoAPI()
 
 @mcp.tool()

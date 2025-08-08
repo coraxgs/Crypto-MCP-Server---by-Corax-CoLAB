@@ -17,7 +17,7 @@ load_dotenv(dotenv_path="/home/pelle/cryptomcpserver/.env")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("portfolio_mcp")
 
-mcp = FastMCP(name="portfolio", stateless_http=True, json_response=True)
+mcp = FastMCP(name="portfolio", stateless_http=True, json_response=True, host="127.0.0.1", port=7004)
 cg = CoinGeckoAPI()
 
 _CACHE = {"prices": {}, "timestamp": 0}

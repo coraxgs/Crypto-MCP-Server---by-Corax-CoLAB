@@ -85,5 +85,10 @@ def portfolio_value(exchanges: List[str]) -> Dict[str, Any]:
     return {"total_usd": total_usd, "details": details, "cache_ttl": CACHE_TTL, "cached_at": _CACHE["timestamp"]}
 
 if __name__ == "__main__":
-    print("Starting portfolio_mcp on http://127.0.0.1:7004/mcp — Crypto MCP Server – Produced by Corax CoLAB")
-    mcp.run("streamable-http", "127.0.0.1", 7004, "/mcp")
+    print("Starting coingecko_mcp on http://127.0.0.1:7004/mcp — Crypto MCP Server (Corax CoLAB)")
+    mcp.run(
+        "streamable-http",    # transport kan vara positionellt
+        host="127.0.0.1",     # namngiven
+        port=7004,            # namngiven
+        path="/mcp",          # OBS: inte mount_path utan path
+    )

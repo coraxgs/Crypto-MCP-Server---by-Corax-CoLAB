@@ -86,4 +86,4 @@ def portfolio_value(exchanges: List[str]) -> Dict[str, Any]:
 
 if __name__ == "__main__":
     print("Starting portfolio_mcp on http://127.0.0.1:7004/mcp — Crypto MCP Server – Produced by Corax CoLAB")
-    mcp.run(transport="streamable-http", host="127.0.0.1", port=7004, mount_path="/mcp")
+    mcp.run("streamable-http", "127.0.0.1", 7004, "/mcp")

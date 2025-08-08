@@ -16,7 +16,7 @@ load_dotenv(dotenv_path="/home/pelle/cryptomcpserver/.env")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("onchain_mcp")
 
-mcp = FastMCP(name="onchain", stateless_http=True, json_response=True)
+mcp = FastMCP(name="onchain", stateless_http=True, json_response=True, host="127.0.0.1", port=7002)
 
 def _get_web3(rpc_url: Optional[str] = None) -> Web3:
     rpc_url = rpc_url or os.getenv("ETH_RPC_URL")

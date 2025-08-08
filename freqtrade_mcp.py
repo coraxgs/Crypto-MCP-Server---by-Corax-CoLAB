@@ -64,5 +64,10 @@ def trades(limit: int = 20) -> Dict[str, Any]:
     return _req(f"trades?limit={limit}")
 
 if __name__ == "__main__":
-    print("Starting freqtrade_mcp on http://127.0.0.1:7011/mcp (-> " + FREQTRADE_REST_URL + ") — Crypto MCP Server (Corax CoLAB)")
-    mcp.run("streamable-http", "127.0.0.1", 7011, "/mcp")
+    print("Starting coingecko_mcp on http://127.0.0.1:7011/mcp — Crypto MCP Server (Corax CoLAB)")
+    mcp.run(
+        "streamable-http",    # transport kan vara positionellt
+        host="127.0.0.1",     # namngiven
+        port=7011,            # namngiven
+        path="/mcp",          # OBS: inte mount_path utan path
+    )

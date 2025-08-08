@@ -46,4 +46,4 @@ def send_discord(message: str) -> dict:
 
 if __name__ == "__main__":
     print("Starting notifier_mcp on http://127.0.0.1:7005/mcp — Crypto MCP Server – Produced by Corax CoLAB")
-    mcp.run(transport="streamable-http", host="127.0.0.1", port=7005, mount_path="/mcp")
+    mcp.run("streamable-http", "127.0.0.1", 7005, "/mcp")

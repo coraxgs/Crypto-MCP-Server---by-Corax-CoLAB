@@ -64,6 +64,6 @@ def trades(limit: int = 20) -> Dict[str, Any]:
     return _req(f"trades?limit={limit}")
 
 if __name__ == "__main__":
-    print("Starting coingecko_mcp on http://127.0.0.1:7011/mcp — Crypto MCP Server (Corax CoLAB)")
+    print("Starting freqtrade_mcp on http://127.0.0.1:7011/mcp — Crypto MCP Server (Corax CoLAB)")
     # transport, bind (address:port), mount_path
-    mcp.run("streamable-http", "127.0.0.1:7011", "/mcp")
+    mcp.run("streamable-http")

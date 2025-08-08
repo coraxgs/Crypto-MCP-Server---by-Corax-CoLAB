@@ -23,7 +23,7 @@ Path: /home/pelle/cryptomcpserver/
 
 <img width="1024" height="1536" alt="cryptomcpinfograph1" src="https://github.com/user-attachments/assets/e0bfce4d-2dc2-4d89-abdf-9594fe5df31d" />
 
-🚀 Full Installation & Run Guide for Crypto MCP Server (on Raspberry Pi 5)
+<h1>🚀 Full Installation & Run Guide for Crypto MCP Server (on Raspberry Pi 5)</h1>
 ✅ Run these commands in exact order
 🧑‍💻 Assumes you're running on a Raspberry Pi 5 as user pelle.
 If you're using a different user, change pelle in the systemd service files or run everything as that user.

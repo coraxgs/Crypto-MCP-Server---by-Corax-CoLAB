@@ -47,5 +47,5 @@ def trending() -> Dict[str, Any]:
 
 if __name__ == "__main__":
     print("Starting coingecko_mcp on http://127.0.0.1:7010/mcp — Crypto MCP Server (Corax CoLAB)")
-    # transport, bind (address:port), mount_path
-    mcp.run("streamable-http", "127.0.0.1:7010", "/mcp")
+    # transport + bind (address:port/path)
+    mcp.run("streamable-http")

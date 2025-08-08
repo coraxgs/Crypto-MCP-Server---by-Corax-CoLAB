@@ -1,0 +1,16 @@
+[Unit]
+Description=ccxt MCP server - Crypto MCP Server (Corax CoLAB)
+After=network.target
+
+[Service]
+Type=simple
+User=pelle
+WorkingDirectory=/home/pelle/cryptomcpserver
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=/home/pelle/cryptomcpserver/.env
+ExecStart=/home/pelle/cryptomcpserver/venv/bin/python /home/pelle/cryptomcpserver/ccxt_mcp.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

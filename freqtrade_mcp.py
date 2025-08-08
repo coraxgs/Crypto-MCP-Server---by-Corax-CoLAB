@@ -15,7 +15,7 @@ load_dotenv(dotenv_path="/home/pelle/cryptomcpserver/.env")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("freqtrade_mcp")
 
-mcp = FastMCP(name="freqtrade", stateless_http=True, json_response=True)
+mcp = FastMCP(name="freqtrade", stateless_http=True, json_response=True, host="127.0.0.1", port=7011)
 
 FREQTRADE_REST_URL = os.getenv("FREQTRADE_REST_URL", "http://127.0.0.1:8080")
 FREQTRADE_API_KEY = os.getenv("FREQTRADE_API_KEY", None)

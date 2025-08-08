@@ -16,7 +16,7 @@ load_dotenv(dotenv_path="/home/pelle/cryptomcpserver/.env")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ccxt_mcp")
 
-mcp = FastMCP(name="ccxt", stateless_http=True, json_response=True)
+mcp = FastMCP(name="ccxt", stateless_http=True, json_response=True, host="127.0.0.1", port=7001)
 
 def _make_exchange(exchange_id: str) -> ccxt.Exchange:
     exchange_id = exchange_id.lower()

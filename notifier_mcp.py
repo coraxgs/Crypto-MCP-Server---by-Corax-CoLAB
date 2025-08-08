@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("notifier_mcp")
 
 # Initialize FastMCP server
-mcp = FastMCP(name="notifier", stateless_http=True, json_response=True)
+mcp = FastMCP(name="notifier", stateless_http=True, json_response=True, host="127.0.0.1", port=7005)
 
 # Load credentials from environment
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")

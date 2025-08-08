@@ -1,3 +1,5 @@
+<img width="1024" height="1024" alt="cryptomcplogo" src="https://github.com/user-attachments/assets/159c6ff1-7831-4c01-a3fb-019ea30f33a6" />
+
 Crypto MCP Server – Produced by Corax CoLAB
 This project runs several local MCP servers (Model Context Protocol) to enable Claude Desktop to:
 
@@ -18,6 +20,8 @@ Communicate with Freqtrade via REST API
 Installation and usage instructions can be found in install.sh (run as user pelle).
 
 Path: /home/pelle/cryptomcpserver/
+
+<img width="1024" height="1536" alt="cryptomcpinfograph1" src="https://github.com/user-attachments/assets/e0bfce4d-2dc2-4d89-abdf-9594fe5df31d" />
 
 🚀 Full Installation & Run Guide for Crypto MCP Server (on Raspberry Pi 5)
 ✅ Run these commands in exact order
@@ -171,3 +175,5 @@ Call portfolio.portfolio_value exchanges=['binance'].
 Call freqtrade.status.
 
 Call notifier.send_telegram message='Test from Crypto MCP Server'.
+
+<img width="1024" height="1024" alt="cryptomcppic" src="https://github.com/user-attachments/assets/9e8f5a08-cbc9-42e3-aed2-d53fcc6d0083" />

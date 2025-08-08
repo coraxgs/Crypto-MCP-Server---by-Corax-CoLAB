@@ -77,6 +77,6 @@ def fetch_open_orders(exchange: str, symbol: Optional[str] = None) -> list:
     return ex.fetch_open_orders()
 
 if __name__ == "__main__":
-    print("Starting coingecko_mcp on http://127.0.0.1:7001/mcp — Crypto MCP Server (Corax CoLAB)")
+    print("Starting ccxt_mcp on http://127.0.0.1:7001/mcp — Crypto MCP Server (Corax CoLAB)")
     # transport, bind (address:port), mount_path
-    mcp.run("streamable-http", "127.0.0.1:7001", "/mcp")
+    mcp.run("streamable-http")

@@ -64,6 +64,6 @@ def tx_info(txhash: str, rpc_url: Optional[str] = None) -> dict:
     return {"tx": dict(tx), "receipt": dict(receipt)}
 
 if __name__ == "__main__":
-    print("Starting coingecko_mcp on http://127.0.0.1:7002/mcp — Crypto MCP Server (Corax CoLAB)")
+    print("Starting onchain_mcp on http://127.0.0.1:7002/mcp — Crypto MCP Server (Corax CoLAB)")
     # transport, bind (address:port), mount_path
-    mcp.run("streamable-http", "127.0.0.1:7002", "/mcp")
+    mcp.run("streamable-http")

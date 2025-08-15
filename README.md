@@ -2,7 +2,7 @@
 
 <h1>Crypto MCP Server — by Corax CoLAB 🚀🪙</h1>
 
-Crypto MCP Server is a local, lightweight dashboard + utility layer that connects Claude Desktop (Local MCP tools) and your local MCP servers on a Raspberry Pi. It provides a REST + WebSocket backend that proxies MCP tools (CCXT, CoinGecko, Portfolio, Freqtrade, etc.), stores order logs locally (SQLite), and ships a React frontend dashboard for monitoring and limited control.
+Crypto MCP Server is a local, lightweight dashboard + utility layer that connects Claude Desktop (Local MCP tools) and your local MCP servers on a Raspberry Pi (or other platform with Linux dist). It provides a REST + WebSocket backend that proxies MCP tools (CCXT, CoinGecko, Portfolio, Freqtrade, etc.), stores order logs locally (SQLite), and ships a React frontend dashboard for monitoring and limited control.
 
 > Default project path used in this README: /home/pelle/cryptomcpserver/
 The installer script name is now install.sh and should be located at /home/pelle/install.sh. 📁

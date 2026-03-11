@@ -2,7 +2,7 @@
 """
 onchain_mcp.py
 On-chain MCP server (Ethereum family) for Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Blockchain
-Exposes: eth_balance, erc20_balance, tx_info
+Exposes: eth_balance, erc20_balance, tx_info, gas_price
 """
 import os
 import logging
@@ -30,6 +30,13 @@ def _get_web3(rpc_url: Optional[str] = None) -> Web3:
     if not w3.is_connected():
         raise RuntimeError(f"Kan inte koppla till RPC: {rpc_url}")
     return w3
+
+@mcp.tool()
+def gas_price(rpc_url: Optional[str] = None) -> dict:
+    w3 = _get_web3(rpc_url)
+    wei = w3.eth.gas_price
+    gwei = w3.from_wei(wei, "gwei")
+    return {"gas_price_wei": str(wei), "gas_price_gwei": str(gwei)}
 
 @mcp.tool()
 def eth_balance(address: str, rpc_url: Optional[str] = None) -> dict:

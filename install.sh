@@ -89,11 +89,29 @@ const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 const path = require('path');
 
+const MCP_TA = process.env.MCP_TA || 'http://127.0.0.1:7003/mcp';
+const MCP_ONCHAIN = process.env.MCP_ONCHAIN || 'http://127.0.0.1:7002/mcp';
 const MCP_CCXT = process.env.MCP_CCXT || 'http://127.0.0.1:7001/mcp';
 const MCP_PORTFOLIO = process.env.MCP_PORTFOLIO || 'http://127.0.0.1:7004/mcp';
 const PORT = parseInt(process.env.PORT || '4000', 10);
 
 const app = express();
+
+// Aggressive Caching Layer (Sustainability const app = express(); Performance)
+const memoryCache = new Map();
+const CACHE_TTL_MS = 15000; // 15 seconds default TTL
+
+async function cachedCallMCP(url, method, params, ttlMs = CACHE_TTL_MS) {
+  const cacheKey = `${url}-${method}-${JSON.stringify(params)}`;
+  const cached = memoryCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < ttlMs) {
+    return cached.data;
+  }
+  const data = await callMCP(url, method, params);
+  memoryCache.set(cacheKey, { data, timestamp: Date.now() });
+  return data;
+}
+
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -161,10 +179,42 @@ async function callMCP(mcpUrl, toolName, args = {}) {
 app.get('/api/portfolio', async (req, res) => {
   const exchanges = (req.query.exchanges || 'binance').split(',').map(s => s.trim());
   try {
-    const result = await callMCP(MCP_PORTFOLIO, 'portfolio_value', exchanges);
+    const result = await cachedCallMCP(MCP_PORTFOLIO, 'portfolio_value', exchanges);
     res.json({ ok: true, data: result });
   } catch (err) {
     console.error('portfolio error', err.message || err);
+    res.status(500).json({ ok: false, error: String(err.message || err) });
+  }
+});
+
+// GET /api/gas
+app.get('/api/gas', async (req, res) => {
+  try {
+    const result = await cachedCallMCP(MCP_ONCHAIN, 'gas_price', {});
+    res.json({ ok: true, data: result });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err.message || err) });
+  }
+});
+
+// GET /api/ai_signal
+app.get('/api/ai_signal', async (req, res) => {
+  const { exchange = 'binance', symbol = 'BTC/USDT' } = req.query;
+  try {
+    const result = await cachedCallMCP(MCP_TA, 'compute_indicators', { exchange, symbol });
+    res.json({ ok: true, data: result });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: String(err.message || err) });
+  }
+});
+
+// GET /api/ohlcv
+app.get('/api/ohlcv', async (req, res) => {
+  const { exchange = 'binance', symbol = 'BTC/USDT', timeframe = '1h', limit = 200 } = req.query;
+  try {
+    const result = await cachedCallMCP(MCP_CCXT, 'fetch_ohlcv', { exchange, symbol, timeframe, limit: Number(limit) });
+    res.json({ ok: true, data: result });
+  } catch (err) {
     res.status(500).json({ ok: false, error: String(err.message || err) });
   }
 });
@@ -173,7 +223,7 @@ app.get('/api/portfolio', async (req, res) => {
 app.get('/api/ticker', async (req, res) => {
   const { exchange = 'binance', symbol = 'BTC/USDT' } = req.query;
   try {
-    const result = await callMCP(MCP_CCXT, 'get_ticker', { exchange, symbol });
+    const result = await cachedCallMCP(MCP_CCXT, 'get_ticker', { exchange, symbol });
     res.json({ ok: true, data: result });
   } catch (err) {
     console.error('ticker error', err.message || err);
@@ -188,7 +238,7 @@ app.post('/api/order/dry_run', async (req, res) => {
     return res.status(400).json({ ok:false, error: 'Missing required fields' });
   }
   try {
-    const ticker = await callMCP(MCP_CCXT, 'get_ticker', { exchange, symbol });
+    const ticker = await cachedCallMCP(MCP_CCXT, 'get_ticker', { exchange, symbol });
     const marketPrice = ticker && (ticker.last || ticker.close) ? (ticker.last || ticker.close) : null;
     const usedPrice = (price !== undefined && price !== null) ? price : marketPrice;
     const estimatedCost = (usedPrice && amount) ? (parseFloat(usedPrice) * parseFloat(amount)) : null;
@@ -398,7 +448,7 @@ EOF
 cat > "$FRONTEND/src/App.tsx" <<'EOF'
 import React from 'react'
 import PortfolioPanel from './components/PortfolioPanel'
-import TickerPanel from './components/TickerPanel'
+import TickerPanel, { GasWidget } from './components/TickerPanel'
 import OrderPanel from './components/OrderPanel'
 import OrdersLogPanel from './components/OrdersLogPanel'
 
@@ -407,6 +457,7 @@ export default function App() {
     <div className="main-grid">
       <div style={{padding:18}}>
         <h1>Crypto MCP Server — by Corax CoLAB - The Future of Edge AI & Blockchain</h1>
+        <GasWidget />
         <PortfolioPanel />
         <TickerPanel />
       </div>
@@ -435,18 +486,21 @@ cat > "$FRONTEND/src/components/PortfolioPanel.tsx" <<'EOF'
 import React, { useEffect, useState } from 'react'
 import io from 'socket.io-client'
 import Plotly from 'plotly.js-basic-dist'
+import Plotly from 'plotly.js-basic-dist'
 
 export default function PortfolioPanel() {
   const [details, setDetails] = useState<any[]>([])
   const [total, setTotal] = useState<number>(0)
 
   useEffect(() => {
-    fetch('/api/portfolio?exchanges=binance').then(r=>r.json()).then(j=>{
+    fetch('/api/portfolio?exchanges=binance', { headers: { 'Authorization': 'Bearer corax-default-key' } }).then(r=>r.json()).then(j=>{
       if (j.ok && j.data) {
         setDetails(j.data.details || [])
         setTotal(j.data.total_usd || 0)
       }
     }).catch(console.error)
+
+    fetch('/api/ai_signal?exchange=binance&symbol=BTC/USDT', { headers: { 'Authorization': 'Bearer corax-default-key' } }).then(r=>r.json()).then(j=>{ if(j.ok) setAiSignal(j.data) }).catch(console.error)
 
     const socket = io()
     socket.on('portfolio', (data:any) => {
@@ -455,6 +509,7 @@ export default function PortfolioPanel() {
         setDetails(data.details || [])
       }
     })
+    fetch('/api/ohlcv?exchange=binance&symbol=BTC/USDT', { headers: { 'Authorization': 'Bearer corax-default-key' } }).then(r=>r.json()).then(j=>{ if(j.ok && j.data) { const d = j.data; const trace = { x: d.map((t:any)=>new Date(t[0])), open: d.map((t:any)=>t[1]), high: d.map((t:any)=>t[2]), low: d.map((t:any)=>t[3]), close: d.map((t:any)=>t[4]), type: 'candlestick', xaxis: 'x', yaxis: 'y' }; Plotly.newPlot('candlestick-chart', [trace], {height:300, margin:{t:20,b:40,l:40,r:20}, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', font:{color:'#f8fafc'} }); } }).catch(console.error);
     return ()=>{ socket.disconnect() }
   }, [])
 
@@ -487,30 +542,44 @@ EOF
 cat > "$FRONTEND/src/components/TickerPanel.tsx" <<'EOF'
 import React, { useEffect, useState } from 'react'
 import io from 'socket.io-client'
+import Plotly from 'plotly.js-basic-dist'
+
+nexport function GasWidget() {
+  const [gas, setGas] = useState<any>(null);
+  useEffect(() => {
+    fetch('/api/gas', { headers: { 'Authorization': 'Bearer corax-default-key' } }).then(r=>r.json()).then(j=>{ if(j.ok) setGas(j.data) }).catch(console.error);
+  }, []);
+  if (!gas) return null;
+  return <div style={{background:'#1e293b', color:'#f8fafc', padding:'8px 12px', borderRadius:8, display:'inline-block', marginBottom:12, fontSize:12, border:'1px solid #334155'}}>⛽ ETH Gas: <span style={{color:'#10b981', fontWeight:'bold'}}>{Number(gas.gas_price_gwei).toFixed(2)} Gwei</span></div>
+}
 
 export default function TickerPanel(){
   const [ticker, setTicker] = useState<any>(null)
+  const [aiSignal, setAiSignal] = useState<any>(null)
 
   useEffect(() => {
-    fetch('/api/ticker?exchange=binance&symbol=BTC/USDT').then(r=>r.json()).then(j=>{
+    fetch('/api/ticker?exchange=binance&symbol=BTC/USDT', { headers: { 'Authorization': 'Bearer corax-default-key' } }).then(r=>r.json()).then(j=>{
       if (j.ok) setTicker(j.data)
     }).catch(console.error)
 
+    fetch('/api/ai_signal?exchange=binance&symbol=BTC/USDT', { headers: { 'Authorization': 'Bearer corax-default-key' } }).then(r=>r.json()).then(j=>{ if(j.ok) setAiSignal(j.data) }).catch(console.error)
+
     const socket = io()
     socket.on('ticker', (data:any) => setTicker(data))
+    fetch('/api/ohlcv?exchange=binance&symbol=BTC/USDT', { headers: { 'Authorization': 'Bearer corax-default-key' } }).then(r=>r.json()).then(j=>{ if(j.ok && j.data) { const d = j.data; const trace = { x: d.map((t:any)=>new Date(t[0])), open: d.map((t:any)=>t[1]), high: d.map((t:any)=>t[2]), low: d.map((t:any)=>t[3]), close: d.map((t:any)=>t[4]), type: 'candlestick', xaxis: 'x', yaxis: 'y' }; Plotly.newPlot('candlestick-chart', [trace], {height:300, margin:{t:20,b:40,l:40,r:20}, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', font:{color:'#f8fafc'} }); } }).catch(console.error);
     return ()=>{ socket.disconnect() }
   }, [])
 
   return (
     <div className="card">
-      <h3>BTC / USDT (Binance)</h3>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><h3>BTC / USDT (Binance)</h3>{aiSignal && <div style={{padding:'4px 8px',borderRadius:4,background:aiSignal.signal==='BUY'?'#10b981':aiSignal.signal==='SELL'?'#ef4444':'#f59e0b',color:'white',fontWeight:'bold',fontSize:12}}>AI Signal: {aiSignal.signal} (RSI: {aiSignal.rsi.toFixed(1)})</div>}</div>
       {ticker ? (<div>
         <div style={{display:'flex',gap:12}}>
           <div><small className="small-muted">Last</small><div style={{fontSize:18}}>{ticker.last ?? ticker.close ?? '—'}</div></div>
           <div><small className="small-muted">Bid</small><div>{ticker.bid ?? '—'}</div></div>
           <div><small className="small-muted">Ask</small><div>{ticker.ask ?? '—'}</div></div>
         </div>
-        <pre style={{background:'#334155',padding:8,borderRadius:6}}>{JSON.stringify(ticker, null, 2)}</pre>
+        <div id="candlestick-chart" style={{width:'100%',height:300,marginTop:12}} /><details><summary className="small-muted" style={{cursor:'pointer',marginTop:12}}>Raw Ticker JSON</summary><pre style={{background:'#334155',padding:8,borderRadius:6,marginTop:8}}>{JSON.stringify(ticker, null, 2)}</pre></details>
       </div>) : <div>Loading…</div>}
     </div>
   )
@@ -531,14 +600,14 @@ export default function OrderPanel(){
   const [result,setResult]=useState<any>(null)
 
   async function previewOrder(){
-    const resp = await fetch('/api/order/dry_run', {method:'POST',headers:{'Content-Type':'application/json'}, body: JSON.stringify({exchange,symbol,side,type,amount,price})})
+    const resp = await fetch('/api/order/dry_run', {method:'POST',headers:{'Content-Type':'application/json', 'Authorization': 'Bearer corax-default-key'}, body: JSON.stringify({exchange,symbol,side,type,amount,price})})
     const j = await resp.json()
     if (j.ok) setPreview(j.data); else alert(j.error)
   }
 
   async function placeOrder(){
     if (!confirm('Place live order?')) return
-    const resp = await fetch('/api/order/execute', {method:'POST',headers:{'Content-Type':'application/json'}, body: JSON.stringify({exchange,symbol,side,type,amount,price,execute:true})})
+    const resp = await fetch('/api/order/execute', {method:'POST',headers:{'Content-Type':'application/json', 'Authorization': 'Bearer corax-default-key'}, body: JSON.stringify({exchange,symbol,side,type,amount,price,execute:true})})
     const j = await resp.json()
     if (j.ok) { setResult(j.data); alert('Order placed') } else alert(j.error)
   }
@@ -570,13 +639,17 @@ EOF
 cat > "$FRONTEND/src/components/OrdersLogPanel.tsx" <<'EOF'
 import React, { useEffect, useState } from 'react'
 import io from 'socket.io-client'
+import Plotly from 'plotly.js-basic-dist'
 
 export default function OrdersLogPanel(){
   const [orders,setOrders]=useState<any[]>([])
   useEffect(()=>{
-    fetch('/api/orders').then(r=>r.json()).then(j=>{ if (j.ok) setOrders(j.data || []) })
+    fetch('/api/orders', { headers: { 'Authorization': 'Bearer corax-default-key' } }).then(r=>r.json()).then(j=>{ if (j.ok) setOrders(j.data || []) })
+    fetch('/api/ai_signal?exchange=binance&symbol=BTC/USDT', { headers: { 'Authorization': 'Bearer corax-default-key' } }).then(r=>r.json()).then(j=>{ if(j.ok) setAiSignal(j.data) }).catch(console.error)
+
     const socket = io()
     socket.on('order_placed', (d:any)=> setOrders(prev => [{...d, created_at: new Date().toISOString()}, ...prev].slice(0,200)) )
+    fetch('/api/ohlcv?exchange=binance&symbol=BTC/USDT', { headers: { 'Authorization': 'Bearer corax-default-key' } }).then(r=>r.json()).then(j=>{ if(j.ok && j.data) { const d = j.data; const trace = { x: d.map((t:any)=>new Date(t[0])), open: d.map((t:any)=>t[1]), high: d.map((t:any)=>t[2]), low: d.map((t:any)=>t[3]), close: d.map((t:any)=>t[4]), type: 'candlestick', xaxis: 'x', yaxis: 'y' }; Plotly.newPlot('candlestick-chart', [trace], {height:300, margin:{t:20,b:40,l:40,r:20}, paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)', font:{color:'#f8fafc'} }); } }).catch(console.error);
     return ()=>{ socket.disconnect() }
   },[])
   return (

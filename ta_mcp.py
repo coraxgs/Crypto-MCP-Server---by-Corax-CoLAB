@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ta_mcp.py
-Technical analysis MCP server for GAP Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Blockchain
+Technical analysis MCP server for Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Blockchain
 Exposes: compute_indicators (RSI, MACD, SMA50, BB)
 """
 import os
@@ -54,6 +54,6 @@ def compute_indicators(exchange: str, symbol: str, timeframe: str = "1h", limit:
     return {"symbol": symbol, "timeframe": timeframe, "rsi": rsi, "macd_hist": macd_hist, "sma50": last.get("sma50"), "bb_lower": last.get("bb_lower"), "bb_upper": last.get("bb_upper"), "signal": signal }
 
 if __name__ == "__main__":
-    print("Starting ta_mcp on http://127.0.0.1:7003/mcp — GAP Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
+    print("Starting ta_mcp on http://127.0.0.1:7003/mcp — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
     # transport, bind (address:port), mount_path
     mcp.run("streamable-http")

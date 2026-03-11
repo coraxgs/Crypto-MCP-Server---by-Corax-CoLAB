@@ -309,7 +309,7 @@ EOF
 echo "==> Installing systemd service ($SERVICE_NAME)"
 sudo tee "$SYSTEMD_PATH" > /dev/null <<EOF
 [Unit]
-Description=Crypto MCP GUI Backend - GAP Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)
+Description=Crypto MCP GUI Backend - Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)
 After=network.target
 
 [Service]
@@ -377,7 +377,7 @@ cat > "$FRONTEND/index.html" <<'EOF'
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GAP Crypto MCP Server – Dashboard</title>
+    <title>Crypto MCP Server – Dashboard</title>
   </head>
   <body>
     <div id="root"></div>
@@ -406,7 +406,7 @@ export default function App() {
   return (
     <div className="main-grid">
       <div style={{padding:18}}>
-        <h1>GAP Crypto MCP Server — by Corax CoLAB - The Future of Edge AI & Blockchain</h1>
+        <h1>Crypto MCP Server — by Corax CoLAB - The Future of Edge AI & Blockchain</h1>
         <PortfolioPanel />
         <TickerPanel />
       </div>

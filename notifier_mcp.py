@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 notifier_mcp.py
-Send notifications to Telegram and Discord for GAP Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Blockchain
+Send notifications to Telegram and Discord for Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Blockchain
 """
 import os
 import logging
@@ -25,7 +25,7 @@ DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK_URL")
 @mcp.tool()
 def ping() -> str:
     """Health check endpoint"""
-    return "notifier_mcp alive — GAP Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)"
+    return "notifier_mcp alive — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)"
 
 @mcp.tool()
 def send_telegram(message: str) -> dict:
@@ -45,7 +45,7 @@ def send_discord(message: str) -> dict:
     return {"status": r.status_code, "result_text": r.text}
 
 if __name__ == "__main__":
-    print("Starting notifier_mcp on http://127.0.0.1:7005/mcp — GAP Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
+    print("Starting notifier_mcp on http://127.0.0.1:7005/mcp — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
     # transport, bind (address:port), mount_path
     mcp.run("streamable-http")
 

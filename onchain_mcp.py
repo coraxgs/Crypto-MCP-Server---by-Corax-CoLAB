@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 onchain_mcp.py
-On-chain MCP server (Ethereum family) for GAP Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Blockchain
+On-chain MCP server (Ethereum family) for Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Blockchain
 Exposes: eth_balance, erc20_balance, tx_info
 """
 import os
@@ -64,6 +64,6 @@ def tx_info(txhash: str, rpc_url: Optional[str] = None) -> dict:
     return {"tx": dict(tx), "receipt": dict(receipt)}
 
 if __name__ == "__main__":
-    print("Starting onchain_mcp on http://127.0.0.1:7002/mcp — GAP Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
+    print("Starting onchain_mcp on http://127.0.0.1:7002/mcp — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
     # transport, bind (address:port), mount_path
     mcp.run("streamable-http")

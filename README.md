@@ -1,8 +1,8 @@
 <img width="1024" height="1024" alt="cryptomcplogo" src="https://github.com/user-attachments/assets/159c6ff1-7831-4c01-a3fb-019ea30f33a6" />
 
-<h1>Crypto MCP Server — by Corax CoLAB 🚀🪙</h1>
+<h1>GAP Crypto MCP Server — by Corax CoLAB - The Future of Edge AI & Blockchain 🚀🪙</h1>
 
-Crypto MCP Server is a local, lightweight dashboard + utility layer that connects Claude Desktop (Local MCP tools) and your local MCP servers on a Raspberry Pi (or other platform with Linux dist). It provides a REST + WebSocket backend that proxies MCP tools (CCXT, CoinGecko, Portfolio, Freqtrade, etc.), stores order logs locally (SQLite), and ships a React frontend dashboard for monitoring and limited control.
+GAP Crypto MCP Server is a local, lightweight dashboard + utility layer that connects Claude Desktop (Local MCP tools) and your local MCP servers on a Raspberry Pi (or other platform with Linux dist). It provides a REST + WebSocket backend that proxies MCP tools (CCXT, CoinGecko, Portfolio, Freqtrade, etc.), stores order logs locally (SQLite), and ships a React frontend dashboard for monitoring and limited control.
 
 > Default project path used in this README: /home/pelle/cryptomcpserver/
 The installer script name is now install.sh and should be located at /home/pelle/install.sh. 📁
@@ -46,7 +46,7 @@ Extending & contribution info
 
 ✨ Overview & features
 
-Crypto MCP Server provides:
+GAP Crypto MCP Server provides:
 
 Proxy to local MCP servers via JSON-RPC tools/call.
 
@@ -359,7 +359,7 @@ Service file: /etc/systemd/system/crypto-mcp-gui.service
 Minimal example (install.sh writes this for you):
 
 [Unit]
-Description=Crypto MCP GUI Backend - Crypto MCP Server (Corax CoLAB)
+Description=Crypto MCP GUI Backend - GAP Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)
 After=network.target
 
 [Service]
@@ -428,3 +428,16 @@ Add more MCPs: CoinGecko (market data), On-chain (balances &
 
 
 <img width="1024" height="1024" alt="cryptomcppic" src="https://github.com/user-attachments/assets/9e8f5a08-cbc9-42e3-aed2-d53fcc6d0083" />
+
+---
+
+## 🌍 The Corax CoLAB Ecosystem
+This product is proudly brought to you by **Corax CoLAB**, the architects behind cyber-physical systems that secure your future in an increasingly regulated and resource-constrained world.
+
+We unite:
+- **Edge AI & Autonomous Systems**
+- **Blockchain & Web3 Innovation**
+- **Zero Trust Security (Post-Quantum Cryptography ready)**
+- **Sustainability & Compliance-as-Code**
+
+Find out more at [Corax CoLAB](https://coraxcolab.com/).

@@ -2,7 +2,7 @@
 """
 freqtrade_mcp.py
 MCP server to interact with a running Freqtrade instance via its REST API.
-For Crypto MCP Server – Produced by Corax CoLAB
+For GAP Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Blockchain
 """
 import os
 import logging
@@ -33,7 +33,7 @@ def _req(path: str, method: str = "get", json: Optional[dict]=None) -> Dict[str,
 
 @mcp.tool()
 def ping() -> str:
-    return f"freqtrade_mcp alive (rest={FREQTRADE_REST_URL}) — Crypto MCP Server (Corax CoLAB)"
+    return f"freqtrade_mcp alive (rest={FREQTRADE_REST_URL}) — GAP Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)"
 
 @mcp.tool()
 def status() -> Dict[str, Any]:
@@ -64,6 +64,6 @@ def trades(limit: int = 20) -> Dict[str, Any]:
     return _req(f"trades?limit={limit}")
 
 if __name__ == "__main__":
-    print("Starting freqtrade_mcp on http://127.0.0.1:7011/mcp — Crypto MCP Server (Corax CoLAB)")
+    print("Starting freqtrade_mcp on http://127.0.0.1:7011/mcp — GAP Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
     # transport, bind (address:port), mount_path
     mcp.run("streamable-http")

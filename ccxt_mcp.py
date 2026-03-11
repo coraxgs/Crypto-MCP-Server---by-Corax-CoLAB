@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ccxt_mcp.py
-CCXT MCP server for Crypto MCP Server – Produced by Corax CoLAB
+CCXT MCP server for GAP Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Blockchain
 Exposes: get_ticker, fetch_ohlcv, fetch_balance, create_order, cancel_order, fetch_open_orders
 Run via systemd or: python3 ccxt_mcp.py
 """
@@ -33,7 +33,7 @@ def _make_exchange(exchange_id: str) -> ccxt.Exchange:
 
 @mcp.tool()
 def ping() -> str:
-    return "ccxt_mcp alive — Crypto MCP Server (Corax CoLAB)"
+    return "ccxt_mcp alive — GAP Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)"
 
 @mcp.tool()
 def get_ticker(exchange: str, symbol: str) -> dict:
@@ -77,6 +77,6 @@ def fetch_open_orders(exchange: str, symbol: Optional[str] = None) -> list:
     return ex.fetch_open_orders()
 
 if __name__ == "__main__":
-    print("Starting ccxt_mcp on http://127.0.0.1:7001/mcp — Crypto MCP Server (Corax CoLAB)")
+    print("Starting ccxt_mcp on http://127.0.0.1:7001/mcp — GAP Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
     # transport, bind (address:port), mount_path
     mcp.run("streamable-http")

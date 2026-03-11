@@ -309,7 +309,7 @@ EOF
 echo "==> Installing systemd service ($SERVICE_NAME)"
 sudo tee "$SYSTEMD_PATH" > /dev/null <<EOF
 [Unit]
-Description=Crypto MCP GUI Backend - Crypto MCP Server (Corax CoLAB)
+Description=Crypto MCP GUI Backend - Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)
 After=network.target
 
 [Service]
@@ -406,7 +406,7 @@ export default function App() {
   return (
     <div className="main-grid">
       <div style={{padding:18}}>
-        <h1>Crypto MCP Server — by Corax CoLAB</h1>
+        <h1>Crypto MCP Server — by Corax CoLAB - The Future of Edge AI & Blockchain</h1>
         <PortfolioPanel />
         <TickerPanel />
       </div>
@@ -421,13 +421,13 @@ EOF
 
 cat > "$FRONTEND/src/styles.css" <<'EOF'
 /* Minimal fallback CSS */
-:root{--bg:#f8fafc;--card:#fff;--muted:#94a3b8;--primary:#0ea5a4;--shadow:0 6px 18px rgba(16,42,67,0.06);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-*{box-sizing:border-box}html,body,#root{height:100%;margin:0;background:var(--bg);color:#0f172a}
+:root{--bg:#0f172a;--card:#1e293b;--muted:#94a3b8;--primary:#10b981;--shadow:0 6px 18px rgba(0,0,0,0.4);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+*{box-sizing:border-box}html,body,#root{height:100%;margin:0;background:var(--bg);color:#f8fafc}
 .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:var(--shadow);margin-bottom:12px}
 .small-muted{color:var(--muted);font-size:12px}
 .btn-primary{background:var(--primary);color:white;padding:8px 12px;border-radius:8px;border:none}
 .table{width:100%;border-collapse:collapse;font-size:13px}
-.table th,.table td{padding:8px 6px;text-align:left;border-bottom:1px solid #f1f5f9}
+.table th,.table td{padding:8px 6px;text-align:left;border-bottom:1px solid #334155}
 .orders-scroll{max-height:320px;overflow:auto;display:block}
 EOF
 
@@ -462,7 +462,7 @@ export default function PortfolioPanel() {
     const assets = details.slice(0, 12)
     const x = assets.map(a=>a.asset)
     const y = assets.map(a=>a.value_usd || 0)
-    const data = [{ x, y, type: 'bar', marker:{color:'#0ea5a4'} }]
+    const data = [{ x, y, type: 'bar', marker:{color:'#10b981'} }]
     Plotly.newPlot('portfolio-chart', data, {height:300, margin:{t:20,b:40}})
   }, [details])
 
@@ -510,7 +510,7 @@ export default function TickerPanel(){
           <div><small className="small-muted">Bid</small><div>{ticker.bid ?? '—'}</div></div>
           <div><small className="small-muted">Ask</small><div>{ticker.ask ?? '—'}</div></div>
         </div>
-        <pre style={{background:'#f1f5f9',padding:8,borderRadius:6}}>{JSON.stringify(ticker, null, 2)}</pre>
+        <pre style={{background:'#334155',padding:8,borderRadius:6}}>{JSON.stringify(ticker, null, 2)}</pre>
       </div>) : <div>Loading…</div>}
     </div>
   )
@@ -559,8 +559,8 @@ export default function OrderPanel(){
           <button className="btn-primary" onClick={previewOrder}>Preview</button>
           <button onClick={placeOrder}>Place</button>
         </div>
-        {preview && <pre style={{background:'#f1f5f9',padding:8}}>{JSON.stringify(preview,null,2)}</pre>}
-        {result && <pre style={{background:'#e6ffea',padding:8}}>{JSON.stringify(result,null,2)}</pre>}
+        {preview && <pre style={{background:'#334155',padding:8}}>{JSON.stringify(preview,null,2)}</pre>}
+        {result && <pre style={{background:'#064e3b',padding:8}}>{JSON.stringify(result,null,2)}</pre>}
       </div>
     </div>
   )

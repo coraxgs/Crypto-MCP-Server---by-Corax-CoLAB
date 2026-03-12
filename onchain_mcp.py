@@ -16,7 +16,7 @@ load_dotenv(dotenv_path="/home/pelle/cryptomcpserver/.env")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("onchain_mcp")
 
-mcp = FastMCP(name="onchain", stateless_http=True, json_response=True, host="127.0.0.1", port=7002)
+mcp = FastMCP(name="onchain", stateless_http=True, json_response=True, host="0.0.0.0", port=7002)
 
 def _get_web3(rpc_url: Optional[str] = None) -> Web3:
     rpc_url = rpc_url or os.getenv("ETH_RPC_URL")
@@ -67,3 +67,51 @@ if __name__ == "__main__":
     print("Starting onchain_mcp on http://127.0.0.1:7002/mcp — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
     # transport, bind (address:port), mount_path
     mcp.run("streamable-http")
+
+import requests
+
+@mcp.tool()
+def get_dexscreener_trending() -> dict:
+    """
+    Fetches the latest trending tokens from DexScreener across all chains.
+    This gives the AI insight into what is popular on-chain right now.
+    """
+    try:
+        url = "https://api.dexscreener.com/token-profiles/latest/v1"
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            return {"status": "success", "data": response.json()}
+        else:
+            return {"error": f"DexScreener API error: {response.status_code}"}
+    except Exception as e:
+        logger.error(f"Error fetching DexScreener trending: {e}")
+        return {"error": str(e)}
+
+@mcp.tool()
+def search_dexscreener_token(query: str) -> dict:
+    """
+    Searches for a specific token or contract address on DexScreener.
+    """
+    try:
+        url = f"https://api.dexscreener.com/latest/dex/search?q={query}"
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            return {"status": "success", "data": response.json().get('pairs', [])}
+        else:
+            return {"error": f"DexScreener API error: {response.status_code}"}
+    except Exception as e:
+        logger.error(f"Error searching DexScreener token: {e}")
+        return {"error": str(e)}
+
+@mcp.tool()
+def simulate_dex_swap(token_in: str, token_out: str, amount_in: float, chain: str = "ethereum") -> dict:
+    """
+    Simulates a swap on a DEX (e.g. Uniswap).
+    NOTE: Currently a stub to allow AI to reason about on-chain swaps without executing live trades.
+    """
+    return {
+        "status": "simulation_only",
+        "message": f"Simulated swap of {amount_in} {token_in} to {token_out} on {chain}.",
+        "estimated_gas_usd": 15.50,
+        "warning": "Live on-chain execution requires wallet private keys and is not fully enabled in this stub."
+    }

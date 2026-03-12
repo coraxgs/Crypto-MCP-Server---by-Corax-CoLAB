@@ -15,10 +15,12 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-force-graph-3d": "^1.29.1",
+    "react-plotly.js": "^2.6.0",
     "socket.io-client": "^4.7.2",
     "three": "^0.183.2"
   },
   "devDependencies": {
+    "@types/react-plotly.js": "^2.6.4",
     "@types/three": "^0.183.1",
     "@vitejs/plugin-react": "^4.0.0",
     "typescript": "^5.2.2",

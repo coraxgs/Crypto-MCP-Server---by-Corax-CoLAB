@@ -1,9 +1,219 @@
-/* Minimal fallback CSS */
-:root{--bg:#0f172a;--card:#1e293b;--muted:#94a3b8;--primary:#10b981;--shadow:0 6px 18px rgba(0,0,0,0.4);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-*{box-sizing:border-box}html,body,#root{height:100%;margin:0;background:var(--bg);color:#f8fafc}
-.card{background:var(--card);padding:14px;border-radius:10px;box-shadow:var(--shadow);margin-bottom:12px}
-.small-muted{color:var(--muted);font-size:12px}
-.btn-primary{background:var(--primary);color:white;padding:8px 12px;border-radius:8px;border:none}
-.table{width:100%;border-collapse:collapse;font-size:13px}
-.table th,.table td{padding:8px 6px;text-align:left;border-bottom:1px solid #334155}
-.orders-scroll{max-height:320px;overflow:auto;display:block}
+/*
+  Crypto MCP Server - Corax CoLAB
+  Core Stylesheet
+*/
+
+:root {
+  --bg: #020205;
+  --card: rgba(15, 23, 42, 0.7);
+  --card-border: rgba(59, 130, 246, 0.2);
+  --muted: #64748b;
+  --primary: #10b981;
+  --primary-glow: rgba(16, 185, 129, 0.4);
+  --danger: #ef4444;
+  --danger-glow: rgba(239, 68, 68, 0.4);
+  --accent: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.4);
+  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: #f8fafc;
+  overflow-x: hidden;
+}
+
+body {
+  /* CRT Scanline overlay effect */
+  background:
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 2px, 3px 100%;
+  background-attachment: fixed;
+}
+
+/* Base Components */
+
+.card {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--card-border);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  margin-bottom: 0;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.5;
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.small-muted {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: monospace;
+}
+
+/* Buttons */
+
+.btn-primary {
+  background: var(--primary);
+  color: #000;
+  font-weight: bold;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.btn-primary:hover {
+  background: transparent;
+  color: var(--primary);
+  box-shadow: 0 0 25px var(--primary-glow);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  font-weight: bold;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--danger);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+  box-shadow: 0 0 15px var(--danger-glow);
+}
+
+.btn-danger:hover {
+  background: transparent;
+  color: var(--danger);
+  box-shadow: 0 0 25px var(--danger-glow);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: monospace;
+}
+
+.btn-outline:hover {
+  border-color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+/* Tables */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th, .table td {
+  padding: 10px 8px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.table th {
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.orders-scroll {
+  max-height: 400px;
+  overflow-y: auto;
+  display: block;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.orders-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.orders-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.orders-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--accent);
+  border-radius: 10px;
+}
+
+/* Inputs & Forms */
+
+input, select {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  font-family: monospace;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* Utilities */
+
+.text-green { color: var(--primary); text-shadow: 0 0 8px var(--primary-glow); }
+.text-red { color: var(--danger); text-shadow: 0 0 8px var(--danger-glow); }
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* Grid Layout Adjustments for smaller screens */
+@media (max-width: 1200px) {
+  .main-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

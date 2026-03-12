@@ -14,10 +14,10 @@ else
     docker compose up -d --build
   else
     docker-compose up -d --build
-  fi
+  if
 
   echo "==> Setup finished!"
   echo "Dashboard is available at http://localhost (or your server IP)"
   echo "Backend API is available at http://localhost:4000"
   echo "MCP Endpoints are exposed on ports 7001, 7004, 7010, etc."
-fi
+if

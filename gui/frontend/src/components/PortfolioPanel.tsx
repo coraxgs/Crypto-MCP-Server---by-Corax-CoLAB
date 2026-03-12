@@ -1,11 +1,12 @@
 import { authenticatedFetch } from "../auth"
 import React, { useEffect, useState } from 'react'
 import io from 'socket.io-client'
-import Plotly from 'plotly.js-basic-dist'
+import AssetUniverse from './features/AssetUniverse'
 
 export default function PortfolioPanel() {
   const [details, setDetails] = useState<any[]>([])
   const [total, setTotal] = useState<number>(0)
+  const [viewMode, setViewMode] = useState<'3d' | 'list'>('3d')
 
   useEffect(() => {
     authenticatedFetch('/api/portfolio?exchanges=binance').then(r=>r.json()).then(j=>{
@@ -25,27 +26,61 @@ export default function PortfolioPanel() {
     return ()=>{ socket.disconnect() }
   }, [])
 
-  useEffect(() => {
-    const assets = details.slice(0, 12)
-    const x = assets.map(a=>a.asset)
-    const y = assets.map(a=>a.value_usd || 0)
-    const data = [{ x, y, type: 'bar', marker:{color:'#10b981'} }]
-    Plotly.newPlot('portfolio-chart', data, {height:300, margin:{t:20,b:40}})
-  }, [details])
-
   return (
     <div className="card">
-      <h3>Portfolio</h3>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <div style={{fontSize:22,fontWeight:700}}>{ total ? total.toFixed(2) : '—' } USD</div>
-        <div className="small-muted">Live</div>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center', marginBottom: '1rem'}}>
+        <h3 style={{margin: 0}}>Asset Universe</h3>
+        <div style={{display:'flex', gap: '0.5rem'}}>
+          <button
+            onClick={() => setViewMode('3d')}
+            className="btn-outline"
+            style={{padding: '0.2rem 0.5rem', fontSize: '0.8rem', opacity: viewMode === '3d' ? 1 : 0.5}}
+          >
+            3D HUD
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            className="btn-outline"
+            style={{padding: '0.2rem 0.5rem', fontSize: '0.8rem', opacity: viewMode === 'list' ? 1 : 0.5}}
+          >
+            LIST
+          </button>
+        </div>
       </div>
-      <div id="portfolio-chart" style={{width:'100%',height:300}} />
-      <table className="table"><thead><tr><th>Asset</th><th>Amount</th><th>Value</th></tr></thead>
-        <tbody>
-          {details.map((d,i)=>(<tr key={i}><td>{d.asset}</td><td>{Number(d.amount).toFixed(6)}</td><td>{d.value_usd ? d.value_usd.toFixed(2) : '—'}</td></tr>))}
-        </tbody>
-      </table>
+
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center', marginBottom: '1rem'}}>
+        <div style={{fontSize:28,fontWeight:900, color: '#10b981', textShadow: '0 0 10px rgba(16, 185, 129, 0.4)'}}>
+          ${total ? total.toFixed(2) : '—'}
+        </div>
+        <div className="small-muted" style={{textTransform: 'uppercase', letterSpacing: '1px'}}>Live Sync</div>
+      </div>
+
+      {viewMode === '3d' ? (
+        <AssetUniverse portfolio={details} totalValue={total} />
+      ) : (
+        <div style={{maxHeight: '400px', overflowY: 'auto'}}>
+          <table className="table" style={{width: '100%'}}>
+            <thead>
+              <tr style={{textAlign: 'left', borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
+                <th style={{padding: '8px'}}>Asset</th>
+                <th style={{padding: '8px'}}>Amount</th>
+                <th style={{padding: '8px'}}>Value (USD)</th>
+                <th style={{padding: '8px'}}>%</th>
+              </tr>
+            </thead>
+            <tbody>
+              {details.sort((a,b)=>(b.value_usd||0)-(a.value_usd||0)).map((d,i)=>(
+                <tr key={i} style={{borderBottom: '1px solid rgba(255,255,255,0.05)'}}>
+                  <td style={{padding: '8px', fontWeight: 'bold'}}>{d.asset}</td>
+                  <td style={{padding: '8px', fontFamily: 'monospace'}}>{Number(d.amount).toFixed(6)}</td>
+                  <td style={{padding: '8px', color: '#10b981'}}>${d.value_usd ? d.value_usd.toFixed(2) : '—'}</td>
+                  <td style={{padding: '8px', opacity: 0.7}}>{total ? ((d.value_usd / total) * 100).toFixed(1) : 0}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   )
 }

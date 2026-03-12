@@ -14,7 +14,8 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
-nconst DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'admin';
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'admin';
+const app = express();
 
 // Basic auth middleware for all /api routes
 app.use('/api', (req, res, next) => {
@@ -31,7 +32,6 @@ const MCP_CCXT = process.env.MCP_CCXT || 'http://127.0.0.1:7001/mcp';
 const MCP_PORTFOLIO = process.env.MCP_PORTFOLIO || 'http://127.0.0.1:7004/mcp';
 const PORT = parseInt(process.env.PORT || '4000', 10);
 
-const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 

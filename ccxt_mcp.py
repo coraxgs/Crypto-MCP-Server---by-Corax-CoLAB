@@ -9,6 +9,7 @@ import os
 import logging
 from typing import Optional, List, Dict, Any
 import ccxt
+import requests
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 
@@ -16,7 +17,19 @@ load_dotenv(dotenv_path="/home/pelle/cryptomcpserver/.env")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("ccxt_mcp")
 
-mcp = FastMCP(name="ccxt", stateless_http=True, json_response=True, host="127.0.0.1", port=7001)
+mcp = FastMCP(name="ccxt", stateless_http=True, json_response=True, host="0.0.0.0", port=7001)
+
+# Guardrails
+MAX_TRADE_USD = float(os.getenv("MAX_TRADE_USD", 100.0))
+ALLOWED_PAIRS_STR = os.getenv("ALLOWED_PAIRS", "")
+ALLOWED_PAIRS = [p.strip() for p in ALLOWED_PAIRS_STR.split(",")] if ALLOWED_PAIRS_STR else []
+# Example ALLOWED_PAIRS_STR="BTC/USDT,ETH/USDT"
+# If ALLOWED_PAIRS is empty, we allow all (for backward compatibility), but log a warning
+if not ALLOWED_PAIRS:
+    logger.warning("No ALLOWED_PAIRS configured. AI can trade ANY pair!")
+
+# Endpoint to dashboard for HITL (Human In The Loop) approval
+DASHBOARD_API_URL = os.getenv("DASHBOARD_API_URL", "http://backend:4000")
 
 def _make_exchange(exchange_id: str) -> ccxt.Exchange:
     exchange_id = exchange_id.lower()
@@ -28,7 +41,6 @@ def _make_exchange(exchange_id: str) -> ccxt.Exchange:
     opts = {"enableRateLimit": True}
     if api_key and api_secret:
         opts.update({"apiKey": api_key, "secret": api_secret})
-    # Some exchanges require extra options for testnet; handle externally if needed
     return cls(opts)
 
 @mcp.tool()
@@ -55,6 +67,53 @@ def fetch_balance(exchange: str) -> dict:
 
 @mcp.tool()
 def create_order(exchange: str, symbol: str, side: str, type: str, amount: float, price: Optional[float] = None, params: Optional[dict] = None) -> dict:
+    """
+    Creates an order.
+    IMPORTANT: This does NOT execute immediately. It sends a pending request to the dashboard for human approval.
+    """
+    if ALLOWED_PAIRS and symbol not in ALLOWED_PAIRS:
+        return {"error": f"Symbol {symbol} is not in ALLOWED_PAIRS list: {ALLOWED_PAIRS}"}
+
+    try:
+        ex = _make_exchange(exchange)
+        ticker = ex.fetch_ticker(symbol)
+        current_price = ticker.get("last", 0)
+
+        # Guardrail: Check MAX_TRADE_USD
+        estimated_usd = amount * (price if price else current_price)
+        if estimated_usd > MAX_TRADE_USD:
+            return {"error": f"Estimated trade size ${estimated_usd:.2f} exceeds MAX_TRADE_USD ${MAX_TRADE_USD:.2f}"}
+
+        # Instead of executing, send to Dashboard API as "pending"
+        payload = {
+            "exchange": exchange,
+            "symbol": symbol,
+            "side": side,
+            "type": type,
+            "amount": amount,
+            "price": price,
+            "params": params or {},
+            "estimated_usd": estimated_usd
+        }
+
+        # Call backend to register pending order
+        res = requests.post(f"{DASHBOARD_API_URL}/api/order/pending", json=payload, timeout=5)
+        if res.status_code == 200:
+            return {
+                "status": "pending_approval",
+                "message": f"Order for {amount} {symbol} requires human approval in the dashboard.",
+                "details": payload
+            }
+        else:
+            return {"error": f"Failed to register pending order: {res.text}"}
+
+    except Exception as e:
+        logger.error(f"Error in create_order: {e}")
+        return {"error": str(e)}
+
+@mcp.tool()
+def execute_approved_order(exchange: str, symbol: str, side: str, type: str, amount: float, price: Optional[float] = None, params: Optional[dict] = None) -> dict:
+    """Internal tool called by the backend to actually execute the order after human approval."""
     ex = _make_exchange(exchange)
     params = params or {}
     if type == "market":
@@ -76,7 +135,26 @@ def fetch_open_orders(exchange: str, symbol: Optional[str] = None) -> list:
         return ex.fetch_open_orders(symbol)
     return ex.fetch_open_orders()
 
+@mcp.tool()
+def log_reasoning(trade_id: str, explanation: str) -> dict:
+    """
+    Logs the AI's reasoning for a specific pending trade or general market observation.
+    Must be called BEFORE executing a trade or immediately after a dry_run.
+    """
+    try:
+        payload = {
+            "trade_id": trade_id,
+            "explanation": explanation
+        }
+        res = requests.post(f"{DASHBOARD_API_URL}/api/order/reasoning", json=payload, timeout=5)
+        if res.status_code == 200:
+            return {"status": "success", "message": "Reasoning logged successfully."}
+        else:
+            return {"error": f"Failed to log reasoning: {res.text}"}
+    except Exception as e:
+        logger.error(f"Error in log_reasoning: {e}")
+        return {"error": str(e)}
+
 if __name__ == "__main__":
-    print("Starting ccxt_mcp on http://127.0.0.1:7001/mcp — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
-    # transport, bind (address:port), mount_path
+    print("Starting ccxt_mcp on http://0.0.0.0:7001/mcp — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
     mcp.run("streamable-http")

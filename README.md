@@ -221,7 +221,7 @@ Save.
 
 
 
-5. Repeat for other MCPs (coingecko, portfolio, freqtrade) with their ports.
+5. Repeat for other MCPs (coingecko, portfolio, freqtrade, octobot, hummingbot, superalgos, llm) with their ports.
 
 
 
@@ -234,6 +234,10 @@ http://127.0.0.1:7010/mcp — coingecko MCP
 http://127.0.0.1:7004/mcp — portfolio MCP
 
 http://127.0.0.1:7011/mcp — freqtrade MCP
+http://127.0.0.1:7012/mcp — octobot MCP
+http://127.0.0.1:7013/mcp — hummingbot MCP
+http://127.0.0.1:7014/mcp — superalgos MCP
+http://127.0.0.1:7015/mcp — llm MCP (Open Source AI functionality)
 
 
 Test MCP from the Pi (curl examples)

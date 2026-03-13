@@ -1,3 +1,4 @@
+import NeuralTradeVisualizer from './features/NeuralTradeVisualizer'
 import { authenticatedFetch } from "../auth"
 import React, { useState } from 'react'
 
@@ -10,18 +11,23 @@ export default function OrderPanel(){
   const [price,setPrice]=useState<number|null>(null)
   const [preview,setPreview]=useState<any>(null)
   const [result,setResult]=useState<any>(null)
+  const [routingActive, setRoutingActive] = useState(false)
 
   async function previewOrder(){
+    setRoutingActive(true)
     const resp = await authenticatedFetch('/api/order/dry_run', {method:'POST',headers:{'Content-Type':'application/json'}, body: JSON.stringify({exchange,symbol,side,type,amount,price})})
     const j = await resp.json()
     if (j.ok) setPreview(j.data); else alert(j.error)
+    setTimeout(() => setRoutingActive(false), 2000)
   }
 
   async function placeOrder(){
     if (!confirm('Place live order?')) return
+    setRoutingActive(true)
     const resp = await authenticatedFetch('/api/order/execute', {method:'POST',headers:{'Content-Type':'application/json'}, body: JSON.stringify({exchange,symbol,side,type,amount,price,execute:true})})
     const j = await resp.json()
     if (j.ok) { setResult(j.data); alert('Order placed') } else alert(j.error)
+    setTimeout(() => setRoutingActive(false), 2000)
   }
 
   return (
@@ -42,6 +48,11 @@ export default function OrderPanel(){
         </div>
         {preview && <pre style={{background:'#334155',padding:8}}>{JSON.stringify(preview,null,2)}</pre>}
         {result && <pre style={{background:'#064e3b',padding:8}}>{JSON.stringify(result,null,2)}</pre>}
+      </div>
+      {/* Neural Trade Visualizer Overlay Component */}
+      <div style={{ marginTop: '20px' }}>
+          <h4 style={{ fontSize: '12px', color: '#888', textTransform: 'uppercase', marginBottom: '8px' }}>Smart Routing Diagnostics</h4>
+          <NeuralTradeVisualizer active={routingActive} />
       </div>
     </div>
   )

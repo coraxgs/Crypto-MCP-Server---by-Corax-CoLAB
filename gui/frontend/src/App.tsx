@@ -4,11 +4,17 @@ import TickerPanel from './components/TickerPanel'
 import OrderPanel from './components/OrderPanel'
 import OrdersLogPanel from './components/OrdersLogPanel'
 import OracleCopilot from './components/features/OracleCopilot'
+import GlobalWeatherSystem from './components/features/GlobalWeatherSystem'
+import WhaleSonarSweep from './components/features/WhaleSonarSweep'
+import VolatilityMatrix from './components/features/VolatilityMatrix'
+import PredictiveGhosting from './components/features/PredictiveGhosting'
+import GlobalWeatherSystem from './components/features/GlobalWeatherSystem'
 import RiskRadarPanel from './components/features/RiskRadarPanel'
 import BacktestArenaPanel from './components/features/BacktestArenaPanel'
 import { getAuthToken, setAuthToken } from './auth'
 
 export default function App() {
+  const [sentiment, setSentiment] = useState<'bull' | 'bear' | 'neutral'>('neutral');
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAuthToken());
   const [password, setPassword] = useState('');
 
@@ -50,6 +56,7 @@ export default function App() {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', background: '#020205' }}>
+      <GlobalWeatherSystem sentiment={sentiment} />
       {/* Background grid effect */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -59,18 +66,29 @@ export default function App() {
         pointerEvents: 'none'
       }}></div>
 
+
+      {/* Sentiment Toggles */}
+      <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 9999, display: 'flex', gap: '10px' }}>
+        <button onClick={() => setSentiment('bull')} className="btn-outline" style={{ color: '#10b981', borderColor: sentiment === 'bull' ? '#10b981' : '#333' }}>BULL MODE</button>
+        <button onClick={() => setSentiment('neutral')} className="btn-outline" style={{ color: '#60a5fa', borderColor: sentiment === 'neutral' ? '#60a5fa' : '#333' }}>NEUTRAL</button>
+        <button onClick={() => setSentiment('bear')} className="btn-outline" style={{ color: '#ef4444', borderColor: sentiment === 'bear' ? '#ef4444' : '#333' }}>BEAR MODE</button>
+      </div>
+
       <div className="main-grid" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', padding: '20px', maxWidth: '1600px', margin: '0 auto' }}>
 
         {/* Left Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <PortfolioPanel />
           <TickerPanel />
+          <PredictiveGhosting />
           <BacktestArenaPanel />
+          <WhaleSonarSweep />
         </div>
 
         {/* Right Column */}
         <aside style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <RiskRadarPanel />
+          <VolatilityMatrix />
           <OrderPanel />
           <OrdersLogPanel />
         </aside>

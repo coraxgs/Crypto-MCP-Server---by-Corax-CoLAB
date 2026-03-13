@@ -2,6 +2,16 @@
 
 <h1>Crypto MCP Server — by Corax CoLAB - The Future of Edge AI & Blockchain 🚀🪙</h1>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/version-2.0.0-blue.svg?cacheSeconds=2592000" />
+  <img src="https://img.shields.io/badge/python->=3.10-blue.svg" />
+  <img src="https://img.shields.io/badge/node->=20.x-green.svg" />
+  <img src="https://img.shields.io/badge/React-Vite-61dafb.svg" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" />
+</p>
+
+
+
 Crypto MCP Server is a local, lightweight dashboard + utility layer that connects Claude Desktop (Local MCP tools) and your local MCP servers on a Raspberry Pi (or other platform with Linux dist). It provides a REST + WebSocket backend that proxies MCP tools (CCXT, CoinGecko, Portfolio, Freqtrade, etc.), stores order logs locally (SQLite), and ships a React frontend dashboard for monitoring and limited control.
 
 > Default project path used in this README: /home/pelle/cryptomcpserver/
@@ -12,19 +22,19 @@ The installer script name is now install.sh and should be located at /home/pelle
 
 ---
 
-📚 Table of contents
+## 📚 Table of contents
 
 Overview & features
 
 Repository layout
 
-✅ Quick start — automated (install.sh)
+## ✅ Quick start — automated (install.sh)
 
 Manual install (condensed)
 
 Configuration (.env) & MCP endpoints
 
-🔗 Claude Desktop integration (step-by-step)
+## 🔗 Claude Desktop integration (step-by-step)
 
 Dashboard user manual (what you can do)
 
@@ -44,29 +54,34 @@ Extending & contribution info
 
 ---
 
-✨ Overview & features
 
-Crypto MCP Server provides:
+## ✨ Overview & Features
 
-Proxy to local MCP servers via JSON-RPC tools/call.
+Crypto MCP Server provides an **advanced, fully integrated ecosystem** for crypto trading and monitoring directly from your edge devices.
 
-REST endpoints: /api/ticker, /api/portfolio, /api/order/dry_run, /api/order/execute, /api/orders.
+🔹 **Proxy to local MCP servers** via JSON-RPC `tools/call`.
+🔹 **REST API Endpoints:** `/api/ticker`, `/api/portfolio`, `/api/order/dry_run`, `/api/order/execute`, `/api/orders`.
+🔹 **Real-Time Data:** Live updates powered by **Socket.io** for ticker, portfolio, and orders.
+🔹 **Local Order Logging:** Securely store order logs locally using **SQLite** (`orders.db`).
+🔹 **Next-Gen React + Vite Frontend:** A state-of-the-art dashboard featuring stunning 3D visualizations and advanced trading tools.
+🔹 **Systemd Integration:** Runs seamlessly as a background service starting at boot.
+🔹 **Claude Desktop Ready:** Designed specifically to integrate with Claude Desktop Local MCP Servers. 🤖
 
-Live updates with Socket.io (ticker, portfolio, orders).
-
-Local order logging in SQLite (orders.db).
-
-React + Vite frontend (portfolio, ticker, order preview/execute, orders log).
-
-A systemd service for backend so it can start at boot.
-
-Designed to integrate with Claude Desktop Local MCP Servers. 🤖
-
-
+### 🚀 NEW: World-Class 3D Features & Modules
+We have recently supercharged the dashboard with **next-level** interactive components:
+*   **Arbitrage Wormhole:** Visualize cross-exchange arbitrage opportunities in real-time.
+*   **Algo Grid Architect:** Design and deploy automated grid trading strategies.
+*   **Oracle Copilot:** AI-driven insights and market sentiment analysis.
+*   **Quantum Risk Map:** Advanced topography of your portfolio's risk exposure.
+*   **Whale Constellations & Sonar Sweep:** Track large on-chain movements and whale activity.
+*   **Global Weather System:** Dynamic environment reflecting current market sentiment (Bull, Bear, Neutral).
+*   **News Singularity:** Aggregated crypto news streams directly into your command center.
+*   **And much more!** (Predictive Ghosting, Backtest Arena, Risk Radar, Volatility Matrix).
 
 ---
 
-📁 Repository layout (what you should have)
+
+## 📁 Repository layout (what you should have)
 
 /home/pelle/cryptomcpserver/
 └─ gui/
@@ -92,7 +107,7 @@ Designed to integrate with Claude Desktop Local MCP Servers. 🤖
 
 ---
 
-✅ Quick start — automated (recommended) — install.sh 🎯
+## ✅ Quick start — automated (recommended) — install.sh 🎯
 
 Place the provided install.sh into /home/pelle/install.sh (or /home/pelle/cryptomcpserver/install.sh if you prefer). Make it executable and run it as user pelle:
 
@@ -124,7 +139,7 @@ sudo journalctl -u crypto-mcp-gui.service -f
 
 ---
 
-🛠 Manual install (condensed)
+## 🛠 Manual install (condensed)
 
 If you prefer to do everything yourself:
 
@@ -172,7 +187,7 @@ sudo systemctl enable --now crypto-mcp-gui.service
 
 ---
 
-⚙️ Configuration: .env (backend)
+## ⚙️ Configuration: .env (backend)
 
 Copy and edit /home/pelle/cryptomcpserver/gui/backend/.env.example → .env:
 
@@ -190,7 +205,7 @@ PORT — backend port (default 4000)
 
 ---
 
-🔗 Claude Desktop integration (detailed) 🧩
+## 🔗 Claude Desktop integration (detailed) 🧩
 
 Overview
 
@@ -283,7 +298,7 @@ Security → never expose MCP endpoints that can place live trades to the public
 
 ---
 
-🖥 Dashboard — what you can do (user manual)
+## 🖥 Dashboard — what you can do (user manual)
 
 Portfolio: view aggregated balances & USD value (updated via portfolio MCP).
 
@@ -306,7 +321,7 @@ Safety: Always test with testnet keys. The UI requires confirmation to execute l
 
 ---
 
-🔁 REST API examples (curl)
+## 🔁 REST API examples (curl)
 
 Ticker:
 
@@ -340,7 +355,7 @@ curl http://127.0.0.1:4000/api/orders | jq
 
 ---
 
-🗄 SQLite & logs
+## 🗄 SQLite & logs
 
 DB file: /home/pelle/cryptomcpserver/gui/backend/orders.db
 
@@ -356,7 +371,7 @@ sudo journalctl -u crypto-mcp-gui.service -f
 
 ---
 
-🧰 Systemd service (backend)
+## 🧰 Systemd service (backend)
 
 Service file: /etc/systemd/system/crypto-mcp-gui.service
 
@@ -388,7 +403,7 @@ sudo systemctl status crypto-mcp-gui.service
 
 ---
 
-⚠️ Troubleshooting & common errors
+## ⚠️ Troubleshooting & common errors
 
 Service crashes on start → check journalctl -u crypto-mcp-gui.service -n 200. Common issues: missing npm dependencies, syntax errors, or port 4000 already in use.
 
@@ -406,7 +421,7 @@ Claude cannot call MCP → ensure Claude can reach the Pi (use LAN IP or SSH tun
 
 ---
 
-🔒 Security & best practices
+## 🔒 Security & best practices
 
 Use testnet keys while testing.
 
@@ -420,16 +435,15 @@ For remote exposure: use an authenticated reverse proxy (NGINX + TLS + basic aut
 
 ---
 
-🧩 Extending & Integration ideas
+## 🧩 Extending & Integration ideas
 
 Add more MCPs: CoinGecko (market data), On-chain (balances &
 
 
 
 
+
 <img width="1024" height="1536" alt="cryptomcpinfograph1" src="https://github.com/user-attachments/assets/e0bfce4d-2dc2-4d89-abdf-9594fe5df31d" />
-
-
 
 <img width="1024" height="1024" alt="cryptomcppic" src="https://github.com/user-attachments/assets/9e8f5a08-cbc9-42e3-aed2-d53fcc6d0083" />
 

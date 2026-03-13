@@ -27,7 +27,7 @@ export default function PortfolioPanel() {
   }, [])
 
   return (
-    <div className="card">
+    <div className="card interactive-element">
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center', marginBottom: '1rem'}}>
         <h3 style={{margin: 0}}>Asset Universe</h3>
         <div style={{display:'flex', gap: '0.5rem'}}>

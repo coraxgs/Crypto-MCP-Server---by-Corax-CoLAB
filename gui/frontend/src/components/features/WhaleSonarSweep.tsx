@@ -125,7 +125,7 @@ export default function WhaleSonarSweep() {
   }, [angle, blips]);
 
   return (
-    <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#020205', position: 'relative' }}>
+    <div className="card interactive-element" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#020205', position: 'relative' }}>
       <div style={{ position: 'absolute', top: 10, left: 10, color: '#10b981', fontFamily: 'monospace', fontSize: '12px' }}>
         WHALE SONAR ACTIVE
       </div>

@@ -85,7 +85,7 @@ export default function AlgoGridArchitect() {
   ];
 
   return (
-    <div className="card" style={{ gridColumn: '1 / -1', height: '350px', position: 'relative', overflow: 'hidden', backgroundColor: '#020205' }}>
+    <div className="card interactive-element" style={{ gridColumn: '1 / -1', height: '350px', position: 'relative', overflow: 'hidden', backgroundColor: '#020205' }}>
       <div style={{ position: 'absolute', top: 15, left: 15, zIndex: 20, display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Settings size={20} className="text-amber" />
         <h3 style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>Strategy Grid Architect</h3>

@@ -82,7 +82,7 @@ export default function WhaleConstellations() {
   }, []);
 
   return (
-    <div className="card" style={{ gridColumn: '1 / -1', height: '350px', position: 'relative', overflow: 'hidden', padding: 0 }}>
+    <div className="card interactive-element" style={{ gridColumn: '1 / -1', height: '350px', position: 'relative', overflow: 'hidden', padding: 0 }}>
       <div style={{ position: 'absolute', top: 15, left: 15, zIndex: 10, display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Anchor size={20} className="text-purple" />
         <h3 style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>On-Chain Whale Mapping</h3>

@@ -128,7 +128,7 @@ export default function NewsSingularity() {
   }, []);
 
   return (
-    <div className="card" style={{ height: '350px', position: 'relative', overflow: 'hidden', padding: 0 }}>
+    <div className="card interactive-element" style={{ height: '350px', position: 'relative', overflow: 'hidden', padding: 0 }}>
       <div style={{ position: 'absolute', top: 15, left: 15, zIndex: 10, display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Globe size={20} className="text-blue" />
         <h3 style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>Global LLM Sentiment</h3>

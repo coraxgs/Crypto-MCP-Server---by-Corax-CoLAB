@@ -51,3 +51,56 @@ services:
 
 volumes:
   db_data:
+
+  octobot-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    environment:
+      - MCP_MODULE=octobot_mcp
+      - OCTOBOT_REST_URL=http://octobot:5001
+    ports:
+      - "7012:7012"
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  hummingbot-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    environment:
+      - MCP_MODULE=hummingbot_mcp
+      - HUMMINGBOT_REST_URL=https://hummingbot:15888
+    ports:
+      - "7013:7013"
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  superalgos-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    environment:
+      - MCP_MODULE=superalgos_mcp
+      - SUPERALGOS_REST_URL=http://superalgos:34248
+    ports:
+      - "7014:7014"
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  llm-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    environment:
+      - MCP_MODULE=llm_mcp
+      - LLM_MODEL=ollama/mistral
+      - LLM_API_BASE=http://host.docker.internal:11434
+    ports:
+      - "7015:7015"
+    restart: unless-stopped
+    depends_on:
+      - redis

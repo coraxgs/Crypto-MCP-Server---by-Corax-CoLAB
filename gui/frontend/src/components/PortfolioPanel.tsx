@@ -1,5 +1,6 @@
 import { authenticatedFetch } from "../auth"
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
+import OrbitalPortfolio from './features/OrbitalPortfolio'
 import io from 'socket.io-client'
 import AssetUniverse from './features/AssetUniverse'
 

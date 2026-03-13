@@ -3,9 +3,11 @@ import PortfolioPanel from './components/PortfolioPanel'
 import TickerPanel from './components/TickerPanel'
 import OrderPanel from './components/OrderPanel'
 import OrdersLogPanel from './components/OrdersLogPanel'
-import OracleCopilot from './components/features/OracleCopilot'
+import OracleCopilot from './components/features/OracleCopilot';
+import SentimentWeather from './components/features/SentimentWeather';
 import RiskRadarPanel from './components/features/RiskRadarPanel'
-import BacktestArenaPanel from './components/features/BacktestArenaPanel'
+import BacktestArenaPanel from './components/features/BacktestArenaPanel';
+import LiquidityFlowMap from './components/features/LiquidityFlowMap';
 import { getAuthToken, setAuthToken } from './auth'
 
 export default function App() {
@@ -50,6 +52,7 @@ export default function App() {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', background: '#020205' }}>
+      <SentimentWeather />
       {/* Background grid effect */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -66,6 +69,7 @@ export default function App() {
           <PortfolioPanel />
           <TickerPanel />
           <BacktestArenaPanel />
+          <LiquidityFlowMap />
         </div>
 
         {/* Right Column */}

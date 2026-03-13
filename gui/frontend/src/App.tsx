@@ -8,9 +8,13 @@ import GlobalWeatherSystem from './components/features/GlobalWeatherSystem'
 import WhaleSonarSweep from './components/features/WhaleSonarSweep'
 import VolatilityMatrix from './components/features/VolatilityMatrix'
 import PredictiveGhosting from './components/features/PredictiveGhosting'
-import GlobalWeatherSystem from './components/features/GlobalWeatherSystem'
 import RiskRadarPanel from './components/features/RiskRadarPanel'
 import BacktestArenaPanel from './components/features/BacktestArenaPanel'
+import ArbitrageWormhole from './components/features/ArbitrageWormhole'
+import NewsSingularity from './components/features/NewsSingularity'
+import AlgoGridArchitect from './components/features/AlgoGridArchitect'
+import QuantumRiskMap from './components/features/QuantumRiskMap'
+import WhaleConstellations from './components/features/WhaleConstellations'
 import { getAuthToken, setAuthToken } from './auth'
 
 export default function App() {
@@ -66,7 +70,6 @@ export default function App() {
         pointerEvents: 'none'
       }}></div>
 
-
       {/* Sentiment Toggles */}
       <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 9999, display: 'flex', gap: '10px' }}>
         <button onClick={() => setSentiment('bull')} className="btn-outline" style={{ color: '#10b981', borderColor: sentiment === 'bull' ? '#10b981' : '#333' }}>BULL MODE</button>
@@ -76,10 +79,18 @@ export default function App() {
 
       <div className="main-grid" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', padding: '20px', maxWidth: '1600px', margin: '0 auto' }}>
 
+        {/* Feature 1: Arbitrage Wormhole (Spans full width) */}
+        <ArbitrageWormhole />
+
+        {/* Feature 3: Algo Grid Architect (Spans full width) */}
+        <AlgoGridArchitect />
+
         {/* Left Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <PortfolioPanel />
           <TickerPanel />
+          {/* Feature 2: News Singularity */}
+          <NewsSingularity />
           <PredictiveGhosting />
           <BacktestArenaPanel />
           <WhaleSonarSweep />
@@ -87,14 +98,18 @@ export default function App() {
 
         {/* Right Column */}
         <aside style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Feature 4: Quantum Risk Topography */}
+          <QuantumRiskMap />
           <RiskRadarPanel />
+          {/* Feature 5: Whale Constellations */}
+          <WhaleConstellations />
           <VolatilityMatrix />
           <OrderPanel />
           <OrdersLogPanel />
         </aside>
       </div>
 
-      {/* Feature 3: The Oracle Co-Pilot */}
+      {/* Original Co-Pilot */}
       <OracleCopilot />
 
     </div>

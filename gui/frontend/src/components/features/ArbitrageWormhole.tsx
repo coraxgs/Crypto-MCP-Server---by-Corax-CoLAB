@@ -152,7 +152,7 @@ export default function ArbitrageWormhole() {
   const targetPos = new THREE.Vector3(4, 0, 0);
 
   return (
-    <div className="card" style={{ gridColumn: '1 / -1', height: '350px', position: 'relative', overflow: 'hidden', padding: 0 }}>
+    <div className="card interactive-element" style={{ gridColumn: '1 / -1', height: '350px', position: 'relative', overflow: 'hidden', padding: 0 }}>
       <div style={{ position: 'absolute', top: 15, left: 15, zIndex: 10, display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Network size={20} className="text-cyan" />
         <h3 style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>Cross-DEX Arbitrage Vortex</h3>

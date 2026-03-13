@@ -4,6 +4,7 @@ import TickerPanel from './components/TickerPanel'
 import OrderPanel from './components/OrderPanel'
 import OrdersLogPanel from './components/OrdersLogPanel'
 import OracleCopilot from './components/features/OracleCopilot'
+import MarketSentimentAnalyzer from "./components/features/MarketSentimentAnalyzer";
 import GlobalWeatherSystem from './components/features/GlobalWeatherSystem'
 import WhaleSonarSweep from './components/features/WhaleSonarSweep'
 import VolatilityMatrix from './components/features/VolatilityMatrix'
@@ -37,7 +38,7 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #000 100%)' }}>
-        <form onSubmit={handleLogin} className="card" style={{ width: 350, display: 'flex', flexDirection: 'column', gap: 16, border: '1px solid #334155', boxShadow: '0 0 30px rgba(16, 185, 129, 0.1)' }}>
+        <form onSubmit={handleLogin} className="card interactive-element" style={{ width: 350, display: 'flex', flexDirection: 'column', gap: 16, border: '1px solid #334155', boxShadow: '0 0 30px rgba(16, 185, 129, 0.1)' }}>
           <div style={{display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center'}}>
             <div style={{width: '20px', height: '20px', background: '#10b981', borderRadius: '50%', boxShadow: '0 0 10px #10b981'}}></div>
             <h3 style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '2px', color: '#fff' }}>SYSTEM AUTHENTICATION</h3>
@@ -110,6 +111,7 @@ export default function App() {
       </div>
 
       {/* Original Co-Pilot */}
+        <MarketSentimentAnalyzer />
       <OracleCopilot />
 
     </div>

@@ -39,7 +39,7 @@ const Terrain = () => {
 
 export default function VolatilityMatrix() {
   return (
-    <div className="card" style={{ height: '300px', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+    <div className="card interactive-element" style={{ height: '300px', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 10 }}>
         <h3 style={{ margin: 0, color: '#8b5cf6', fontFamily: 'monospace', fontSize: '14px', textShadow: '0 0 5px #8b5cf6' }}>QUANTUM ANOMALY MATRIX</h3>
         <div style={{ fontSize: '10px', color: '#a3a3a3' }}>3D Volatility Surface mapping</div>

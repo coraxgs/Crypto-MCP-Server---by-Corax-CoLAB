@@ -18,7 +18,7 @@ export default function TickerPanel(){
   }, [])
 
   return (
-    <div className="card">
+    <div className="card interactive-element">
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center', marginBottom: '1rem'}}>
         <h3 style={{margin: 0}}>Tactical Market Overview</h3>
         <div className="small-muted" style={{textTransform: 'uppercase', letterSpacing: '1px'}}>Live Sync</div>

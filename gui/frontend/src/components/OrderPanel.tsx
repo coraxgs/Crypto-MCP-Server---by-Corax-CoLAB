@@ -31,7 +31,7 @@ export default function OrderPanel(){
   }
 
   return (
-    <div className="card">
+    <div className="card interactive-element">
       <h3>Order / Trade</h3>
       <div style={{display:'grid',gap:8}}>
         <input value={exchange} onChange={e=>setExchange(e.target.value)} />

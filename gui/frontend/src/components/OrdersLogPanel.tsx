@@ -34,7 +34,7 @@ export default function OrdersLogPanel(){
   }
 
   return (
-    <div className="card">
+    <div className="card interactive-element">
       <h3>Orders Log (AI Diary)</h3>
       <div className="orders-scroll">
         <table className="table">

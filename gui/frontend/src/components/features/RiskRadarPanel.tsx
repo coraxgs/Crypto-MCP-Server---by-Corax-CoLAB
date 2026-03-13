@@ -72,7 +72,7 @@ export default function RiskRadarPanel() {
   };
 
   return (
-    <div className="card" style={{
+    <div className="card interactive-element" style={{
       border: defcon === 'RED' ? '1px solid #ef4444' : defcon === 'YELLOW' ? '1px solid #f59e0b' : '1px solid #10b981',
       boxShadow: defcon === 'RED' ? '0 0 30px rgba(239, 68, 68, 0.2)' : 'none',
       transition: 'all 0.5s ease',

@@ -14,16 +14,44 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'admin';
+const crypto = require('crypto');
+
+let DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
+if (!DASHBOARD_PASSWORD) {
+  DASHBOARD_PASSWORD = crypto.randomBytes(16).toString('hex');
+  console.warn('\n=============================================================');
+  console.warn('⚠️  SECURITY WARNING: DASHBOARD_PASSWORD not set in environment.');
+  console.warn('⚠️  A temporary random password has been generated for this session:');
+  console.warn('⚠️  --> ' + DASHBOARD_PASSWORD + ' <--');
+  console.warn('⚠️  Please set DASHBOARD_PASSWORD in gui/backend/.env for a permanent password.');
+  console.warn('=============================================================\n');
+}
 const app = express();
 
 // Basic auth middleware for all /api routes
 app.use('/api', (req, res, next) => {
-  if (req.path === '/order/pending' || req.path === '/order/reasoning') return next();
+  if (req.path === '/order/pending' || req.path === '/order/reasoning') {
+    // Restrict AI-only endpoints to localhost for defense-in-depth
+    const clientIp = req.ip || req.connection.remoteAddress;
+    if (clientIp !== '127.0.0.1' && clientIp !== '::1' && clientIp !== '::ffff:127.0.0.1') {
+      return res.status(403).json({ ok: false, error: 'Forbidden: Localhost only' });
+    }
+    return next();
+  }
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ ok: false, error: 'Unauthorized' });
   const token = authHeader.split(' ')[1];
-  if (token !== DASHBOARD_PASSWORD) return res.status(403).json({ ok: false, error: 'Forbidden' });
+  if (!token) return res.status(403).json({ ok: false, error: 'Forbidden' });
+
+  try {
+    const tokenBuffer = Buffer.from(token);
+    const passBuffer = Buffer.from(DASHBOARD_PASSWORD);
+    if (tokenBuffer.length !== passBuffer.length || !crypto.timingSafeEqual(tokenBuffer, passBuffer)) {
+      return res.status(403).json({ ok: false, error: 'Forbidden' });
+    }
+  } catch (e) {
+    return res.status(403).json({ ok: false, error: 'Forbidden' });
+  }
   next();
 });
 const path = require('path');
@@ -125,6 +153,14 @@ app.post('/api/order/dry_run', async (req, res) => {
   if (!exchange || !symbol || !side || !type || !amount) {
     return res.status(400).json({ ok:false, error: 'Missing required fields' });
   }
+  const numericAmount = Number(amount);
+  if (isNaN(numericAmount) || numericAmount <= 0) {
+    return res.status(400).json({ ok:false, error: 'Amount must be a positive number' });
+  }
+  const numericPrice = price !== undefined && price !== null ? Number(price) : null;
+  if (numericPrice !== null && (isNaN(numericPrice) || numericPrice <= 0)) {
+    return res.status(400).json({ ok:false, error: 'Price must be a positive number' });
+  }
   try {
     const ticker = await callMCP(MCP_CCXT, 'get_ticker', { exchange, symbol });
     const marketPrice = ticker && (ticker.last || ticker.close) ? (ticker.last || ticker.close) : null;
@@ -153,6 +189,14 @@ app.post('/api/order/execute', async (req, res) => {
   const { exchange, symbol, side, type, amount, price, execute, params } = req.body || {};
   if (!exchange || !symbol || !side || !type || !amount) {
     return res.status(400).json({ ok:false, error: 'Missing required fields' });
+  }
+  const numericAmount = Number(amount);
+  if (isNaN(numericAmount) || numericAmount <= 0) {
+    return res.status(400).json({ ok:false, error: 'Amount must be a positive number' });
+  }
+  const numericPrice = price !== undefined && price !== null ? Number(price) : null;
+  if (numericPrice !== null && (isNaN(numericPrice) || numericPrice <= 0)) {
+    return res.status(400).json({ ok:false, error: 'Price must be a positive number' });
   }
   try {
     if (!execute) {
@@ -246,6 +290,14 @@ app.post('/api/order/pending', (req, res) => {
   const { exchange, symbol, side, type, amount, price, params, estimated_usd } = req.body || {};
   if (!exchange || !symbol || !side || !type || !amount) {
     return res.status(400).json({ ok: false, error: 'Missing required fields' });
+  }
+  const numericAmount = Number(amount);
+  if (isNaN(numericAmount) || numericAmount <= 0) {
+    return res.status(400).json({ ok: false, error: 'Amount must be a positive number' });
+  }
+  const numericPrice = price !== undefined && price !== null ? Number(price) : null;
+  if (numericPrice !== null && (isNaN(numericPrice) || numericPrice <= 0)) {
+    return res.status(400).json({ ok: false, error: 'Price must be a positive number' });
   }
 
   try {

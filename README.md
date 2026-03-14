@@ -68,6 +68,12 @@ The Crypto MCP Server now features advanced interactive elements and real-time A
 *   ⚛️ **Quantum Risk Map:** Real-time visual topography of your portfolio's risk exposure.
 *   🌀 **Arbitrage Wormhole & Algo Grid Architect:** Interactive components for visualizing cross-exchange opportunities and algorithmic trading grids.
 *   ✨ **Cyberpunk UI Polish:** The entire dashboard is wrapped in a dark, glowing aesthetic with glassmorphism, animated CRT scanlines, and reactive hover states.
+*   👁️ **System Overview:** A high-level visual summary of your entire crypto operation, including system status, active agents, and total equity.
+*   🧠 **Neural Net Liquidity:** Real-time visualization of market liquidity using a simulated neural network topography, helping you spot support and resistance levels.
+*   📊 **Holo Topographic Order Book:** A 3D, holographic representation of the order book, providing deep insights into market depth and potential price movements.
+*   📰 **News Singularity:** An AI-curated feed of the most critical market news, sentiment-scored and presented in a sleek, easily digestible format.
+*   🛰️ **Orbital Portfolio:** A dynamic, physics-based 3D visualization of your asset allocation, where tokens orbit your central portfolio based on market cap and performance.
+*   🐋 **Whale Constellations:** Tracks and maps major wallet movements as constellations, allowing you to follow the 'smart money' across the blockchain.
 
 ---
 
@@ -112,6 +118,13 @@ The Crypto MCP Server now features advanced interactive elements and real-time A
             ├─ OrderPanel.tsx
             ├─ OrdersLogPanel.tsx
             └─ features/         # Advanced AI & Visual Components
+               ├─ SystemOverview.tsx
+               ├─ NeuralNetLiquidity.tsx
+               ├─ HoloTopographicOrderBook.tsx
+               ├─ NewsSingularity.tsx
+               ├─ OrbitalPortfolio.tsx
+               ├─ WhaleConstellations.tsx
+               └─ ... (other features)
 ```
 
 ---

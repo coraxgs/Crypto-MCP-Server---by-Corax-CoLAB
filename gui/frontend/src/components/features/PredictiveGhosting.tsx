@@ -1,7 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Plotly from 'plotly.js-basic-dist';
 
 export default function PredictiveGhosting() {
+  const [scrubberValue, setScrubberValue] = useState(0);
+  const chartRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     // Generate base trend
     const x = [];
@@ -80,6 +83,23 @@ export default function PredictiveGhosting() {
         name: 'Confidence Interval (95%)'
     };
 
+    // Ghost Crosshairs based on scrubber
+    const targetIndex = scrubberValue;
+    let traceGhost = null;
+    if (targetIndex > 0 && targetIndex <= futureSteps) {
+        const targetX = futureX[targetIndex - 1];
+        const targetY = futureY[targetIndex - 1];
+
+        traceGhost = {
+            x: [targetX],
+            y: [targetY],
+            type: 'scatter',
+            mode: 'markers',
+            marker: { size: 12, color: '#ef4444', symbol: 'cross-thin', line: { width: 2, color: '#ef4444' } },
+            name: 'Ghost Target Lock'
+        };
+    }
+
     const layout = {
       paper_bgcolor: 'transparent',
       plot_bgcolor: 'transparent',
@@ -88,23 +108,47 @@ export default function PredictiveGhosting() {
       xaxis: { showgrid: false },
       yaxis: { gridcolor: 'rgba(255,255,255,0.05)' },
       showlegend: true,
-      legend: { orientation: 'h', y: 1.1 }
+      legend: { orientation: 'h', y: 1.1 },
+      // Update shapes for crosshair lines if needed
     };
 
-    Plotly.react('predictive-chart', [traceHistorical, traceUpper, traceLower, tracePredictive] as any, layout as any, {displayModeBar: false});
-  }, []);
+    const traces = [traceHistorical, traceUpper, traceLower, tracePredictive];
+    if (traceGhost) traces.push(traceGhost);
+
+    Plotly.react('predictive-chart', traces as any, layout as any, {displayModeBar: false});
+  }, [scrubberValue]);
 
   return (
-    <div className="card interactive-element" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '4px solid #10b981' }}>
+    <div className="card glass-panel interactive-element" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '4px solid #10b981' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ margin: 0, color: '#10b981', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h3 style={{ margin: 0, color: '#10b981', display: 'flex', alignItems: 'center', gap: '8px', textShadow: '0 0 10px #10b981' }}>
                 AI Trajectory Ghosting
             </h3>
-            <div style={{ fontSize: '10px', color: '#fff', background: 'rgba(16, 185, 129, 0.2)', padding: '2px 6px', borderRadius: '4px', border: '1px solid #10b981' }}>
-                MODEL: KERNEL-SVR
+            <div style={{ fontSize: '10px', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '2px 6px', borderRadius: '4px', border: '1px solid #10b981' }}>
+                PROBABILITY CONES ACTIVE
             </div>
         </div>
-        <div id="predictive-chart" style={{ width: '100%', height: '200px' }}></div>
+        <div id="predictive-chart" style={{ width: '100%', height: '250px' }} ref={chartRef}></div>
+
+        {/* Timeline Scrubber */}
+        <div style={{ marginTop: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#94a3b8', marginBottom: '5px' }}>
+                <span>Present</span>
+                <span style={{ color: scrubberValue > 0 ? '#ef4444' : '#94a3b8' }}>
+                    {scrubberValue > 0 ? `T+${scrubberValue} Prediction` : 'Timeline Scrubber'}
+                </span>
+                <span>Future</span>
+            </div>
+            <input
+                type="range"
+                min="0"
+                max="20"
+                value={scrubberValue}
+                onChange={(e) => setScrubberValue(parseInt(e.target.value))}
+                style={{ width: '100%', accentColor: '#10b981', background: 'transparent' }}
+                className="neon-slider"
+            />
+        </div>
     </div>
   );
 }

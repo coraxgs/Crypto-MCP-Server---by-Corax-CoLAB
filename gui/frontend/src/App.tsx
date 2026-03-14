@@ -16,6 +16,8 @@ import NewsSingularity from './components/features/NewsSingularity'
 import AlgoGridArchitect from './components/features/AlgoGridArchitect'
 import QuantumRiskMap from './components/features/QuantumRiskMap'
 import WhaleConstellations from './components/features/WhaleConstellations'
+import SystemOverview from './components/features/SystemOverview'
+
 import { getAuthToken, setAuthToken } from './auth'
 
 export default function App() {
@@ -79,6 +81,10 @@ export default function App() {
       </div>
 
       <div className="main-grid" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', padding: '20px', maxWidth: '1600px', margin: '0 auto' }}>
+
+
+        {/* Feature 0: System Overview (Spans full width) */}
+        <SystemOverview />
 
         {/* Feature 1: Arbitrage Wormhole (Spans full width) */}
         <ArbitrageWormhole />

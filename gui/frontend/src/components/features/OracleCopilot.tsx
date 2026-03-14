@@ -212,6 +212,7 @@ export default function OracleCopilot() {
               <span style={{ fontFamily: 'monospace', fontSize: '12px', color: '#60a5fa', fontWeight: 'bold' }}>ORACLE // LOG_STREAM</span>
             </div>
             <button
+              aria-label="Close Oracle Log Stream"
               onClick={() => setIsOpen(false)}
               style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', padding: 0 }}
             >

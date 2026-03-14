@@ -116,7 +116,6 @@ export default function BacktestArenaPanel() {
         </h3>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <select
-            aria-label="Select Strategy"
             value={strategy}
             onChange={e => setStrategy(e.target.value)}
             style={{ background: 'rgba(0,0,0,0.5)', color: '#fff', border: '1px solid #334155', padding: '4px 8px', borderRadius: '4px', fontFamily: 'monospace' }}
@@ -125,9 +124,7 @@ export default function BacktestArenaPanel() {
             <option>Mean-Reversion-Alpha</option>
             <option>Momentum-Burst</option>
           </select>
-          <button aria-label="Settings" style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-            <Settings size={16} color="#888" />
-          </button>
+          <Settings size={16} color="#888" style={{cursor: 'pointer'}} />
         </div>
       </div>
 
@@ -155,7 +152,6 @@ export default function BacktestArenaPanel() {
       {/* Playback Controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '15px', background: 'rgba(0,0,0,0.3)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
         <button
-          aria-label="Rewind to start"
           onClick={() => setProgress(0)}
           style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', padding: '5px' }}
         >
@@ -163,7 +159,6 @@ export default function BacktestArenaPanel() {
         </button>
 
         <button
-          aria-label={isPlaying ? "Pause backtest" : "Play backtest"}
           onClick={() => setIsPlaying(!isPlaying)}
           style={{
             background: isPlaying ? '#ef4444' : '#10b981',
@@ -183,7 +178,6 @@ export default function BacktestArenaPanel() {
         </button>
 
         <button
-          aria-label={`Increase playback speed (currently ${speed}x)`}
           onClick={() => setSpeed(s => s >= 5 ? 1 : s + 2)}
           style={{ background: 'none', border: 'none', color: speed > 1 ? '#3b82f6' : '#888', cursor: 'pointer', padding: '5px', display: 'flex', alignItems: 'center', gap: '2px' }}
         >
@@ -194,7 +188,6 @@ export default function BacktestArenaPanel() {
         <div style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center' }}>
           <input
             type="range"
-            aria-label="Playback progress"
             min="0"
             max="100"
             value={progress}

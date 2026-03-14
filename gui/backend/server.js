@@ -30,14 +30,6 @@ const app = express();
 
 // Basic auth middleware for all /api routes
 app.use('/api', (req, res, next) => {
-  if (req.path === '/order/pending' || req.path === '/order/reasoning') {
-    // Restrict AI-only endpoints to localhost for defense-in-depth
-    const clientIp = req.ip || req.connection.remoteAddress;
-    if (clientIp !== '127.0.0.1' && clientIp !== '::1' && clientIp !== '::ffff:127.0.0.1') {
-      return res.status(403).json({ ok: false, error: 'Forbidden: Localhost only' });
-    }
-    return next();
-  }
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ ok: false, error: 'Unauthorized' });
   const token = authHeader.split(' ')[1];
@@ -346,7 +338,7 @@ app.post('/api/order/approve', async (req, res) => {
         type: order.type,
         amount: Number(order.amount),
         price: order.price !== null ? Number(order.price) : null,
-        params: {}
+        params: { approval_token: DASHBOARD_PASSWORD }
       };
 
       const orderResp = await callMCP(MCP_CCXT, 'execute_approved_order', orderArgs);

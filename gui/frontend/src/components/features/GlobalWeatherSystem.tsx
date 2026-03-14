@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -6,7 +6,7 @@ const Particles = ({ sentiment }: { sentiment: 'bull' | 'bear' | 'neutral' }) =>
   const mesh = useRef<THREE.InstancedMesh>(null);
   const count = 2000;
 
-  const particles = useMemo(() => {
+  const particleData = useMemo(() => {
     const temp = [];
     for (let i = 0; i < count; i++) {
       const x = (Math.random() - 0.5) * 50;
@@ -18,15 +18,15 @@ const Particles = ({ sentiment }: { sentiment: 'bull' | 'bear' | 'neutral' }) =>
     return temp;
   }, [count]);
 
-  const color = new THREE.Color();
-  const dummy = new THREE.Object3D();
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const color = useMemo(() => new THREE.Color(), []);
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!mesh.current) return;
 
     let targetColor = sentiment === 'bull' ? '#10b981' : sentiment === 'bear' ? '#ef4444' : '#60a5fa';
 
-    particles.forEach((particle, i) => {
+    particleData.forEach((particle, i) => {
       let { x, y, z, speed, offset } = particle;
 
       if (sentiment === 'bear') {
@@ -71,7 +71,7 @@ const Particles = ({ sentiment }: { sentiment: 'bull' | 'bear' | 'neutral' }) =>
   });
 
   return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
+    <instancedMesh ref={mesh} args={[undefined as any, undefined as any, count]}>
       <boxGeometry args={[0.1, 0.1, 0.1]} />
       <meshBasicMaterial transparent opacity={0.6} depthWrite={false} blending={THREE.AdditiveBlending} />
     </instancedMesh>
@@ -79,11 +79,28 @@ const Particles = ({ sentiment }: { sentiment: 'bull' | 'bear' | 'neutral' }) =>
 };
 
 export default function GlobalWeatherSystem({ sentiment = 'neutral' }: { sentiment?: 'bull' | 'bear' | 'neutral' }) {
+  const [lightning, setLightning] = useState(false);
+
+  useEffect(() => {
+    if (sentiment === 'bear') {
+      const interval = setInterval(() => {
+        if (Math.random() > 0.8) {
+          setLightning(true);
+          setTimeout(() => setLightning(false), 100);
+          setTimeout(() => setLightning(true), 150);
+          setTimeout(() => setLightning(false), 200);
+        }
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [sentiment]);
+
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, pointerEvents: 'none', opacity: sentiment === 'neutral' ? 0.3 : 0.6 }}>
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 0, pointerEvents: 'none', opacity: sentiment === 'neutral' ? 0.3 : 0.8 }}>
       <Canvas camera={{ position: [0, 0, 15], fov: 75 }}>
         <Particles sentiment={sentiment} />
       </Canvas>
+
       {/* Glitch Overlay for Bear Market */}
       {sentiment === 'bear' && (
         <div style={{
@@ -94,6 +111,19 @@ export default function GlobalWeatherSystem({ sentiment = 'neutral' }: { sentime
           opacity: 0.3
         }} />
       )}
+
+      {/* Lightning Strike Overlay */}
+      {lightning && (
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'white',
+          opacity: 0.5,
+          zIndex: 1000,
+          pointerEvents: 'none',
+          mixBlendMode: 'overlay'
+        }} />
+      )}
+
       {/* Glow Overlay for Bull Market */}
       {sentiment === 'bull' && (
         <div style={{
@@ -102,6 +132,7 @@ export default function GlobalWeatherSystem({ sentiment = 'neutral' }: { sentime
           animation: 'pulseBg 4s infinite alternate',
         }} />
       )}
+
       <style>{`
         @keyframes glitch {
           0% { transform: translate(0) }

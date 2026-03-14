@@ -17,6 +17,12 @@ import AlgoGridArchitect from './components/features/AlgoGridArchitect'
 import QuantumRiskMap from './components/features/QuantumRiskMap'
 import WhaleConstellations from './components/features/WhaleConstellations'
 import SystemOverview from './components/features/SystemOverview'
+import NeuralNetLiquidity from './components/features/NeuralNetLiquidity';
+import HoloTopographicOrderBook from './components/features/HoloTopographicOrderBook';
+import OrbitalPortfolio from './components/features/OrbitalPortfolio';
+
+
+
 
 import { getAuthToken, setAuthToken } from './auth'
 
@@ -85,6 +91,12 @@ export default function App() {
 
         {/* Feature 0: System Overview (Spans full width) */}
         <SystemOverview />
+        {/* Feature 1: Neural Net Liquidity */}
+        <NeuralNetLiquidity />
+        {/* Feature 2: Liquidity Trench */}
+        <HoloTopographicOrderBook />
+
+
 
         {/* Feature 1: Arbitrage Wormhole (Spans full width) */}
         <ArbitrageWormhole />
@@ -99,6 +111,9 @@ export default function App() {
           {/* Feature 2: News Singularity */}
           <NewsSingularity />
           <PredictiveGhosting />
+        {/* Feature 4: Orbital Portfolio */}
+        <OrbitalPortfolio />
+
           <BacktestArenaPanel />
           <WhaleSonarSweep />
         </div>

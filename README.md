@@ -1,60 +1,71 @@
 <div align="center">
-  <img width="800" alt="Frontend Dashboard" src="./gui/frontend/public/images/dashboard.png" style="border-radius: 12px; margin-bottom: 20px;" />
+  <a href="https://coraxcolab.com" target="_blank">
+    <img width="800" alt="Frontend Dashboard" src="./gui/frontend/public/images/dashboard.png" style="border-radius: 12px; margin-bottom: 20px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);" />
+  </a>
 
-  <h1>Crypto MCP Server <br> <span style="font-size: 0.6em; color: #10b981;">by Corax CoLAB - The Future of Edge AI & Blockchain 🚀🪙</span></h1>
+  <h1>Crypto MCP Server <br> <span style="font-size: 0.6em; color: #10b981;">by Corax CoLAB & PelleNybe 🚀🪙</span></h1>
 
   <p>
-    <img src="https://img.shields.io/badge/version-2.0.0-blue.svg?cacheSeconds=2592000" />
-    <img src="https://img.shields.io/badge/python->=3.10-blue.svg" />
-    <img src="https://img.shields.io/badge/node->=20.x-green.svg" />
-    <img src="https://img.shields.io/badge/React-Vite-61dafb.svg" />
-    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" />
+    <a href="https://github.com/PelleNybe"><img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=22&pause=1000&color=10B981&center=true&vCenter=true&width=600&lines=Welcome+to+Crypto+MCP+Server;The+Future+of+Edge+AI+%26+Blockchain;AI-driven+command+center" alt="Typing SVG" /></a>
   </p>
 
-  <p><em>The ultimate AI-driven command center for your local crypto operations.</em></p>
+  <p>
+    <a href="https://github.com/PelleNybe"><img src="https://img.shields.io/badge/version-2.0.0-blue.svg?style=for-the-badge&logo=github" /></a>
+    <img src="https://img.shields.io/badge/python->=3.10-blue.svg?style=for-the-badge&logo=python" />
+    <img src="https://img.shields.io/badge/node->=20.x-green.svg?style=for-the-badge&logo=nodedotjs" />
+    <img src="https://img.shields.io/badge/React-Vite-61dafb.svg?style=for-the-badge&logo=react" />
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge" />
+  </p>
+
+  <p><em>The ultimate AI-driven command center for your local crypto operations, featuring a dark, cyberpunk/command-center aesthetic.</em></p>
 </div>
 
 ---
 
 ## 🗺️ System Overview & Architecture
 
-The image series illustrates the four key stages of the Crypto MCP Server, a local ecosystem developed by Corax CoLAB to bridge AI (Claude Desktop), local tools (on a Raspberry Pi), and blockchain technology. The visual narrative progresses from a high-level architectural overview to the practical user experience and essential security considerations.
+The image series below illustrates the four key stages of the Crypto MCP Server, a local ecosystem developed by **Corax CoLAB** and **[PelleNybe](https://github.com/PelleNybe)** to bridge AI (Claude Desktop), local tools (on a Raspberry Pi or Linux machine), and blockchain technology.
 
-### Architectural Overview
-This diagram establishes the foundational flow of the system. It shows how Claude Desktop communicates via JSON-RPC with the Crypto MCP Server backend (REST + WebSocket). The server acts as a proxy, directing traffic to specific local MCP tools on a Raspberry Pi—such as CCXT for exchange trading, CoinGecko for market data, and Portfolio for asset aggregation—while logging orders to a local SQLite database.
-
-<div align="center">
-  <img width="800" alt="Architectural Overview" src="./gui/frontend/public/images/architecture.jpg" style="border-radius: 12px; margin-bottom: 20px;" />
-</div>
-
-### Installation and Configuration
-This image highlights the "Quick Start" process. It shows a user physically working with a Raspberry Pi and a terminal interface. The terminal displays successful execution steps of the automated install.sh script, which automates directory creation, Node.js installation, and service setup, bringing the backend and frontend to an active state.
+<details>
+<summary><b>1️⃣ Architectural Overview (Click to expand)</b></summary>
+<br>
+This diagram establishes the foundational flow of the system. It shows how Claude Desktop communicates via JSON-RPC with the Crypto MCP Server backend (REST + WebSocket). The server acts as a proxy, directing traffic to specific local MCP tools—such as CCXT for exchange trading, CoinGecko for market data, and Portfolio for asset aggregation—while logging orders to a local SQLite database.
 
 <div align="center">
-  <img width="800" alt="Installation and Configuration" src="./gui/frontend/public/images/installation.jpg" style="border-radius: 12px; margin-bottom: 20px;" />
+  <img width="800" alt="Architectural Overview" src="./gui/frontend/public/images/architecture.jpg" style="border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,255,150,0.1);" />
 </div>
+</details>
 
-### Frontend Dashboard
-This visual details the React-based user interface. It is a comprehensive cockpit divided into functional panels, enabling the user to monitor their portfolio, view live market data (tickers), preview orders through a "dry run" simulation, and execute live trades (with a critical confirmation step). A live-updating order log completes the monitoring tools.
+<details>
+<summary><b>2️⃣ Installation and Configuration (Click to expand)</b></summary>
+<br>
+This image highlights the "Quick Start" process. It shows a user physically working with a Linux terminal interface. The terminal displays successful execution steps of the automated `install.sh` script, which automates directory creation, Node.js installation, and service setup.
 
 <div align="center">
-  
+  <img width="800" alt="Installation and Configuration" src="./gui/frontend/public/images/installation.jpg" style="border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,255,150,0.1);" />
 </div>
+</details>
 
-### Security and Best Practices
-The final infographic summarizes the core security principles for operating the MCP server. It visually maps out essential "best practices": using testnet keys for risk-free simulation, securing API keys (e.g., in .env files), restricting network access (LAN only or VPN/SSH tunnels), leveraging local control and logging, and implementing an authenticated reverse proxy (NGINX) for secure remote exposure.
+<details>
+<summary><b>3️⃣ Security and Best Practices (Click to expand)</b></summary>
+<br>
+The final infographic summarizes the core security principles for operating the MCP server. It visually maps out essential "best practices": using testnet keys for risk-free simulation, securing API keys, restricting network access (LAN only or VPN/SSH tunnels), leveraging local control, and implementing an authenticated reverse proxy (NGINX).
 
 <div align="center">
-  <img width="800" alt="Security and Best Practices" src="./gui/frontend/public/images/security.jpg" style="border-radius: 12px; margin-bottom: 20px;" />
+  <img width="800" alt="Security and Best Practices" src="./gui/frontend/public/images/security.jpg" style="border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,255,150,0.1);" />
 </div>
+</details>
 
 ---
 
+<div align="center">
+  <img src="https://raw.githubusercontent.com/PelleNybe/PelleNybe/main/assets/line.svg" width="100%" height="2" onerror="this.style.display='none'"/>
+</div>
 
 **Crypto MCP Server** is a local, lightweight dashboard + utility layer that connects **Claude Desktop (Local MCP tools)** and your local MCP servers on a Raspberry Pi (or other platforms with a Linux distro). It provides a REST + WebSocket backend that proxies MCP tools (CCXT, CoinGecko, Portfolio, Freqtrade, etc.), stores order logs locally (SQLite), and ships a **cyberpunk-themed React frontend dashboard** for monitoring and advanced AI-driven control.
 
-> 📁 **Default project path used in this README:** `/home/pelle/cryptomcpserver/`
-> 🎯 **Installer script:** `install.sh` (located at `/home/pelle/install.sh`)
+> 📁 **Default project path:** `$HOME/cryptomcpserver/`
+> 🎯 **Installer script:** `install.sh` (located at `$HOME/install.sh`)
 
 ---
 
@@ -69,11 +80,11 @@ The Crypto MCP Server now features advanced interactive elements and real-time A
 *   🌀 **Arbitrage Wormhole & Algo Grid Architect:** Interactive components for visualizing cross-exchange opportunities and algorithmic trading grids.
 *   ✨ **Cyberpunk UI Polish:** The entire dashboard is wrapped in a dark, glowing aesthetic with glassmorphism, animated CRT scanlines, and reactive hover states.
 *   👁️ **System Overview:** A high-level visual summary of your entire crypto operation, including system status, active agents, and total equity.
-*   🧠 **Neural Net Liquidity:** Real-time visualization of market liquidity using a simulated neural network topography, helping you spot support and resistance levels.
-*   📊 **Holo Topographic Order Book:** A 3D, holographic representation of the order book, providing deep insights into market depth and potential price movements.
-*   📰 **News Singularity:** An AI-curated feed of the most critical market news, sentiment-scored and presented in a sleek, easily digestible format.
-*   🛰️ **Orbital Portfolio:** A dynamic, physics-based 3D visualization of your asset allocation, where tokens orbit your central portfolio based on market cap and performance.
-*   🐋 **Whale Constellations:** Tracks and maps major wallet movements as constellations, allowing you to follow the 'smart money' across the blockchain.
+*   🧠 **Neural Net Liquidity:** Real-time visualization of market liquidity using a simulated neural network topography.
+*   📊 **Holo Topographic Order Book:** A 3D, holographic representation of the order book.
+*   📰 **News Singularity:** An AI-curated feed of the most critical market news, sentiment-scored.
+*   🛰️ **Orbital Portfolio:** A dynamic, physics-based 3D visualization of your asset allocation.
+*   🐋 **Whale Constellations:** Tracks and maps major wallet movements as constellations.
 
 ---
 
@@ -97,7 +108,7 @@ The Crypto MCP Server now features advanced interactive elements and real-time A
 ## 📁 Repository layout (what you should have)
 
 ```text
-/home/pelle/cryptomcpserver/
+$HOME/cryptomcpserver/
 └─ gui/
    ├─ backend/
    │  ├─ server.js
@@ -131,11 +142,11 @@ The Crypto MCP Server now features advanced interactive elements and real-time A
 
 ## ✅ Quick start — automated (recommended) — install.sh 🎯
 
-Place the provided `install.sh` into `/home/pelle/install.sh` (or `/home/pelle/cryptomcpserver/install.sh` if you prefer). Make it executable and run it as user `pelle`:
+Place the provided `install.sh` into `$HOME/install.sh` (or `$HOME/cryptomcpserver/install.sh` if you prefer). Make it executable and run it:
 
 ```bash
-# Save install.sh to /home/pelle/install.sh, then:
-cd /home/pelle
+# Save install.sh to $HOME/install.sh, then:
+cd $HOME
 chmod +x install.sh
 ./install.sh
 ```
@@ -143,7 +154,7 @@ chmod +x install.sh
 **What install.sh does (summary):**
 1. Creates directories and writes backend & frontend files.
 2. Installs Node.js if missing and runs `npm install` for backend & frontend.
-3. Ensures the `orders` table exists in `/home/pelle/cryptomcpserver/gui/backend/orders.db`.
+3. Ensures the `orders` table exists in `$HOME/cryptomcpserver/gui/backend/orders.db`.
 4. Frees port 4000 if occupied, then installs & enables the systemd service `crypto-mcp-gui.service`.
 5. Attempts a production build of the frontend.
 
@@ -174,7 +185,7 @@ If you prefer to do everything yourself:
 
 3. **Backend:**
    ```bash
-   cd /home/pelle/cryptomcpserver/gui/backend
+   cd $HOME/cryptomcpserver/gui/backend
    npm install
    cp .env.example .env
    # edit .env if needed
@@ -182,7 +193,7 @@ If you prefer to do everything yourself:
 
 4. **Frontend (dev):**
    ```bash
-   cd /home/pelle/cryptomcpserver/gui/frontend
+   cd $HOME/cryptomcpserver/gui/frontend
    npm install
    npm run dev -- --host   # open http://PI_IP:5173 on your laptop
    ```
@@ -198,7 +209,7 @@ If you prefer to do everything yourself:
 
 ## ⚙️ Configuration: .env (backend)
 
-Copy and edit `/home/pelle/cryptomcpserver/gui/backend/.env.example` → `.env`:
+Copy and edit `$HOME/cryptomcpserver/gui/backend/.env.example` → `.env`:
 
 ```env
 MCP_CCXT=http://127.0.0.1:7001/mcp
@@ -273,11 +284,11 @@ curl -s -X POST http://127.0.0.1:4000/api/order/execute \
 
 ## 🗄 SQLite & logs
 
-**DB file:** `/home/pelle/cryptomcpserver/gui/backend/orders.db`
+**DB file:** `$HOME/cryptomcpserver/gui/backend/orders.db`
 
 **Inspect last 10 orders:**
 ```bash
-sqlite3 /home/pelle/cryptomcpserver/gui/backend/orders.db \
+sqlite3 $HOME/cryptomcpserver/gui/backend/orders.db \
   "SELECT id,created_at,exchange,symbol,side,amount,price,status FROM orders ORDER BY created_at DESC LIMIT 10;"
 ```
 
@@ -310,20 +321,23 @@ sudo journalctl -u crypto-mcp-gui.service -f
 ---
 
 <div align="center">
-  <img width="800" alt="cryptomcpinfograph1" src="https://github.com/user-attachments/assets/e0bfce4d-2dc2-4d89-abdf-9594fe5df31d" style="border-radius: 12px; margin-bottom: 20px;" />
-  <img width="800" alt="cryptomcppic" src="https://github.com/user-attachments/assets/9e8f5a08-cbc9-42e3-aed2-d53fcc6d0083" style="border-radius: 12px;" />
+  <h3>Explore the Source 🌐</h3>
+  <a href="https://github.com/PelleNybe">
+    <img src="https://img.shields.io/badge/PelleNybe-GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="PelleNybe Repo" />
+  </a>
+  <a href="https://coraxcolab.com">
+    <img src="https://img.shields.io/badge/Corax_CoLAB-Website-10B981?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Corax CoLAB" />
+  </a>
+  <br><br>
+  <p>
+    <i>This product is proudly brought to you by <b>Corax CoLAB</b> and <b>PelleNybe</b>, the architects behind cyber-physical systems that secure your future in an increasingly regulated and resource-constrained world.</i>
+  </p>
+  <p>
+    <b>We unite:</b><br>
+    🤖 Edge AI & Autonomous Systems<br>
+    ⛓️ Blockchain & Web3 Innovation<br>
+    🛡️ Zero Trust Security (Post-Quantum Cryptography ready)<br>
+    🌱 Sustainability & Compliance-as-Code
+  </p>
+  <img src="https://raw.githubusercontent.com/PelleNybe/PelleNybe/main/assets/line.svg" width="100%" height="2" onerror="this.style.display='none'"/>
 </div>
-
----
-
-## 🌍 The Corax CoLAB Ecosystem
-
-This product is proudly brought to you by **Corax CoLAB**, the architects behind cyber-physical systems that secure your future in an increasingly regulated and resource-constrained world.
-
-We unite:
-- **Edge AI & Autonomous Systems** 🤖
-- **Blockchain & Web3 Innovation** ⛓️
-- **Zero Trust Security (Post-Quantum Cryptography ready)** 🛡️
-- **Sustainability & Compliance-as-Code** 🌱
-
-Find out more at [Corax CoLAB](https://coraxcolab.com/crypto-mcp-server/).

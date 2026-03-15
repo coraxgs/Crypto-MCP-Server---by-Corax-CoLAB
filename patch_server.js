@@ -1,43 +1,31 @@
 const fs = require('fs');
 
-let content = fs.readFileSync('gui/backend/server.js', 'utf8');
+const serverFile = 'gui/backend/server.js';
+let content = fs.readFileSync(serverFile, 'utf8');
 
-const old_middleware = `// Basic auth middleware for all /api routes
-app.use('/api', (req, res, next) => {
-  if (req.path === '/order/pending' || req.path === '/order/reasoning') {
-    // Restrict AI-only endpoints to localhost for defense-in-depth
-    const clientIp = req.ip || req.connection.remoteAddress;
-    if (clientIp !== '127.0.0.1' && clientIp !== '::1' && clientIp !== '::ffff:127.0.0.1') {
-      return res.status(403).json({ ok: false, error: 'Forbidden: Localhost only' });
-    }
-    return next();
-  }`;
+const newEndpoints = `
+// GET /api/mcp
+app.post('/api/mcp', async (req, res) => {
+  const { mcp, method, params } = req.body;
+  if (!mcp || !method) return res.status(400).json({ ok: false, error: 'Missing mcp or method' });
 
-const new_middleware = `// Basic auth middleware for all /api routes
-app.use('/api', (req, res, next) => {`;
+  const mcpUrl = process.env[mcp];
+  if (!mcpUrl) return res.status(400).json({ ok: false, error: 'Unknown MCP endpoint' });
 
-content = content.replace(old_middleware, new_middleware);
+  try {
+    const result = await callMCP(mcpUrl, method, params || {});
+    res.json({ ok: true, data: result });
+  } catch (err) {
+    console.error('mcp error', err.message || err);
+    res.status(500).json({ ok: false, error: String(err.message || err) });
+  }
+});
+`;
 
-const old_exec = `      const orderArgs = {
-        exchange: order.exchange,
-        symbol: order.symbol,
-        side: order.side,
-        type: order.type,
-        amount: Number(order.amount),
-        price: order.price !== null ? Number(order.price) : null,
-        params: {}
-      };`;
-
-const new_exec = `      const orderArgs = {
-        exchange: order.exchange,
-        symbol: order.symbol,
-        side: order.side,
-        type: order.type,
-        amount: Number(order.amount),
-        price: order.price !== null ? Number(order.price) : null,
-        params: { approval_token: DASHBOARD_PASSWORD }
-      };`;
-
-content = content.replace(old_exec, new_exec);
-
-fs.writeFileSync('gui/backend/server.js', content);
+if (!content.includes('/api/mcp')) {
+  content = content.replace("app.get('/api/ticker'", newEndpoints + "\napp.get('/api/ticker'");
+  fs.writeFileSync(serverFile, content, 'utf8');
+  console.log("Patched server.js with generic MCP endpoint");
+} else {
+  console.log("server.js already patched");
+}

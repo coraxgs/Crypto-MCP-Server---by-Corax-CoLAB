@@ -1,5 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Plotly from 'plotly.js-basic-dist';
+import { callMcpEndpoint } from '../../api_mcp';
+import { callMcpEndpoint } from '../../api_mcp';
 
 export default function PredictiveGhosting() {
   const [scrubberValue, setScrubberValue] = useState(0);

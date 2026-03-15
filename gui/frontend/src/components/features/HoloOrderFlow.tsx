@@ -1,4 +1,5 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
+import { callMcpEndpoint } from '../../api_mcp';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Line, Box, Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -85,13 +86,13 @@ export default function HoloOrderFlow({ price, symbol }: { price: number, symbol
         </group>
 
         {/* Render Bids */}
-        {simulatedOrderBook.bids.map((bid, index) => (
-          <Wall key={`bid-${index}`} type="bid" price={bid.price} volume={bid.volume} maxVolume={simulatedOrderBook.maxVolume} index={index} />
+        {bids.map((bid, index) => (
+          <Wall key={`bid-${index}`} type="bid" price={bid.price} volume={bid.volume} maxVolume={maxVolume} index={index} />
         ))}
 
         {/* Render Asks */}
-        {simulatedOrderBook.asks.map((ask, index) => (
-          <Wall key={`ask-${index}`} type="ask" price={ask.price} volume={ask.volume} maxVolume={simulatedOrderBook.maxVolume} index={index} />
+        {asks.map((ask, index) => (
+          <Wall key={`ask-${index}`} type="ask" price={ask.price} volume={ask.volume} maxVolume={maxVolume} index={index} />
         ))}
 
         <OrbitControls

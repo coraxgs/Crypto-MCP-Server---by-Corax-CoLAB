@@ -48,9 +48,36 @@ app.use('/api', (req, res, next) => {
 });
 const path = require('path');
 
+
+
+
 const MCP_CCXT = process.env.MCP_CCXT || 'http://127.0.0.1:7001/mcp';
 const MCP_PORTFOLIO = process.env.MCP_PORTFOLIO || 'http://127.0.0.1:7004/mcp';
+const MCP_LLM = process.env.MCP_LLM || 'http://127.0.0.1:7015/mcp';
+const MCP_COINGECKO = process.env.MCP_COINGECKO || 'http://127.0.0.1:7010/mcp';
+const MCP_FREQTRADE = process.env.MCP_FREQTRADE || 'http://127.0.0.1:7002/mcp';
+const MCP_OCTOBOT = process.env.MCP_OCTOBOT || 'http://127.0.0.1:7003/mcp';
+const MCP_ONCHAIN = process.env.MCP_ONCHAIN || 'http://127.0.0.1:7007/mcp';
+const MCP_TA = process.env.MCP_TA || 'http://127.0.0.1:7005/mcp';
+const MCP_SUPERALGOS = process.env.MCP_SUPERALGOS || 'http://127.0.0.1:7006/mcp';
+const MCP_HUMMINGBOT = process.env.MCP_HUMMINGBOT || 'http://127.0.0.1:7014/mcp';
+const MCP_NOTIFIER = process.env.MCP_NOTIFIER || 'http://127.0.0.1:7016/mcp';
+
+const mcpUrls = {
+  MCP_CCXT,
+  MCP_PORTFOLIO,
+  MCP_LLM,
+  MCP_COINGECKO,
+  MCP_FREQTRADE,
+  MCP_OCTOBOT,
+  MCP_ONCHAIN,
+  MCP_TA,
+  MCP_SUPERALGOS,
+  MCP_HUMMINGBOT,
+  MCP_NOTIFIER
+};
 const PORT = parseInt(process.env.PORT || '4000', 10);
+
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -119,7 +146,7 @@ async function callMCP(mcpUrl, toolName, args = {}) {
 app.get('/api/portfolio', async (req, res) => {
   const exchanges = (req.query.exchanges || 'binance').split(',').map(s => s.trim());
   try {
-    const result = await callMCP(MCP_PORTFOLIO, 'portfolio_value', exchanges);
+    const result = await callMCP(mcpUrls.MCP_PORTFOLIO, 'portfolio_value', exchanges);
     res.json({ ok: true, data: result });
   } catch (err) {
     console.error('portfolio error', err.message || err);
@@ -128,10 +155,28 @@ app.get('/api/portfolio', async (req, res) => {
 });
 
 // GET /api/ticker
+
+// GET /api/mcp
+app.post('/api/mcp', async (req, res) => {
+  const { mcp, method, params } = req.body;
+  if (!mcp || !method) return res.status(400).json({ ok: false, error: 'Missing mcp or method' });
+
+  const mcpUrl = mcpUrls[mcp];
+  if (!mcpUrl) return res.status(400).json({ ok: false, error: 'Unknown MCP endpoint' });
+
+  try {
+    const result = await callMCP(mcpUrl, method, params || {});
+    res.json({ ok: true, data: result });
+  } catch (err) {
+    console.error('mcp error', err.message || err);
+    res.status(500).json({ ok: false, error: String(err.message || err) });
+  }
+});
+
 app.get('/api/ticker', async (req, res) => {
   const { exchange = 'binance', symbol = 'BTC/USDT' } = req.query;
   try {
-    const result = await callMCP(MCP_CCXT, 'get_ticker', { exchange, symbol });
+    const result = await callMCP(mcpUrls.MCP_CCXT, 'get_ticker', { exchange, symbol });
     res.json({ ok: true, data: result });
   } catch (err) {
     console.error('ticker error', err.message || err);
@@ -154,7 +199,7 @@ app.post('/api/order/dry_run', async (req, res) => {
     return res.status(400).json({ ok:false, error: 'Price must be a positive number' });
   }
   try {
-    const ticker = await callMCP(MCP_CCXT, 'get_ticker', { exchange, symbol });
+    const ticker = await callMCP(mcpUrls.MCP_CCXT, 'get_ticker', { exchange, symbol });
     const marketPrice = ticker && (ticker.last || ticker.close) ? (ticker.last || ticker.close) : null;
     const usedPrice = (price !== undefined && price !== null) ? price : marketPrice;
     const estimatedCost = (usedPrice && amount) ? (parseFloat(usedPrice) * parseFloat(amount)) : null;
@@ -209,7 +254,7 @@ app.post('/api/order/execute', async (req, res) => {
       params: exchangeParams
     };
 
-    const orderResp = await callMCP(MCP_CCXT, 'create_order', orderArgs);
+    const orderResp = await callMCP(mcpUrls.MCP_CCXT, 'create_order', orderArgs);
 
     const stmt = db.prepare('INSERT INTO orders (exchange,symbol,side,type,amount,price,dry_run,status,response) VALUES (?,?,?,?,?,?,?,?)');
     stmt.run(exchange, symbol, side, type, amount, price || null, 0, 'placed', JSON.stringify(orderResp));
@@ -253,8 +298,8 @@ async function callAndEmit(mcpUrl, toolName, args, eventName) {
 }
 
 // Polling intervals
-setInterval(() => callAndEmit(MCP_PORTFOLIO, 'portfolio_value', ['binance'], 'portfolio'), 30000);
-setInterval(() => callAndEmit(MCP_CCXT, 'get_ticker', { exchange: 'binance', symbol: 'BTC/USDT' }, 'ticker'), 5000);
+setInterval(() => callAndEmit(mcpUrls.MCP_PORTFOLIO, 'portfolio_value', ['binance'], 'portfolio'), 30000);
+setInterval(() => callAndEmit(mcpUrls.MCP_CCXT, 'get_ticker', { exchange: 'binance', symbol: 'BTC/USDT' }, 'ticker'), 5000);
 
 // Start server and handle errors (EADDRINUSE will be surfaced)
 server.listen(PORT, () => {
@@ -341,7 +386,7 @@ app.post('/api/order/approve', async (req, res) => {
         params: { approval_token: DASHBOARD_PASSWORD }
       };
 
-      const orderResp = await callMCP(MCP_CCXT, 'execute_approved_order', orderArgs);
+      const orderResp = await callMCP(mcpUrls.MCP_CCXT, 'execute_approved_order', orderArgs);
 
       db.run('UPDATE orders SET status = ?, response = ?, dry_run = 0 WHERE id = ?', ['placed', JSON.stringify(orderResp), orderId]);
 

@@ -1,4 +1,5 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
+import { callMcpEndpoint } from '../../api_mcp';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -8,26 +9,33 @@ const TrenchView = () => {
   const groupRef = useRef<THREE.Group>(null);
 
   // Create synthetic order book data
-  const { bids, asks } = useMemo(() => {
-    let bs = [];
-    let as = [];
-    let currentPrice = 64000;
 
-    // Bids (Green walls, decreasing price)
-    for(let i=1; i<=20; i++) {
-      let price = currentPrice - i * 50;
-      let volume = Math.random() * 5 + (i===10 ? 15 : 0); // Add a wall at index 10
-      bs.push({ price, volume, type: 'bid' });
-    }
+  const [bids, setBids] = useState<{price: number, volume: number, type: string}[]>([]);
+  const [asks, setAsks] = useState<{price: number, volume: number, type: string}[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    // Asks (Red walls, increasing price)
-    for(let i=1; i<=20; i++) {
-      let price = currentPrice + i * 50;
-      let volume = Math.random() * 5 + (i===15 ? 20 : 0); // Add a wall at index 15
-      as.push({ price, volume, type: 'ask' });
-    }
-    return { bids: bs.reverse(), asks: as }; // bids closest to price in middle
+  useEffect(() => {
+    let active = true;
+    const fetchOB = async () => {
+      try {
+        const ob = await callMcpEndpoint('MCP_CCXT', 'fetch_order_book', { exchange: 'binance', symbol: 'BTC/USDT', limit: 20 });
+        if (!active) return;
+
+        let bs = ob.bids.map((b: any) => ({ price: b[0], volume: b[1], type: 'bid' }));
+        let as = ob.asks.map((a: any) => ({ price: a[0], volume: a[1], type: 'ask' }));
+        setBids(bs.reverse());
+        setAsks(as);
+      } catch (err) {
+        console.error("Order book fetch error", err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+    fetchOB();
+    const interval = setInterval(fetchOB, 5000);
+    return () => { active = false; clearInterval(interval); };
   }, []);
+
 
   // Animate the trench slightly
   useFrame((state) => {

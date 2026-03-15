@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Play, Pause, FastForward, Rewind, Settings } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Play, Pause, FastForward, Rewind, Settings } from 'lucide-react';
 import Plotly from 'plotly.js-basic-dist';
+import { callMcpEndpoint } from '../../api_mcp';
 
 export default function BacktestArenaPanel() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -8,31 +11,37 @@ export default function BacktestArenaPanel() {
   const [speed, setSpeed] = useState(1);
   const [strategy, setStrategy] = useState('Corax-AI-V1');
 
-  // Generate simulated historical data
-  const historicalData = useMemo(() => {
-    const data = [];
-    let price = 60000;
-    const days = 100;
 
-    for (let i = 0; i < days; i++) {
-      const open = price;
-      const close = price + (Math.random() - 0.48) * 2000; // Slight uptrend
-      const high = Math.max(open, close) + Math.random() * 1000;
-      const low = Math.min(open, close) - Math.random() * 1000;
+  const [historicalData, setHistoricalData] = useState<any[]>([]);
+  useEffect(() => {
+    let active = true;
+    const fetchData = async () => {
+      try {
+        const result = await callMcpEndpoint('MCP_CCXT', 'fetch_ohlcv', { exchange: 'binance', symbol: 'BTC/USDT', timeframe: '1h', limit: 100 });
+        if (!active || !result) return;
 
-      const isTrade = Math.random() > 0.8;
-      const tradeType = isTrade ? (Math.random() > 0.5 ? 'BUY' : 'SELL') : null;
-
-      data.push({
-        date: new Date(Date.now() - (days - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        open, high, low, close,
-        trade: tradeType,
-        profit: tradeType === 'SELL' ? (Math.random() - 0.2) * 500 : 0
-      });
-      price = close;
-    }
-    return data;
+        const data = result.map((c: any) => {
+          const isTrade = Math.random() > 0.8;
+          const tradeType = isTrade ? (Math.random() > 0.5 ? 'BUY' : 'SELL') : null;
+          return {
+            date: new Date(c[0]).toISOString().split('T')[0],
+            open: c[1],
+            high: c[2],
+            low: c[3],
+            close: c[4],
+            trade: tradeType,
+            profit: tradeType === 'SELL' ? (c[4] - c[1]) * 0.1 : 0
+          };
+        });
+        setHistoricalData(data);
+      } catch (err) {
+        console.error("Backtest fetch error", err);
+      }
+    };
+    fetchData();
+    return () => { active = false; };
   }, []);
+
 
   const totalProfit = useMemo(() => {
     const visibleData = historicalData.slice(0, Math.max(1, Math.floor((progress / 100) * historicalData.length)));

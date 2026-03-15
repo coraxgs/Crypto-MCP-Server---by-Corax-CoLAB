@@ -1,5 +1,3 @@
-import React, { useState, useEffect, useRef } from 'react';
-import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Terminal, X, BrainCircuit } from 'lucide-react';
 import { callMcpEndpoint } from '../../api_mcp';
 

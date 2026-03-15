@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > gui/frontend/src/components/features/NewsSingularity.tsx
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Html } from '@react-three/drei';
@@ -171,3 +172,4 @@ export default function NewsSingularity() {
     </div>
   );
 }
+INNER_EOF

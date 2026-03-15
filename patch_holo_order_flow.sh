@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > gui/frontend/src/components/features/HoloTopographicOrderBook.tsx
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { callMcpEndpoint } from '../../api_mcp';
 import { Canvas, useFrame } from '@react-three/fiber';
@@ -133,3 +134,4 @@ export default function HoloTopographicOrderBook() {
     </div>
   );
 }
+INNER_EOF

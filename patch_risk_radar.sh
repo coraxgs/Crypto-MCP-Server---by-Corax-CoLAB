@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > gui/frontend/src/components/features/RiskRadarPanel.tsx
 import React, { useState, useEffect } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import { ShieldAlert, Activity, Wifi } from 'lucide-react';
@@ -195,3 +196,4 @@ export default function RiskRadarPanel() {
     </div>
   );
 }
+INNER_EOF

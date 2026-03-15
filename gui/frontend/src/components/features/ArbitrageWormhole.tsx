@@ -1,7 +1,8 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Html } from '@react-three/drei';
+import { OrbitControls, Text, Html, Line } from '@react-three/drei';
 import * as THREE from 'three';
+import { callMcpEndpoint } from '../../api_mcp';
 import { Network } from 'lucide-react';
 
 const WormholeTunnel = () => {
@@ -133,20 +134,41 @@ const ArbitrageParticle = ({ start, end, speed }: { start: THREE.Vector3, end: T
 export default function ArbitrageWormhole() {
   const [opportunities, setOpportunities] = useState<any[]>([]);
 
+
   useEffect(() => {
-    // Mocking real-time arbitrage detection
-    const interval = setInterval(() => {
-      const isArb = Math.random() > 0.4;
-      if (isArb) {
-        setOpportunities([
-          { pair: 'BTC/USDT', source: 'Kraken', target: 'Binance', spread: (Math.random() * 50 + 10).toFixed(2), p1: 64200, p2: 64260 }
-        ]);
-      } else {
-        setOpportunities([]);
+    let active = true;
+    const fetchArbitrage = async () => {
+      try {
+        // Fetch tickers from different exchanges to compare spread
+        const t1 = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: 'kraken', symbol: 'BTC/USDT' });
+        const t2 = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: 'binance', symbol: 'BTC/USDT' });
+
+        if (!active) return;
+
+        if (t1 && t2 && t1.last && t2.last) {
+          const spread = Math.abs(t1.last - t2.last);
+          if (spread > 10) {
+            setOpportunities([{
+              pair: 'BTC/USDT',
+              source: t1.last < t2.last ? 'Kraken' : 'Binance',
+              target: t1.last < t2.last ? 'Binance' : 'Kraken',
+              spread: spread.toFixed(2),
+              p1: t1.last < t2.last ? t1.last : t2.last,
+              p2: t1.last < t2.last ? t2.last : t1.last
+            }]);
+          } else {
+            setOpportunities([]);
+          }
+        }
+      } catch (err) {
+        console.error("Arbitrage fetch error", err);
       }
-    }, 4000);
-    return () => clearInterval(interval);
+    };
+    fetchArbitrage();
+    const interval = setInterval(fetchArbitrage, 5000);
+    return () => { active = false; clearInterval(interval); };
   }, []);
+
 
   const sourcePos = new THREE.Vector3(-4, 0, 0);
   const targetPos = new THREE.Vector3(4, 0, 0);

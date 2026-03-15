@@ -6,44 +6,38 @@ export default function RiskRadarPanel() {
   const [defcon, setDefcon] = useState<'GREEN' | 'YELLOW' | 'RED'>('GREEN');
   const [logs, setLogs] = useState<string[]>(['[SYS] Connecting to On-Chain MCP Node...']);
 
-  // Generate simulated on-chain network data
-  const data = useMemo(() => {
-    const nodes: any[] = [];
-    const links: any[] = [];
 
-    // Core exchanges
-    const exchanges = ['Binance', 'Coinbase', 'Kraken', 'KuCoin'];
-    exchanges.forEach(name => nodes.push({ id: name, group: 'exchange', size: 20, color: '#3b82f6' }));
+  const [data, setData] = useState({ nodes: [], links: [] });
 
-    // DeFi Protocols
-    const protocols = ['Uniswap', 'Aave', 'Curve', 'MakerDAO'];
-    protocols.forEach(name => nodes.push({ id: name, group: 'defi', size: 15, color: '#8b5cf6' }));
+  useEffect(() => {
+    let active = true;
+    const fetchNodes = async () => {
+      try {
+        const result = await callMcpEndpoint('MCP_CCXT', 'fetch_balance', { exchange: 'binance' });
+        if (!active || !result.total) return;
 
-    // Whale Wallets
-    for (let i = 0; i < 20; i++) {
-      nodes.push({ id: `Whale-${i}`, group: 'whale', size: Math.random() * 8 + 2, color: '#10b981' });
-    }
+        const nodes = [{ id: 'Binance', group: 'exchange', size: 15, color: '#3b82f6' }];
+        const links = [];
 
-    // Connect them
-    nodes.filter(n => n.group === 'whale').forEach(whale => {
-      // Whales connect to 1-3 exchanges or protocols
-      const numConnections = Math.floor(Math.random() * 3) + 1;
-      for (let i = 0; i < numConnections; i++) {
-        const targetGroup = Math.random() > 0.5 ? exchanges : protocols;
-        const target = targetGroup[Math.floor(Math.random() * targetGroup.length)];
-        const value = Math.random() * 100;
+        let i = 0;
+        for (const [coin, amount] of Object.entries(result.total)) {
+          if (amount > 0) {
+            nodes.push({ id: coin, group: 'asset', size: Math.max(5, Math.min(15, amount)), color: '#10b981' });
+            links.push({ source: 'Binance', target: coin, value: amount });
+            i++;
+          }
+        }
 
-        links.push({
-          source: whale.id,
-          target: target,
-          value: value,
-          color: value > 80 ? '#ef4444' : 'rgba(16, 185, 129, 0.5)' // Red links are high risk flows
-        });
+        setData({ nodes, links });
+      } catch (err) {
+        console.error("Failed to fetch risk radar data", err);
       }
-    });
-
-    return { nodes, links };
+    };
+    fetchNodes();
+    const interval = setInterval(fetchNodes, 10000);
+    return () => { active = false; clearInterval(interval); };
   }, []);
+
 
   // Simulate network events
   useEffect(() => {

@@ -163,3 +163,14 @@ def log_reasoning(trade_id: str, explanation: str) -> dict:
 if __name__ == "__main__":
     print("Starting ccxt_mcp on http://0.0.0.0:7001/mcp — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
     mcp.run("streamable-http")
+
+@mcp.tool()
+def fetch_order_book(exchange: str, symbol: str, limit: int = 20) -> dict:
+    """
+    Fetch the order book (L2) for a given symbol.
+    """
+    try:
+        ex = _make_exchange(exchange)
+        return ex.fetch_order_book(symbol, limit)
+    except Exception as e:
+        return {"error": str(e)}

@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > gui/frontend/src/components/features/BacktestArenaPanel.tsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { Play, Pause, FastForward, Rewind, Settings } from 'lucide-react';
 import Plotly from 'plotly.js-basic-dist';
@@ -317,3 +318,4 @@ export default function BacktestArenaPanel() {
     </div>
   );
 }
+INNER_EOF

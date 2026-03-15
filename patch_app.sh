@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > gui/frontend/src/App.tsx
 import React, { useState, useEffect } from 'react'
 import PortfolioPanel from './components/PortfolioPanel'
 import TickerPanel from './components/TickerPanel'
@@ -158,3 +159,4 @@ export default function App() {
     </div>
   )
 }
+INNER_EOF

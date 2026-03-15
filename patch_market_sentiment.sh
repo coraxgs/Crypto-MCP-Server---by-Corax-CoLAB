@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > gui/frontend/src/components/features/MarketSentimentAnalyzer.tsx
 import React, { useState, useEffect } from 'react';
 import { BrainCircuit, Activity, AlertTriangle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { callMcpEndpoint } from '../../api_mcp';
@@ -132,3 +133,4 @@ export default function MarketSentimentAnalyzer() {
     </div>
   );
 }
+INNER_EOF

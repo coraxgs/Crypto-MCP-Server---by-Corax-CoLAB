@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > gui/frontend/src/components/features/PredictiveGhosting.tsx
 import React, { useEffect, useState, useRef } from 'react';
 import Plotly from 'plotly.js-basic-dist';
 import { callMcpEndpoint } from '../../api_mcp';
@@ -185,3 +186,4 @@ export default function PredictiveGhosting() {
     </div>
   );
 }
+INNER_EOF

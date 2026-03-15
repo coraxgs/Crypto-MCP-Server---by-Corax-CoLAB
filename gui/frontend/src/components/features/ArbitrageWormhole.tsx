@@ -202,7 +202,7 @@ export default function ArbitrageWormhole() {
           <>
             <WormholeTunnel />
             {Array.from({ length: 20 }).map((_, i) => (
-              <ArbitrageParticle key={i} start={sourcePos} end={targetPos} speed={0.5 + Math.random() * 1.5} />
+              <ArbitrageParticle key={i} start={sourcePos} end={targetPos} speed={0.5 + (i % 3) * 0.5} />
             ))}
           </>
         )}

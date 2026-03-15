@@ -1,56 +1,80 @@
 import React, { useRef, useState, useEffect } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import * as THREE from 'three';
+import { callMcpEndpoint } from '../../api_mcp';
 
 // Feature 1: The "Neural-Net" Liquidity Flow & Arbitrage Map
 export default function NeuralNetLiquidity() {
-  const fgRef = useRef<any>();
-  const [graphData, setGraphData] = useState({ nodes: [], links: [] });
+    const fgRef = useRef<any>();
+  const [graphData, setGraphData] = useState<any>({ nodes: [], links: [] });
 
   useEffect(() => {
-    // Generate synthetic data for exchanges and pairs
-    const exchanges = ['Binance', 'Kraken', 'Coinbase', 'KuCoin'];
-    const pairs = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT', 'XRP/USDT', 'ADA/USDT'];
+    let active = true;
+    const fetchLiquidity = async () => {
+      try {
+        const exchanges = ['binance', 'kraken', 'kucoin'];
+        const pairs = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT'];
 
-    let nodes: any[] = [];
-    let links: any[] = [];
+        let nodes = [];
+        let links = [];
 
-    // Add exchanges as large hubs
-    exchanges.forEach((ex, idx) => {
-      nodes.push({ id: ex, group: 'exchange', size: 20, color: '#10b981' });
-    });
+        exchanges.forEach(ex => {
+            nodes.push({ id: ex, group: 'exchange', size: 20, color: '#facc15' });
+        });
 
-    // Add pairs orbiting exchanges
-    pairs.forEach((pair, pIdx) => {
-      exchanges.forEach((ex, eIdx) => {
-        const nodeId = `${ex}-${pair}`;
-        nodes.push({ id: nodeId, group: 'pair', size: 5, color: '#60a5fa' });
-        links.push({ source: ex, target: nodeId, value: 1 });
+        // We will try to fetch real tickers to build the network
+        // If an exchange has a pair, link it. If there's an arbitrage opportunity, link the pairs across exchanges.
+        for (const pair of pairs) {
+            const pairNodeId = `root-${pair}`;
+            nodes.push({ id: pairNodeId, group: 'pair-root', size: 10, color: '#10b981' });
 
-        // Randomly link some pairs across exchanges to simulate arbitrage opportunities
-        if (Math.random() > 0.8) {
-          const otherEx = exchanges[(eIdx + 1) % exchanges.length];
-          links.push({
-            source: nodeId,
-            target: `${otherEx}-${pair}`,
-            value: 5,
-            isArbitrage: true
-          });
+            for (let eIdx = 0; eIdx < exchanges.length; eIdx++) {
+                const ex = exchanges[eIdx];
+                const exPairId = `${ex}-${pair}`;
+
+                try {
+                    // Try to get ticker to confirm it exists and maybe use volume for link size
+                    const ticker = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: ex, symbol: pair }).catch(() => null);
+                    if (ticker && ticker.last) {
+                        nodes.push({ id: exPairId, group: 'pair', size: 5, color: '#60a5fa' });
+                        links.push({ source: ex, target: exPairId, value: Math.max(1, Math.min((ticker.baseVolume || 100) / 1000, 10)) });
+                        links.push({ source: pairNodeId, target: exPairId, value: 1, isPair: true });
+
+                        // Check for arbitrage with previous exchanges
+                        for (let i = 0; i < eIdx; i++) {
+                             const prevEx = exchanges[i];
+                             const prevExPairId = `${prevEx}-${pair}`;
+                             const prevTicker = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: prevEx, symbol: pair }).catch(() => null);
+                             if (prevTicker && prevTicker.last) {
+                                 const spread = Math.abs(ticker.last - prevTicker.last) / ticker.last * 100;
+                                 if (spread > 0.1) {
+                                     // Arbitrage link
+                                     links.push({
+                                        source: prevExPairId,
+                                        target: exPairId,
+                                        value: spread * 10,
+                                        isArbitrage: true,
+                                        color: '#ef4444' // Neon red laser
+                                     });
+                                 }
+                             }
+                        }
+                    }
+                } catch(e) {}
+            }
         }
-      });
-    });
 
-    setGraphData({ nodes, links });
-
-    const interval = setInterval(() => {
-      // Simulate shockwaves from whale transactions
-      if (Math.random() > 0.7 && fgRef.current) {
-         // Could trigger some visual effect or update graph data to simulate shockwave
-         // For now just re-centering or slight rotation
+        if (active) {
+            setGraphData({ nodes, links });
+        }
+      } catch (err) {
+        console.error("Neural fetch error", err);
       }
-    }, 5000);
+    };
 
-    return () => clearInterval(interval);
+    fetchLiquidity();
+    const interval = setInterval(fetchLiquidity, 30000);
+    return () => { active = false; clearInterval(interval); };
   }, []);
 
   return (

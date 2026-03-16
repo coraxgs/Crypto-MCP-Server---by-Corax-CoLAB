@@ -12,7 +12,7 @@ export default function PredictiveGhosting() {
 
     const fetchAndCalculate = async () => {
         try {
-            const ohlcvData = await callMcpEndpoint('MCP_CCXT', 'fetch_ohlcv', { exchange: 'binance', symbol: 'BTC/USDT', timeframe: '1h', limit: 50 });
+            const ohlcvData = await callMcpEndpoint('MCP_CCXT', 'fetch_ohlcv', { exchange: 'kraken', symbol: 'BTC/USDT', timeframe: '1h', limit: 50 });
 
             if (!active) return;
             if (!ohlcvData || !Array.isArray(ohlcvData) || ohlcvData.length === 0) return;
@@ -29,7 +29,7 @@ export default function PredictiveGhosting() {
             let volatility = currentPrice * 0.01;
 
             try {
-                const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'binance', symbol: 'BTC/USDT', timeframe: '1h' });
+                const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'kraken', symbol: 'BTC/USDT', timeframe: '1h' });
                 if (active && taData) {
                     if (taData.signal === 'buy') trendFactor = 0.5;
                     if (taData.signal === 'sell') trendFactor = -0.5;
@@ -43,24 +43,40 @@ export default function PredictiveGhosting() {
             }
 
             const futureSteps = 20;
-            let simPrice = currentPrice;
             const futureX = [];
-            const futureY = [];
-            const futureLower = [];
-            const futureUpper = [];
+            let futureY = [];
+            let futureLower = [];
+            let futureUpper = [];
 
-            // Pseudo-random deterministic walk based on historical prices to avoid Math.random() re-renders
-            for (let i = 1; i <= futureSteps; i++) {
-                futureX.push(`T${i}`);
-                const histIdx = Math.floor((i / futureSteps) * (y.length - 2));
-                const priceDiff = (y[histIdx + 1] - y[histIdx]) / y[histIdx];
-
-                simPrice += (priceDiff + (trendFactor * 0.2)) * (volatility * 0.5);
-                futureY.push(simPrice);
-
-                const spread = Math.sqrt(i) * volatility * 0.5;
-                futureLower.push(simPrice - spread);
-                futureUpper.push(simPrice + spread);
+            try {
+                // Call real Monte Carlo simulation from backend (ta_mcp)
+                const mcData = await callMcpEndpoint('MCP_TA', 'monte_carlo_simulation', { exchange: 'kraken', symbol: 'BTC/USDT', timeframe: '1h', limit: 100, future_steps: futureSteps, simulations: 1000 });
+                if (mcData && mcData.median_path && !mcData.error) {
+                    // Remove the first element since it's the current price, to match futureX length
+                    futureY = mcData.median_path.slice(1);
+                    futureLower = mcData.lower_bound.slice(1);
+                    futureUpper = mcData.upper_bound.slice(1);
+                    for (let i = 1; i <= futureSteps; i++) {
+                        futureX.push(`T${i}`);
+                    }
+                } else {
+                    console.warn("Monte Carlo simulation failed or returned error", mcData);
+                    throw new Error("Fallback to defaults");
+                }
+            } catch (err) {
+                console.error("Error fetching Monte Carlo data, falling back", err);
+                // Fallback deterministic walk just in case
+                let simPrice = currentPrice;
+                for (let i = 1; i <= futureSteps; i++) {
+                    futureX.push(`T${i}`);
+                    const histIdx = Math.floor((i / futureSteps) * (y.length - 2));
+                    const priceDiff = (y[histIdx + 1] - y[histIdx]) / y[histIdx];
+                    simPrice += (priceDiff + (trendFactor * 0.2)) * (volatility * 0.5);
+                    futureY.push(simPrice);
+                    const spread = Math.sqrt(i) * volatility * 0.5;
+                    futureLower.push(simPrice - spread);
+                    futureUpper.push(simPrice + spread);
+                }
             }
 
             setPlotData({ x, y, futureX, futureY, futureLower, futureUpper });

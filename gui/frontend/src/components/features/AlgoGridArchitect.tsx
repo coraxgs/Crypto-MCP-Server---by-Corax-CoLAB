@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Network, Activity, Settings, Cpu, Save, Plus } from 'lucide-react';
 import { authenticatedFetch } from '../../auth';
+import { callMcpEndpoint } from '../../api_mcp';
 
 const Node = ({ type, title, position, active }: { type: 'source' | 'logic' | 'action', title: string, position: {x: number, y: number}, active: boolean }) => {
   const colors = {
@@ -65,29 +66,14 @@ const Connection = ({ start, end, active }: { start: {x: number, y: number}, end
   );
 };
 
-const defaultNodes = [
-  { id: 1, type: 'source' as const, title: 'CCXT: BTC/USDT', pos: { x: 20, y: 50 } },
-  { id: 2, type: 'source' as const, title: 'On-Chain: Whale Alert', pos: { x: 20, y: 180 } },
-  { id: 3, type: 'logic' as const, title: 'Freqtrade: RSI < 30', pos: { x: 250, y: 50 } },
-  { id: 4, type: 'logic' as const, title: 'AND Gate', pos: { x: 250, y: 180 } },
-  { id: 5, type: 'action' as const, title: 'Hummingbot: TWAP Buy', pos: { x: 480, y: 110 } },
-];
-
-const defaultConnections = [
-  { start: {x: 200, y: 80}, end: {x: 250, y: 80} },
-  { start: {x: 200, y: 210}, end: {x: 250, y: 210} },
-  { start: {x: 430, y: 80}, end: {x: 480, y: 130} },
-  { start: {x: 430, y: 210}, end: {x: 480, y: 150} }
-];
-
 export default function AlgoGridArchitect() {
   const [activePath, setActivePath] = useState(false);
-  const [nodes, setNodes] = useState(defaultNodes);
-  const [connections, setConnections] = useState(defaultConnections);
+  const [nodes, setNodes] = useState<{id: number, type: 'source'|'logic'|'action', title: string, pos: {x: number, y: number}}[]>([]);
+  const [connections, setConnections] = useState<{start: {x: number, y: number}, end: {x: number, y: number}}[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Load strategies from backend
+    // Load strategies from backend or build dynamic default
     const loadStrategies = async () => {
       try {
         const res = await authenticatedFetch('/api/strategies');
@@ -100,8 +86,32 @@ export default function AlgoGridArchitect() {
             if(loadedNodes && loadedNodes.length > 0) {
                setNodes(loadedNodes);
                setConnections(loadedConnections);
+               return;
             }
         }
+
+        // No saved strategies, build dynamic starting grid from live market data
+        const markets = await callMcpEndpoint('MCP_CCXT', 'fetch_markets', { exchange: 'binance' });
+        // Use first available pair as an example, defaults to BTC/USDT
+        const pair = markets && markets.length > 0 ? markets.find((m: any) => m.symbol.includes('USDT'))?.symbol || 'BTC/USDT' : 'BTC/USDT';
+
+        const dynamicNodes = [
+            { id: 1, type: 'source' as const, title: `CCXT: ${pair}`, pos: { x: 20, y: 50 } },
+            { id: 2, type: 'source' as const, title: 'On-Chain: ETH Router', pos: { x: 20, y: 180 } },
+            { id: 3, type: 'logic' as const, title: 'Freqtrade: RSI < 30', pos: { x: 250, y: 50 } },
+            { id: 4, type: 'logic' as const, title: 'AND Gate', pos: { x: 250, y: 180 } },
+            { id: 5, type: 'action' as const, title: 'Hummingbot: TWAP Buy', pos: { x: 480, y: 110 } },
+        ];
+
+        const dynamicConnections = [
+            { start: {x: 200, y: 80}, end: {x: 250, y: 80} },
+            { start: {x: 200, y: 210}, end: {x: 250, y: 210} },
+            { start: {x: 430, y: 80}, end: {x: 480, y: 130} },
+            { start: {x: 430, y: 210}, end: {x: 480, y: 150} }
+        ];
+        setNodes(dynamicNodes);
+        setConnections(dynamicConnections);
+
       } catch (err) {
         console.error("Failed to load strategies:", err);
       }
@@ -123,7 +133,7 @@ export default function AlgoGridArchitect() {
          id: Date.now(),
          type: 'logic' as const,
          title: 'New Custom Logic',
-         pos: { x: 250, y: Math.floor(Math.random() * 200) + 20 }
+         pos: { x: 250 + (nodes.length * 10) % 100, y: 50 + (nodes.length * 30) % 200 }
      };
      setNodes([...nodes, newNode]);
   };

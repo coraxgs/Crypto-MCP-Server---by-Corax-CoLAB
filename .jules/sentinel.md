@@ -10,3 +10,7 @@
 **Prevention:**
 1) Internal backend tools exposed over an MCP interface must require a secret token (e.g. `approval_token`) known only to the backend.
 2) Do not rely on `req.ip` for authentication. Require explicit `Authorization` headers with a shared secret/token even for backend-to-backend internal communication if there's any chance of SSRF or CSRF via a browser.
+2026-03-16 - [Real Data Migration]
+Vulnerability: Legacy files containing mock data arrays and Math.random() usage were co-existing with production features.
+Learning: Unused component files with mock data (`LiquidityFlowMap.tsx`, `PredictiveChart.tsx`) can create confusion. We must ensure only components driven by the MCP backend are utilized.
+Prevention: Perform routine codebase sweeps to prune `.orig` files and unused feature components that don't connect to backend endpoints via `callMcpEndpoint`.

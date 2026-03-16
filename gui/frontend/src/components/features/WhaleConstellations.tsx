@@ -99,7 +99,8 @@ export default function WhaleConstellations() {
             const phi = Math.acos(-1 + (2 * index) / topCoins.length);
             const theta = Math.sqrt(topCoins.length * Math.PI) * phi;
 
-            const r = 6 + Math.random() * 2; // Radius between 6 and 8
+            // Deterministic radius between 6 and 8 based on index
+            const r = 6 + (index % 5) * 0.5; // Radius between 6 and 8
             const x = r * Math.cos(theta) * Math.sin(phi);
             const y = r * Math.sin(theta) * Math.sin(phi);
             const z = r * Math.cos(phi);

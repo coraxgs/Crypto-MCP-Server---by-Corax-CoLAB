@@ -123,7 +123,7 @@ export default function AlgoGridArchitect() {
          id: Date.now(),
          type: 'logic' as const,
          title: 'New Custom Logic',
-         pos: { x: 250, y: Math.floor(Math.random() * 200) + 20 }
+         pos: { x: 250 + (nodes.length * 10) % 100, y: 50 + (nodes.length * 30) % 200 }
      };
      setNodes([...nodes, newNode]);
   };

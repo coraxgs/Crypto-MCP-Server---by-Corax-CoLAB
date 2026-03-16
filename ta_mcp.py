@@ -82,6 +82,7 @@ def monte_carlo_simulation(exchange: str, symbol: str, timeframe: str = "1h", li
 
         # Generate random paths
         # Z is standard normal distributed random variables
+        np.random.seed(int(current_price * 100) % 100000)
         Z = norm.ppf(np.random.rand(future_steps, simulations))
         daily_returns = np.exp(drift + stdev * Z)
 

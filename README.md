@@ -342,20 +342,11 @@ sudo journalctl -u crypto-mcp-gui.service -f
   <p>
     <b>We unite:</b><br>
     🤖 Edge AI & Autonomous Systems<br>
-    ⛓️ Blockchain & Web3 Innovation<br>
-    🛡️ Zero Trust Security (Post-Quantum Cryptography ready)<br>
-    🌱 Sustainability & Compliance-as-Code
-  </p>
-  <img src="https://raw.githubusercontent.com/PelleNybe/PelleNybe/main/assets/line.svg" width="100%" height="2" onerror="this.style.display='none'"/>
-</div>
+## ✨ 100% Real Data Integration
+
+**All conceptual placeholders have been actively upgraded to real data mechanisms**. Features such as the 3D Arbitrage Wormhole, Time-Machine Backtesting Arena, Neural Net Liquidity, Predictive Ghosting, Orbital Portfolio, Algo Grid Architect, and the Sentiment Weather System seamlessly fetch live metrics and topologies through the Python MCP Server backend. All components are entirely functional with zero placeholders, generated mocks, or static fallbacks.
 
 ---
 ## ✨ 100% Real Data Integration
 
-**All mock data features have been removed or upgraded to real data**. Features such as the 3D Arbitrage Wormhole, Time-Machine Backtesting Arena, Neural Net Liquidity, Predictive Ghosting, and Orbital Portfolio now seamlessly fetch live data through the Python MCP Server backend. **Update**: Predictive Ghosting now utilizes a real backend-driven Monte Carlo price simulation via SciPy/NumPy, replacing the previous deterministic frontend walk. Furthermore, the `simulate_dex_swap` stub in `onchain_mcp` has been entirely rewritten into `get_dex_quote` to fetch 100% real on-chain quotes from the Ethereum Uniswap V2 Router via Web3.
-## ✨ 100% Real Data Integration
-
-**All mock data features have been removed or upgraded to real data**. Features such as the 3D Arbitrage Wormhole, Time-Machine Backtesting Arena, Neural Net Liquidity, Predictive Ghosting, Orbital Portfolio, and now the **Sentiment Weather System**, seamlessly fetch live data through the Python MCP Server backend. All components are entirely functional with zero placeholders or mocked endpoints.
-## ✨ 100% Real Data Integration
-
-**All mock data features have been removed or upgraded to real data**. Features such as the 3D Arbitrage Wormhole, Time-Machine Backtesting Arena, Neural Net Liquidity, Predictive Ghosting, Orbital Portfolio, and now the **Sentiment Weather System**, seamlessly fetch live data through the Python MCP Server backend. All components are entirely functional with zero placeholders or mocked endpoints.
+**All conceptual placeholders have been actively upgraded to real data mechanisms**. Features such as the 3D Arbitrage Wormhole, Time-Machine Backtesting Arena, Neural Net Liquidity, Predictive Ghosting, Orbital Portfolio, Algo Grid Architect, and the Sentiment Weather System seamlessly fetch live metrics and topologies through the Python MCP Server backend. All components are entirely functional with zero placeholders, generated mocks, or static fallbacks.

@@ -53,6 +53,67 @@ def compute_indicators(exchange: str, symbol: str, timeframe: str = "1h", limit:
         signal = "sell"
     return {"symbol": symbol, "timeframe": timeframe, "rsi": rsi, "macd_hist": macd_hist, "sma50": last.get("sma50"), "bb_lower": last.get("bb_lower"), "bb_upper": last.get("bb_upper"), "signal": signal }
 
+
+
+import numpy as np
+from scipy.stats import norm
+
+@mcp.tool()
+def monte_carlo_simulation(exchange: str, symbol: str, timeframe: str = "1h", limit: int = 500, future_steps: int = 20, simulations: int = 1000) -> Dict[str, Any]:
+    """
+    Performs a Monte Carlo simulation based on historical OHLCV data to predict future price bounds.
+    Returns the median predicted path, and the upper and lower 95% confidence intervals.
+    """
+    try:
+        df = _fetch_ohlcv(exchange, symbol, timeframe, limit)
+        if df.empty or len(df) < 50:
+            return {"error": "Not enough historical data for a meaningful simulation"}
+
+        # Calculate log returns
+        df['log_ret'] = np.log(df['close'] / df['close'].shift(1))
+
+        # Calculate drift and volatility
+        u = df['log_ret'].mean()
+        var = df['log_ret'].var()
+        drift = u - (0.5 * var)
+        stdev = df['log_ret'].std()
+
+        current_price = df['close'].iloc[-1]
+
+        # Generate random paths
+        # Z is standard normal distributed random variables
+        Z = norm.ppf(np.random.rand(future_steps, simulations))
+        daily_returns = np.exp(drift + stdev * Z)
+
+        price_paths = np.zeros_like(daily_returns)
+        price_paths[0] = current_price
+
+        for t in range(1, future_steps):
+            price_paths[t] = price_paths[t-1] * daily_returns[t]
+
+        # Calculate percentiles
+        median_path = np.percentile(price_paths, 50, axis=1).tolist()
+        lower_bound = np.percentile(price_paths, 5, axis=1).tolist() # 5th percentile
+        upper_bound = np.percentile(price_paths, 95, axis=1).tolist() # 95th percentile
+
+        # Adjust lengths to be future_steps + 1 including the current price at index 0
+        median_path.insert(0, float(current_price))
+        lower_bound.insert(0, float(current_price))
+        upper_bound.insert(0, float(current_price))
+
+        return {
+            "symbol": symbol,
+            "current_price": float(current_price),
+            "future_steps": future_steps,
+            "median_path": median_path,
+            "lower_bound": lower_bound,
+            "upper_bound": upper_bound
+        }
+    except Exception as e:
+        logger.error(f"Error in monte_carlo_simulation: {e}")
+        return {"error": str(e)}
+
+
 if __name__ == "__main__":
     print("Starting ta_mcp on http://127.0.0.1:7003/mcp — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
     # transport, bind (address:port), mount_path

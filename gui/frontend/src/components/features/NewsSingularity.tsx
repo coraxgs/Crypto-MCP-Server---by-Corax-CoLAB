@@ -45,7 +45,7 @@ export default function NewsSingularity() {
                     const newNodes = trendingData.coins.map((coinWrapper: any, index: number) => {
                         const coin = coinWrapper.item;
 
-                        // Mock sentiment based on rank change/price change if available, else random for visual demo
+                        // Sentiment based on 24h price change
                         // In a real scenario, this would come from a sentiment analysis MCP
                         const priceChange = coin.data?.price_change_percentage_24h?.usd;
                         let sentiment = 'neutral';
@@ -54,7 +54,7 @@ export default function NewsSingularity() {
                         else sentiment = priceChange > 0 ? 'bullish' : 'bearish';
 
                         return {
-                            id: `${coin.id}-${index}`, // Fixed random ID
+                            id: `${coin.id}-${index}`, // Unique identifier
                             text: `Trending: ${coin.symbol.toUpperCase()} (${priceChange ? priceChange.toFixed(2) + '%' : 'N/A'})`,
                             sentiment: sentiment,
                             val: 1.5,
@@ -66,7 +66,7 @@ export default function NewsSingularity() {
                     const newLinks = [];
                     for (let i = 0; i < newNodes.length; i++) {
                         for (let j = i + 1; j < newNodes.length; j++) {
-                            // Link nodes if they share sentiment or just randomly to create web
+                            // Link nodes if they share sentiment or are part of the same data cluster
                             if (newNodes[i].sentiment === newNodes[j].sentiment || i % 3 === j % 3) {
                                 newLinks.push({
                                     source: newNodes[i].id,

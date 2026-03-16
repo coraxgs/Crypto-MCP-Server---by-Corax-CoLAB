@@ -1,30 +1,25 @@
-import React, { useRef, useState, useMemo } from 'react';
+import React, { useRef, useState, useMemo, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
+import { callMcpEndpoint } from '../../api_mcp';
 
 // Feature 4: Orbital Portfolio Control Deck
 const Planet = ({ asset, onSelect, selected }: { asset: any, onSelect: any, selected: boolean }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const orbitRef = useRef<THREE.Group>(null);
 
-  // Random starting angle
-  const [angle] = useState(Math.random() * Math.PI * 2);
+  // Starting angle based on distance
+  const [angle] = useState((asset.distance % 3) * Math.PI);
 
   useFrame((state, delta) => {
     if (!selected) {
       if (orbitRef.current) {
-         // Speed based on volatility
          orbitRef.current.rotation.y += asset.speed * delta;
       }
       if (meshRef.current) {
         meshRef.current.rotation.y += 0.01;
       }
-    } else {
-       // if selected, move to center or stop orbiting
-       if (orbitRef.current) {
-          // smoothly rotate to face camera?
-       }
     }
   });
 
@@ -75,7 +70,7 @@ const Planet = ({ asset, onSelect, selected }: { asset: any, onSelect: any, sele
                  <h4 style={{ margin: 0, color: asset.color }}>{asset.name}</h4>
                  <p style={{ margin: '5px 0', fontSize: '12px' }}>Allocation: {asset.allocation}%</p>
                  <p style={{ margin: '5px 0', fontSize: '12px' }}>Value: ${asset.value}</p>
-                 <p style={{ margin: '5px 0', fontSize: '12px' }}>24h Vol: {asset.volatility}%</p>
+                 <p style={{ margin: '5px 0', fontSize: '12px' }}>Amount: {asset.amount}</p>
               </div>
            </Html>
         )}
@@ -86,13 +81,70 @@ const Planet = ({ asset, onSelect, selected }: { asset: any, onSelect: any, sele
 
 export default function OrbitalPortfolio() {
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
+  const [assets, setAssets] = useState<any[]>([]);
+  const [totalValue, setTotalValue] = useState<number>(0);
 
-  const assets = useMemo(() => [
-    { id: 'btc', name: 'BTC', size: 1.5, distance: 4, speed: 0.2, color: '#f59e0b', allocation: 45, value: '45,000', volatility: 2.4 },
-    { id: 'eth', name: 'ETH', size: 1.2, distance: 7, speed: 0.3, color: '#60a5fa', allocation: 30, value: '30,000', volatility: 3.8 },
-    { id: 'sol', name: 'SOL', size: 0.8, distance: 10, speed: 0.5, color: '#10b981', allocation: 15, value: '15,000', volatility: 5.2 },
-    { id: 'link', name: 'LINK', size: 0.6, distance: 12, speed: 0.4, color: '#3b82f6', allocation: 10, value: '10,000', volatility: 4.1 },
-  ], []);
+  useEffect(() => {
+    let active = true;
+
+    const fetchPortfolioData = async () => {
+      try {
+        const data = await callMcpEndpoint('MCP_PORTFOLIO', 'portfolio_value', { exchanges: ['binance'] });
+        if (!active || !data || !data.portfolio) return;
+
+        let total = data.total_usd || 0;
+        if (total === 0) {
+            setAssets([]);
+            setTotalValue(0);
+            return;
+        }
+
+        const colors = ['#f59e0b', '#60a5fa', '#10b981', '#3b82f6', '#a855f7', '#ec4899', '#f43f5e'];
+
+        // Ensure distance is uniquely increasing based on sort
+        let currentDistance = 4;
+        let colorIdx = 0;
+
+        // Map real portfolio data
+        const mappedAssets = Object.entries(data.portfolio)
+          .map(([coin, amount]: [string, any]) => {
+             const price = (data.prices && data.prices[coin]) ? data.prices[coin] : 0;
+             const val = amount * price;
+             const allocation = total > 0 ? (val / total) * 100 : 0;
+             const size = Math.max(0.4, Math.min(2.0, (allocation / 100) * 3));
+
+             return {
+                 id: coin.toLowerCase(),
+                 name: coin.toUpperCase(),
+                 amount: amount,
+                 size: size,
+                 val: val,
+                 allocation: allocation.toFixed(1),
+                 value: val.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+             };
+          })
+          .filter(a => parseFloat(a.allocation) > 1.0) // Only show top assets > 1% allocation
+          .sort((a, b) => b.val - a.val) // Largest allocation closer to center? Or furthest? Let's do largest = biggest size, distance increments
+          .map((coinData) => {
+             coinData.distance = currentDistance;
+             coinData.speed = 0.1 + (parseFloat(coinData.allocation) * 0.005); // Speed based on allocation
+             coinData.color = colors[colorIdx % colors.length];
+             currentDistance += 2.5;
+             colorIdx++;
+             return coinData;
+          });
+
+        setAssets(mappedAssets);
+        setTotalValue(total);
+      } catch (e) {
+          console.error("Orbital fetch error", e);
+      }
+    };
+
+    fetchPortfolioData();
+    const interval = setInterval(fetchPortfolioData, 30000);
+    return () => { active = false; clearInterval(interval); };
+  }, []);
 
   return (
     <div className="card glass-panel interactive-element" style={{ height: '400px', width: '100%', position: 'relative', padding: 0, overflow: 'hidden', borderLeft: '4px solid #8b5cf6' }}>
@@ -128,7 +180,7 @@ export default function OrbitalPortfolio() {
               anchorX="center"
               anchorY="middle"
             >
-              TOTAL: $100K
+              TOTAL: ${totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
             </Text>
         </mesh>
 
@@ -149,13 +201,13 @@ export default function OrbitalPortfolio() {
           autoRotateSpeed={0.5}
         />
 
-        {/* Subtle background stars */}
+        {/* Subtle background stars (Pseudo-random deterministic setup) */}
         <points>
            <bufferGeometry>
               <bufferAttribute
                  attach="attributes-position"
                  count={500}
-                 array={new Float32Array(1500).map(() => (Math.random() - 0.5) * 100)}
+                 array={new Float32Array(1500).map((_, i) => (Math.sin(i * 123.456) * 100))}
                  itemSize={3}
               />
            </bufferGeometry>

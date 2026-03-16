@@ -9,11 +9,18 @@ const Particles = ({ sentiment }: { sentiment: 'bull' | 'bear' | 'neutral' }) =>
   const particleData = useMemo(() => {
     const temp = [];
     for (let i = 0; i < count; i++) {
-      const x = (Math.random() - 0.5) * 50;
-      const y = (Math.random() - 0.5) * 50;
-      const z = (Math.random() - 0.5) * 50;
-      const speed = Math.random() * 0.05 + 0.01;
-      temp.push({ x, y, z, speed, offset: Math.random() * Math.PI * 2 });
+      // Deterministic pseudo-randomness based on index
+      const seed1 = Math.sin(i * 123.456);
+      const seed2 = Math.cos(i * 789.012);
+      const seed3 = Math.sin(i * 345.678);
+      const seed4 = Math.cos(i * 901.234);
+      const seed5 = Math.sin(i * 567.890);
+
+      const x = (seed1) * 25; // -25 to 25 range
+      const y = (seed2) * 25;
+      const z = (seed3) * 25;
+      const speed = Math.abs(seed4) * 0.05 + 0.01;
+      temp.push({ x, y, z, speed, offset: Math.abs(seed5) * Math.PI * 2 });
     }
     return temp;
   }, [count]);
@@ -61,7 +68,7 @@ const Particles = ({ sentiment }: { sentiment: 'bull' | 'bear' | 'neutral' }) =>
 
       // Set color
       color.set(targetColor);
-      // add slight random variation to color brightness
+      // add slight procedural variation to color brightness based on time and index
       color.lerp(new THREE.Color('#ffffff'), Math.sin(state.clock.elapsedTime * speed * 5 + offset) * 0.2);
       mesh.current!.setColorAt(i, color);
     });
@@ -83,14 +90,17 @@ export default function GlobalWeatherSystem({ sentiment = 'neutral' }: { sentime
 
   useEffect(() => {
     if (sentiment === 'bear') {
+      let tick = 0;
       const interval = setInterval(() => {
-        if (Math.random() > 0.8) {
+        tick++;
+        // Trigger lightning deterministically based on tick
+        if (tick % 5 === 0 || tick % 17 === 0) {
           setLightning(true);
           setTimeout(() => setLightning(false), 100);
           setTimeout(() => setLightning(true), 150);
           setTimeout(() => setLightning(false), 200);
         }
-      }, 3000);
+      }, 1000);
       return () => clearInterval(interval);
     }
   }, [sentiment]);

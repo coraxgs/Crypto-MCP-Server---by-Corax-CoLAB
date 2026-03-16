@@ -242,18 +242,17 @@ Save.
 
 Example endpoints to add
 
-http://127.0.0.1:7001/mcp — ccxt MCP
-
-http://127.0.0.1:7010/mcp — coingecko MCP
-
-http://127.0.0.1:7004/mcp — portfolio MCP
-
-http://127.0.0.1:7011/mcp — freqtrade MCP
-http://127.0.0.1:7012/mcp — octobot MCP
-http://127.0.0.1:7013/mcp — hummingbot MCP
-http://127.0.0.1:7014/mcp — superalgos MCP
-http://127.0.0.1:7015/mcp — llm MCP (Open Source AI functionality)
-
+*   `http://127.0.0.1:7001/mcp` — **ccxt MCP** (Exchange trading & market data)
+*   `http://127.0.0.1:7002/mcp` — **onchain MCP** (On-chain blockchain data via Web3)
+*   `http://127.0.0.1:7003/mcp` — **ta MCP** (Technical Analysis metrics)
+*   `http://127.0.0.1:7004/mcp` — **portfolio MCP** (Portfolio tracking & aggregation)
+*   `http://127.0.0.1:7005/mcp` — **notifier MCP** (Alerts & notifications)
+*   `http://127.0.0.1:7010/mcp` — **coingecko MCP** (Live crypto market data & news)
+*   `http://127.0.0.1:7011/mcp` — **freqtrade MCP** (Freqtrade bot integration)
+*   `http://127.0.0.1:7012/mcp` — **octobot MCP** (OctoBot integration)
+*   `http://127.0.0.1:7013/mcp` — **hummingbot MCP** (Hummingbot integration)
+*   `http://127.0.0.1:7014/mcp` — **superalgos MCP** (Superalgos integration)
+*   `http://127.0.0.1:7015/mcp` — **llm MCP** (Open Source AI functionality)
 
 Test MCP from the Pi (curl examples)
 

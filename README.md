@@ -352,4 +352,4 @@ sudo journalctl -u crypto-mcp-gui.service -f
 ---
 ## ✨ 100% Real Data Integration
 
-**All mock data features have been removed or upgraded to real data**. Features such as the 3D Arbitrage Wormhole, Time-Machine Backtesting Arena, Neural Net Liquidity, Predictive Ghosting, and Orbital Portfolio now seamlessly fetch live data through the Python MCP Server backend.
+**All mock data features have been removed or upgraded to real data**. Features such as the 3D Arbitrage Wormhole, Time-Machine Backtesting Arena, Neural Net Liquidity, Predictive Ghosting, and Orbital Portfolio now seamlessly fetch live data through the Python MCP Server backend. **Update**: Predictive Ghosting now utilizes a real backend-driven Monte Carlo price simulation via SciPy/NumPy, replacing the previous deterministic frontend walk. Furthermore, the `simulate_dex_swap` stub in `onchain_mcp` has been entirely rewritten into `get_dex_quote` to fetch 100% real on-chain quotes from the Ethereum Uniswap V2 Router via Web3.

@@ -46,13 +46,13 @@ export default function OrderPanel(){
           <button className="btn-primary" onClick={previewOrder} disabled={routingActive}>{routingActive ? "Routing..." : "Preview"}</button>
           <button onClick={placeOrder} disabled={routingActive}>{routingActive ? "Placing..." : "Place"}</button>
         </div>
-        {preview && <pre style={{background:'#334155',padding:8}}>{JSON.stringify(preview,null,2)}</pre>}
-        {result && <pre style={{background:'#064e3b',padding:8}}>{JSON.stringify(result,null,2)}</pre>}
+        {preview && <pre style={{background:'#334155',padding:8, overflowX: 'auto'}}>{JSON.stringify(preview,null,2)}</pre>}
+        {result && <pre style={{background:'#064e3b',padding:8, overflowX: 'auto'}}>{JSON.stringify(result,null,2)}</pre>}
       </div>
       {/* Neural Trade Visualizer Overlay Component */}
       <div style={{ marginTop: '20px' }}>
           <h4 style={{ fontSize: '12px', color: '#888', textTransform: 'uppercase', marginBottom: '8px' }}>Smart Routing Diagnostics</h4>
-          <NeuralTradeVisualizer active={routingActive} />
+          <NeuralTradeVisualizer active={routingActive} exchange={exchange} symbol={symbol} />
       </div>
     </div>
   )

@@ -1,3 +1,0 @@
-## 2024-03-14 - Interactive Element Accessibility
-**Learning:** Found an issue where the `OrderPanel` grid completely omitted accessibility labeling or any context (`placeholder` / `aria-label`) on form fields. For dense technical UIs (like crypto trading dashboards), preserving layout constraints often leads to skipped explicit `<label>` elements.
-**Action:** When working with space-constrained crypto/finance UI forms, consistently apply `aria-label` and `placeholder` attributes as a fallback to explicit `<label>`s to maintain tight layout while vastly improving screen reader and general user experience. Ensure async actions disable their respective triggering buttons to provide visual feedback and prevent multiple submissions.

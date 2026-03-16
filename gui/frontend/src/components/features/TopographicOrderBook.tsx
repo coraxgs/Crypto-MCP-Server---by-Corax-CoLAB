@@ -13,7 +13,7 @@ function TerrainMesh({ data, type, color, offset }: { data: [number, number][], 
     const meshRef = useRef<THREE.InstancedMesh>(null);
     const count = data.length;
 
-    const dummy = new THREE.Object3D();
+    const dummy = React.useMemo(() => new THREE.Object3D(), []);
     const maxVolume = Math.max(...data.map(d => d[1]), 0.0001);
 
     useFrame(({ clock }) => {

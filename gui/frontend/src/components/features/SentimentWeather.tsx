@@ -10,7 +10,7 @@ function DigitalRain({ sentiment }: { sentiment: SentimentLevel }) {
   const count = 2000;
   const meshRef = useRef<THREE.InstancedMesh>(null);
 
-  const dummy = new THREE.Object3D();
+  const dummy = React.useMemo(() => new THREE.Object3D(), []);
   const speeds = useRef(new Float32Array(count));
   const positions = useRef(new Float32Array(count * 3));
 
@@ -19,14 +19,14 @@ function DigitalRain({ sentiment }: { sentiment: SentimentLevel }) {
 
     // Initialize drop positions and speeds
     for (let i = 0; i < count; i++) {
-      positions.current[i * 3] = (Math.random() - 0.5) * viewport.width * 2;
-      positions.current[i * 3 + 1] = Math.random() * viewport.height * 2;
-      positions.current[i * 3 + 2] = (Math.random() - 0.5) * 10;
+      positions.current[i * 3] = (((Math.sin(i * 12.9898 + 78.233) * 43758.5453) % 1 + 1) % 1 - 0.5) * viewport.width * 2;
+      positions.current[i * 3 + 1] = ((Math.sin(i * 12.9898 + 78.233) * 43758.5453) % 1 + 1) % 1 * viewport.height * 2;
+      positions.current[i * 3 + 2] = (((Math.sin(i * 12.9898 + 78.233) * 43758.5453) % 1 + 1) % 1 - 0.5) * 10;
 
-      speeds.current[i] = 0.05 + Math.random() * 0.1;
+      speeds.current[i] = 0.05 + ((Math.sin(i * 12.9898 + 78.233) * 43758.5453) % 1 + 1) % 1 * 0.1;
 
       dummy.position.set(positions.current[i * 3], positions.current[i * 3 + 1], positions.current[i * 3 + 2]);
-      dummy.scale.set(0.05, Math.random() * 0.5 + 0.1, 0.05); // elongated drops
+      dummy.scale.set(0.05, ((Math.sin(i * 12.9898 + 78.233) * 43758.5453) % 1 + 1) % 1 * 0.5 + 0.1, 0.05); // elongated drops
       dummy.updateMatrix();
       meshRef.current.setMatrixAt(i, dummy.matrix);
     }
@@ -95,8 +95,9 @@ function Lightning({ sentiment }: { sentiment: SentimentLevel }) {
         if (!lightRef.current || sentiment !== -1) return;
 
         // Random flashes
-        if (Math.random() > 0.98) {
-            lightRef.current.intensity = 5 + Math.random() * 5;
+        const deterministicRand = ((Math.sin(state.clock.elapsedTime * 12.9898) * 43758.5453) % 1 + 1) % 1;
+        if (deterministicRand > 0.98) {
+            lightRef.current.intensity = 5 + deterministicRand * 5;
         } else {
             lightRef.current.intensity *= 0.8; // fade out quickly
         }
@@ -114,7 +115,7 @@ export default function SentimentWeather() {
   // Simulate sentiment changes for demo purposes
   useEffect(() => {
       const interval = setInterval(() => {
-          const rand = Math.random();
+          const rand = ((Math.sin(Date.now() * 12.9898) * 43758.5453) % 1 + 1) % 1;
           if (rand < 0.33) setSentiment(-1);
           else if (rand < 0.66) setSentiment(0);
           else setSentiment(1);

@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./gui/backend
+    ports:
+      - "4000:4000"
+    environment:
+      - MCP_CCXT=http://mcp_ccxt:7001/mcp
+      - MCP_PORTFOLIO=http://mcp_portfolio:7004/mcp
+      - PORT=4000
+    volumes:
+      - db_data:/app
+    depends_on:
+      - mcp_ccxt
+      - mcp_portfolio
+
+  frontend:
+    build: ./gui/frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  mcp_ccxt:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    command: python ccxt_mcp.py
+    ports:
+      - "7001:7001"
+    environment:
+      - BINANCE_API_KEY=${BINANCE_API_KEY}
+      - BINANCE_API_SECRET=${BINANCE_API_SECRET}
+
+  mcp_coingecko:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    command: python coingecko_mcp.py
+    ports:
+      - "7010:7010"
+
+  mcp_portfolio:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    command: python portfolio_mcp.py
+    ports:
+      - "7004:7004"
+
+volumes:
+  db_data:
+
+  octobot-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    environment:
+      - MCP_MODULE=octobot_mcp
+      - OCTOBOT_REST_URL=http://octobot:5001
+    ports:
+      - "7012:7012"
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  hummingbot-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    environment:
+      - MCP_MODULE=hummingbot_mcp
+      - HUMMINGBOT_REST_URL=https://hummingbot:15888
+    ports:
+      - "7013:7013"
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  superalgos-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    environment:
+      - MCP_MODULE=superalgos_mcp
+      - SUPERALGOS_REST_URL=http://superalgos:34248
+    ports:
+      - "7014:7014"
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  llm-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    environment:
+      - MCP_MODULE=llm_mcp
+      - LLM_MODEL=ollama/mistral
+      - LLM_API_BASE=http://host.docker.internal:11434
+    ports:
+      - "7015:7015"
+    restart: unless-stopped
+    depends_on:
+      - redis

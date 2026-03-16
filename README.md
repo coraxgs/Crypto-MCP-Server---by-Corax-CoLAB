@@ -74,9 +74,9 @@ The final infographic summarizes the core security principles for operating the 
 The Crypto MCP Server now features advanced interactive elements and real-time AI capabilities embedded directly into the UI:
 
 *   🤖 **Oracle Copilot:** An interactive, voice-activated AI terminal (`OracleCopilot.tsx`) that analyzes commands, executes dry runs, and queries TA/On-chain MCPs. Features real-time voice recognition and a sleek CRT terminal UI.
-*   🌊 **Whale Sonar Sweep:** Dynamic visual tracking of large on-chain movements.
+*   🌊 **Whale Sonar Sweep:** Dynamic visual tracking of real-time trending coin activity utilizing deterministic radar representations.
 *   🌦️ **Global Weather System:** An interactive background system that reacts to the current market sentiment (Bull, Bear, Neutral), altering the entire visual environment.
-*   ⚛️ **Quantum Risk Map:** Real-time visual topography of your portfolio's risk exposure.
+*   ⚛️ **Quantum Risk Map:** Real-time 3D topography of your portfolio risk exposure using real-time Technical Analysis (RSI, Bollinger Bands) from the local MCP backend.
 *   🌀 **Arbitrage Wormhole:** Live Cross-DEX arbitrage detection using multi-exchange CCXT MCP polling.
 *   ✨ **Cyberpunk UI Polish:** The entire dashboard is wrapped in a dark, glowing aesthetic with glassmorphism, animated CRT scanlines, and reactive hover states.
 *   👁️ **System Overview:** A high-level visual summary of your entire crypto operation, including system status, active agents, and total equity.
@@ -84,7 +84,7 @@ The Crypto MCP Server now features advanced interactive elements and real-time A
 *   📊 **Holo Topographic Order Book:** A 3D, holographic representation of the order book, now integrated with real-time live data from CCXT MCP endpoints.
 *   📰 **News Singularity:** An AI-curated feed of the most critical market news, sentiment-scored using live data endpoints via CoinGecko.
 *   🛰️ **Orbital Portfolio:** A dynamic, physics-based 3D visualization of your actual asset allocation using live real-time portfolio MCP data.
-*   🐋 **Whale Constellations:** Tracks and maps major wallet movements as constellations.
+*   🐋 **Whale Constellations:** Real-time 3D mapping of trending coins and market sentiment based on live CoinGecko data endpoints.
 
 ---
 

@@ -301,6 +301,27 @@ async function callAndEmit(mcpUrl, toolName, args, eventName) {
 setInterval(() => callAndEmit(mcpUrls.MCP_PORTFOLIO, 'portfolio_value', ['binance'], 'portfolio'), 30000);
 setInterval(() => callAndEmit(mcpUrls.MCP_CCXT, 'get_ticker', { exchange: 'binance', symbol: 'BTC/USDT' }, 'ticker'), 5000);
 
+// GET /api/strategies
+app.get("/api/strategies", (req, res) => {
+  db.all("SELECT * FROM strategies ORDER BY created_at DESC", [], (err, rows) => {
+    if (err) return res.status(500).json({ ok: false, error: err.message });
+    res.json({ ok: true, data: rows });
+  });
+});
+
+// POST /api/strategies
+app.post("/api/strategies", (req, res) => {
+  const { name, nodes, connections, active } = req.body || {};
+  if (!name || !nodes || !connections) {
+    return res.status(400).json({ ok: false, error: "Missing required fields" });
+  }
+  const stmt = db.prepare("INSERT INTO strategies (name, nodes, connections, active) VALUES (?, ?, ?, ?)");
+  stmt.run(name, JSON.stringify(nodes), JSON.stringify(connections), active ? 1 : 0, function(err) {
+    if (err) return res.status(500).json({ ok: false, error: err.message });
+    res.json({ ok: true, id: this.lastID });
+  });
+  stmt.finalize();
+});
 // Start server and handle errors (EADDRINUSE will be surfaced)
 server.listen(PORT, () => {
   console.log('Crypto MCP GUI backend listening on http://127.0.0.1:' + PORT);

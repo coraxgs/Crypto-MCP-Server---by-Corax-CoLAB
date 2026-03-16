@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Network, Activity, Settings, Cpu } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Network, Activity, Settings, Cpu, Save, Plus } from 'lucide-react';
+import { authenticatedFetch } from '../../auth';
 
 const Node = ({ type, title, position, active }: { type: 'source' | 'logic' | 'action', title: string, position: {x: number, y: number}, active: boolean }) => {
   const colors = {
@@ -64,11 +65,52 @@ const Connection = ({ start, end, active }: { start: {x: number, y: number}, end
   );
 };
 
+const defaultNodes = [
+  { id: 1, type: 'source' as const, title: 'CCXT: BTC/USDT', pos: { x: 20, y: 50 } },
+  { id: 2, type: 'source' as const, title: 'On-Chain: Whale Alert', pos: { x: 20, y: 180 } },
+  { id: 3, type: 'logic' as const, title: 'Freqtrade: RSI < 30', pos: { x: 250, y: 50 } },
+  { id: 4, type: 'logic' as const, title: 'AND Gate', pos: { x: 250, y: 180 } },
+  { id: 5, type: 'action' as const, title: 'Hummingbot: TWAP Buy', pos: { x: 480, y: 110 } },
+];
+
+const defaultConnections = [
+  { start: {x: 200, y: 80}, end: {x: 250, y: 80} },
+  { start: {x: 200, y: 210}, end: {x: 250, y: 210} },
+  { start: {x: 430, y: 80}, end: {x: 480, y: 130} },
+  { start: {x: 430, y: 210}, end: {x: 480, y: 150} }
+];
+
 export default function AlgoGridArchitect() {
   const [activePath, setActivePath] = useState(false);
+  const [nodes, setNodes] = useState(defaultNodes);
+  const [connections, setConnections] = useState(defaultConnections);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Load strategies from backend
+    const loadStrategies = async () => {
+      try {
+        const res = await authenticatedFetch('/api/strategies');
+        const data = await res.json();
+        if (data.ok && data.data && data.data.length > 0) {
+            // Load the most recent strategy
+            const latest = data.data[0];
+            const loadedNodes = JSON.parse(latest.nodes);
+            const loadedConnections = JSON.parse(latest.connections);
+            if(loadedNodes && loadedNodes.length > 0) {
+               setNodes(loadedNodes);
+               setConnections(loadedConnections);
+            }
+        }
+      } catch (err) {
+        console.error("Failed to load strategies:", err);
+      }
+    };
+    loadStrategies();
+  }, []);
 
   // Triggering the animation every few seconds to simulate a live strategy executing
-  React.useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       setActivePath(true);
       setTimeout(() => setActivePath(false), 1500);
@@ -76,13 +118,39 @@ export default function AlgoGridArchitect() {
     return () => clearInterval(interval);
   }, []);
 
-  const nodes = [
-    { id: 1, type: 'source' as const, title: 'CCXT: BTC/USDT', pos: { x: 20, y: 50 } },
-    { id: 2, type: 'source' as const, title: 'On-Chain: Whale Alert', pos: { x: 20, y: 180 } },
-    { id: 3, type: 'logic' as const, title: 'Freqtrade: RSI < 30', pos: { x: 250, y: 50 } },
-    { id: 4, type: 'logic' as const, title: 'AND Gate', pos: { x: 250, y: 180 } },
-    { id: 5, type: 'action' as const, title: 'Hummingbot: TWAP Buy', pos: { x: 480, y: 110 } },
-  ];
+  const addNode = () => {
+     const newNode = {
+         id: Date.now(),
+         type: 'logic' as const,
+         title: 'New Custom Logic',
+         pos: { x: 250, y: Math.floor(Math.random() * 200) + 20 }
+     };
+     setNodes([...nodes, newNode]);
+  };
+
+  const saveStrategy = async () => {
+      setLoading(true);
+      try {
+          const res = await authenticatedFetch('/api/strategies', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  name: 'Strategy ' + new Date().toISOString().split('T')[0],
+                  nodes: nodes,
+                  connections: connections,
+                  active: true
+              })
+          });
+          const data = await res.json();
+          if (data.ok) {
+              console.log("Saved strategy", data.id);
+          }
+      } catch (err) {
+          console.error("Save failed", err);
+      } finally {
+          setLoading(false);
+      }
+  };
 
   return (
     <div className="card interactive-element" style={{ gridColumn: '1 / -1', height: '350px', position: 'relative', overflow: 'hidden', backgroundColor: '#020205' }}>
@@ -91,8 +159,13 @@ export default function AlgoGridArchitect() {
         <h3 style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>Strategy Grid Architect</h3>
       </div>
 
-      <div style={{ position: 'absolute', top: 15, right: 15, zIndex: 20 }}>
-        <button className="btn-outline" style={{ fontSize: '10px', padding: '4px 8px' }}>+ ADD NODE</button>
+      <div style={{ position: 'absolute', top: 15, right: 15, zIndex: 20, display: 'flex', gap: '10px' }}>
+        <button onClick={addNode} className="btn-outline" style={{ fontSize: '10px', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Plus size={12} /> ADD NODE
+        </button>
+        <button onClick={saveStrategy} disabled={loading} className="btn-outline" style={{ fontSize: '10px', padding: '4px 8px', display: 'flex', alignItems: 'center', gap: '4px', borderColor: '#10b981', color: '#10b981' }}>
+            <Save size={12} /> {loading ? 'SAVING...' : 'SAVE & DEPLOY'}
+        </button>
       </div>
 
       {/* Grid Background */}
@@ -103,11 +176,10 @@ export default function AlgoGridArchitect() {
         opacity: 0.2
       }} />
 
-      {/* Connections (hardcoded for demo) */}
-      <Connection start={{x: 200, y: 80}} end={{x: 250, y: 80}} active={activePath} />
-      <Connection start={{x: 200, y: 210}} end={{x: 250, y: 210}} active={activePath} />
-      <Connection start={{x: 430, y: 80}} end={{x: 480, y: 130}} active={activePath} />
-      <Connection start={{x: 430, y: 210}} end={{x: 480, y: 150}} active={activePath} />
+      {/* Connections */}
+      {connections.map((c, i) => (
+         <Connection key={i} start={c.start} end={c.end} active={activePath} />
+      ))}
 
       {/* Nodes */}
       {nodes.map(n => (

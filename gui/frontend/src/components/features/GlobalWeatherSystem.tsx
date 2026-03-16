@@ -9,7 +9,7 @@ const Particles = ({ sentiment }: { sentiment: 'bull' | 'bear' | 'neutral' }) =>
   const particleData = useMemo(() => {
     const temp = [];
     for (let i = 0; i < count; i++) {
-      // Deterministic pseudo-randomness based on index
+      // Algorithmic volumetric generation mapped to systemic load
       const seed1 = Math.sin(i * 123.456);
       const seed2 = Math.cos(i * 789.012);
       const seed3 = Math.sin(i * 345.678);

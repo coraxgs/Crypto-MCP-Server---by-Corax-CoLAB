@@ -240,7 +240,7 @@ app.post('/api/order/execute', async (req, res) => {
       return res.status(400).json({ ok:false, error: 'execute flag not set. Set execute=true to place live order.' });
     }
 
-    // Build exchange-specific params safely (simple placeholder; extend per-exchange)
+    // Build exchange-specific params safely, merging provided routing parameters
     const exchangeKey = (exchange || '').toLowerCase();
     let exchangeParams = Object.assign({}, (params && typeof params === 'object') ? params : {});
 

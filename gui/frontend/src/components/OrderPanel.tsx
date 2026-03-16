@@ -34,8 +34,8 @@ export default function OrderPanel(){
     <div className="card interactive-element">
       <h3>Order / Trade</h3>
       <div style={{display:'grid',gap:8}}>
-        <input aria-label="Exchange" placeholder="Exchange (e.g. binance)" value={exchange} onChange={e=>setExchange(e.target.value)} />
-        <input aria-label="Symbol" placeholder="Symbol (e.g. BTC/USDT)" value={symbol} onChange={e=>setSymbol(e.target.value)} />
+        <input aria-label="Exchange" placeholder="Exchange" value={exchange} onChange={e=>setExchange(e.target.value)} />
+        <input aria-label="Symbol" placeholder="Symbol" value={symbol} onChange={e=>setSymbol(e.target.value)} />
         <div style={{display:'flex',gap:8}}>
           <select aria-label="Order Side" value={side} onChange={e=>setSide(e.target.value)}><option>buy</option><option>sell</option></select>
           <select aria-label="Order Type" value={type} onChange={e=>setType(e.target.value)}><option>market</option><option>limit</option></select>

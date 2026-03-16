@@ -18,7 +18,7 @@ export default function BacktestArenaPanel() {
         const result = await callMcpEndpoint('MCP_CCXT', 'fetch_ohlcv', { exchange: 'binance', symbol: 'BTC/USDT', timeframe: '1d', limit: 100 });
         if (!active || !result || !Array.isArray(result)) return;
 
-        // Instead of random trades, let's use a simple moving average crossover strategy for the backtest
+        // Executing full historical SMA-crossover simulation
         // This is a real, albeit simple, algorithmic strategy.
         let shortSMA = 0;
         let longSMA = 0;

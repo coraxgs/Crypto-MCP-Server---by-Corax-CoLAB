@@ -1,3 +1,4 @@
+import NeuralTradeVisualizer from './features/NeuralTradeVisualizer'
 import { authenticatedFetch } from "../auth"
 import React, { useState } from 'react'
 
@@ -10,38 +11,48 @@ export default function OrderPanel(){
   const [price,setPrice]=useState<number|null>(null)
   const [preview,setPreview]=useState<any>(null)
   const [result,setResult]=useState<any>(null)
+  const [routingActive, setRoutingActive] = useState(false)
 
   async function previewOrder(){
+    setRoutingActive(true)
     const resp = await authenticatedFetch('/api/order/dry_run', {method:'POST',headers:{'Content-Type':'application/json'}, body: JSON.stringify({exchange,symbol,side,type,amount,price})})
     const j = await resp.json()
     if (j.ok) setPreview(j.data); else alert(j.error)
+    setTimeout(() => setRoutingActive(false), 2000)
   }
 
   async function placeOrder(){
     if (!confirm('Place live order?')) return
+    setRoutingActive(true)
     const resp = await authenticatedFetch('/api/order/execute', {method:'POST',headers:{'Content-Type':'application/json'}, body: JSON.stringify({exchange,symbol,side,type,amount,price,execute:true})})
     const j = await resp.json()
     if (j.ok) { setResult(j.data); alert('Order placed') } else alert(j.error)
+    setTimeout(() => setRoutingActive(false), 2000)
   }
 
   return (
-    <div className="card">
+    <div className="card interactive-element">
       <h3>Order / Trade</h3>
       <div style={{display:'grid',gap:8}}>
-        <input value={exchange} onChange={e=>setExchange(e.target.value)} />
-        <input value={symbol} onChange={e=>setSymbol(e.target.value)} />
+        <input aria-label="Exchange" placeholder="Exchange (e.g. binance)" value={exchange} onChange={e=>setExchange(e.target.value)} />
+        <input aria-label="Symbol" placeholder="Symbol (e.g. BTC/USDT)" value={symbol} onChange={e=>setSymbol(e.target.value)} />
         <div style={{display:'flex',gap:8}}>
-          <select value={side} onChange={e=>setSide(e.target.value)}><option>buy</option><option>sell</option></select>
-          <select value={type} onChange={e=>setType(e.target.value)}><option>market</option><option>limit</option></select>
+          <select aria-label="Order Side" value={side} onChange={e=>setSide(e.target.value)}><option>buy</option><option>sell</option></select>
+          <select aria-label="Order Type" value={type} onChange={e=>setType(e.target.value)}><option>market</option><option>limit</option></select>
         </div>
-        <input type="number" value={amount} onChange={e=>setAmount(Number(e.target.value))} />
-        {type==='limit' && <input type="number" value={price ?? ''} onChange={e=>setPrice(Number(e.target.value))} />}
+        <input aria-label="Amount" placeholder="Amount" type="number" value={amount} onChange={e=>setAmount(Number(e.target.value))} />
+        {type==='limit' && <input aria-label="Price" placeholder="Price" type="number" value={price ?? ''} onChange={e=>setPrice(Number(e.target.value))} />}
         <div style={{display:'flex',gap:8}}>
-          <button className="btn-primary" onClick={previewOrder}>Preview</button>
-          <button onClick={placeOrder}>Place</button>
+          <button className="btn-primary" onClick={previewOrder} disabled={routingActive}>{routingActive ? "Routing..." : "Preview"}</button>
+          <button onClick={placeOrder} disabled={routingActive}>{routingActive ? "Placing..." : "Place"}</button>
         </div>
         {preview && <pre style={{background:'#334155',padding:8}}>{JSON.stringify(preview,null,2)}</pre>}
         {result && <pre style={{background:'#064e3b',padding:8}}>{JSON.stringify(result,null,2)}</pre>}
+      </div>
+      {/* Neural Trade Visualizer Overlay Component */}
+      <div style={{ marginTop: '20px' }}>
+          <h4 style={{ fontSize: '12px', color: '#888', textTransform: 'uppercase', marginBottom: '8px' }}>Smart Routing Diagnostics</h4>
+          <NeuralTradeVisualizer active={routingActive} />
       </div>
     </div>
   )

@@ -97,7 +97,8 @@ def create_order(exchange: str, symbol: str, side: str, type: str, amount: float
         }
 
         # Call backend to register pending order
-        res = requests.post(f"{DASHBOARD_API_URL}/api/order/pending", json=payload, timeout=5)
+        headers = {"Authorization": f"Bearer {os.getenv('DASHBOARD_PASSWORD', '')}"}
+        res = requests.post(f"{DASHBOARD_API_URL}/api/order/pending", json=payload, headers=headers, timeout=5)
         if res.status_code == 200:
             return {
                 "status": "pending_approval",
@@ -114,8 +115,11 @@ def create_order(exchange: str, symbol: str, side: str, type: str, amount: float
 @mcp.tool()
 def execute_approved_order(exchange: str, symbol: str, side: str, type: str, amount: float, price: Optional[float] = None, params: Optional[dict] = None) -> dict:
     """Internal tool called by the backend to actually execute the order after human approval."""
-    ex = _make_exchange(exchange)
     params = params or {}
+    db_pass = os.getenv("DASHBOARD_PASSWORD")
+    if db_pass and params.pop("approval_token", None) != db_pass:
+        return {"error": "Unauthorized: Dashboard approval required. Use create_order instead."}
+    ex = _make_exchange(exchange)
     if type == "market":
         order = ex.create_order(symbol, type, side, amount, None, params)
     else:
@@ -146,7 +150,8 @@ def log_reasoning(trade_id: str, explanation: str) -> dict:
             "trade_id": trade_id,
             "explanation": explanation
         }
-        res = requests.post(f"{DASHBOARD_API_URL}/api/order/reasoning", json=payload, timeout=5)
+        headers = {"Authorization": f"Bearer {os.getenv('DASHBOARD_PASSWORD', '')}"}
+        res = requests.post(f"{DASHBOARD_API_URL}/api/order/reasoning", json=payload, headers=headers, timeout=5)
         if res.status_code == 200:
             return {"status": "success", "message": "Reasoning logged successfully."}
         else:
@@ -158,3 +163,14 @@ def log_reasoning(trade_id: str, explanation: str) -> dict:
 if __name__ == "__main__":
     print("Starting ccxt_mcp on http://0.0.0.0:7001/mcp — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
     mcp.run("streamable-http")
+
+@mcp.tool()
+def fetch_order_book(exchange: str, symbol: str, limit: int = 20) -> dict:
+    """
+    Fetch the order book (L2) for a given symbol.
+    """
+    try:
+        ex = _make_exchange(exchange)
+        return ex.fetch_order_book(symbol, limit)
+    except Exception as e:
+        return {"error": str(e)}

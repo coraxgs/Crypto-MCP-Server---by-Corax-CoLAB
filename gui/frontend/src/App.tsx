@@ -3,14 +3,29 @@ import PortfolioPanel from './components/PortfolioPanel'
 import TickerPanel from './components/TickerPanel'
 import OrderPanel from './components/OrderPanel'
 import OrdersLogPanel from './components/OrdersLogPanel'
-import OracleCopilot from './components/features/OracleCopilot';
-import SentimentWeather from './components/features/SentimentWeather';
+import OracleCopilot from './components/features/OracleCopilot'
+import MarketSentimentAnalyzer from "./components/features/MarketSentimentAnalyzer";
+import GlobalWeatherSystem from './components/features/GlobalWeatherSystem'
+import WhaleSonarSweep from './components/features/WhaleSonarSweep'
+import VolatilityMatrix from './components/features/VolatilityMatrix'
+import PredictiveGhosting from './components/features/PredictiveGhosting'
 import RiskRadarPanel from './components/features/RiskRadarPanel'
-import BacktestArenaPanel from './components/features/BacktestArenaPanel';
-import LiquidityFlowMap from './components/features/LiquidityFlowMap';
+import BacktestArenaPanel from './components/features/BacktestArenaPanel'
+import ArbitrageWormhole from './components/features/ArbitrageWormhole'
+import NewsSingularity from './components/features/NewsSingularity'
+import AlgoGridArchitect from './components/features/AlgoGridArchitect'
+import QuantumRiskMap from './components/features/QuantumRiskMap'
+import WhaleConstellations from './components/features/WhaleConstellations'
+import SystemOverview from './components/features/SystemOverview'
+import NeuralNetLiquidity from './components/features/NeuralNetLiquidity';
+import HoloTopographicOrderBook from './components/features/HoloTopographicOrderBook';
+import OrbitalPortfolio from './components/features/OrbitalPortfolio';
+
 import { getAuthToken, setAuthToken } from './auth'
+import { callMcpEndpoint } from './api_mcp'
 
 export default function App() {
+  const [sentiment, setSentiment] = useState<'bull' | 'bear' | 'neutral'>('neutral');
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAuthToken());
   const [password, setPassword] = useState('');
 
@@ -19,6 +34,28 @@ export default function App() {
     window.addEventListener('auth_error', handleAuthError);
     return () => window.removeEventListener('auth_error', handleAuthError);
   }, []);
+
+  // Auto-update global sentiment based on TA data
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const fetchGlobalSentiment = async () => {
+        try {
+            const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'binance', symbol: 'BTC/USDT', timeframe: '1h' });
+            if (taData && taData.signal) {
+                if (taData.signal === 'buy') setSentiment('bull');
+                else if (taData.signal === 'sell') setSentiment('bear');
+                else setSentiment('neutral');
+            }
+        } catch (err) {
+            console.error("Failed to fetch TA for global sentiment", err);
+        }
+    };
+
+    fetchGlobalSentiment();
+    const interval = setInterval(fetchGlobalSentiment, 120000); // Check every 2 minutes
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +66,7 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #000 100%)' }}>
-        <form onSubmit={handleLogin} className="card" style={{ width: 350, display: 'flex', flexDirection: 'column', gap: 16, border: '1px solid #334155', boxShadow: '0 0 30px rgba(16, 185, 129, 0.1)' }}>
+        <form onSubmit={handleLogin} className="card interactive-element" style={{ width: 350, display: 'flex', flexDirection: 'column', gap: 16, border: '1px solid #334155', boxShadow: '0 0 30px rgba(16, 185, 129, 0.1)' }}>
           <div style={{display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center'}}>
             <div style={{width: '20px', height: '20px', background: '#10b981', borderRadius: '50%', boxShadow: '0 0 10px #10b981'}}></div>
             <h3 style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '2px', color: '#fff' }}>SYSTEM AUTHENTICATION</h3>
@@ -52,7 +89,7 @@ export default function App() {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', background: '#020205' }}>
-      <SentimentWeather />
+      <GlobalWeatherSystem sentiment={sentiment} />
       {/* Background grid effect */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -62,25 +99,60 @@ export default function App() {
         pointerEvents: 'none'
       }}></div>
 
+      {/* Sentiment Toggles (Manual override) */}
+      <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 9999, display: 'flex', gap: '10px' }}>
+        <button onClick={() => setSentiment('bull')} className="btn-outline" style={{ color: '#10b981', borderColor: sentiment === 'bull' ? '#10b981' : '#333' }}>BULL MODE</button>
+        <button onClick={() => setSentiment('neutral')} className="btn-outline" style={{ color: '#60a5fa', borderColor: sentiment === 'neutral' ? '#60a5fa' : '#333' }}>NEUTRAL</button>
+        <button onClick={() => setSentiment('bear')} className="btn-outline" style={{ color: '#ef4444', borderColor: sentiment === 'bear' ? '#ef4444' : '#333' }}>BEAR MODE</button>
+      </div>
+
       <div className="main-grid" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', padding: '20px', maxWidth: '1600px', margin: '0 auto' }}>
+
+
+        {/* Feature 0: System Overview (Spans full width) */}
+        <SystemOverview />
+        {/* Feature 1: Neural Net Liquidity */}
+        <NeuralNetLiquidity />
+        {/* Feature 2: Liquidity Trench */}
+        <HoloTopographicOrderBook />
+
+
+
+        {/* Feature 1: Arbitrage Wormhole (Spans full width) */}
+        <ArbitrageWormhole />
+
+        {/* Feature 3: Algo Grid Architect (Spans full width) */}
+        <AlgoGridArchitect />
 
         {/* Left Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <PortfolioPanel />
           <TickerPanel />
+          {/* Feature 2: News Singularity */}
+          <NewsSingularity />
+          <PredictiveGhosting />
+        {/* Feature 4: Orbital Portfolio */}
+        <OrbitalPortfolio />
+
           <BacktestArenaPanel />
-          <LiquidityFlowMap />
+          <WhaleSonarSweep />
         </div>
 
         {/* Right Column */}
         <aside style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {/* Feature 4: Quantum Risk Topography */}
+          <QuantumRiskMap />
           <RiskRadarPanel />
+          {/* Feature 5: Whale Constellations */}
+          <WhaleConstellations />
+          <VolatilityMatrix />
           <OrderPanel />
           <OrdersLogPanel />
         </aside>
       </div>
 
-      {/* Feature 3: The Oracle Co-Pilot */}
+      {/* Original Co-Pilot */}
+      <MarketSentimentAnalyzer />
       <OracleCopilot />
 
     </div>

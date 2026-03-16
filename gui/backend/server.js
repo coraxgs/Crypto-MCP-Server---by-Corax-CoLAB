@@ -14,23 +14,70 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'admin';
+const crypto = require('crypto');
+
+let DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD;
+if (!DASHBOARD_PASSWORD) {
+  DASHBOARD_PASSWORD = crypto.randomBytes(16).toString('hex');
+  console.warn('\n=============================================================');
+  console.warn('⚠️  SECURITY WARNING: DASHBOARD_PASSWORD not set in environment.');
+  console.warn('⚠️  A temporary random password has been generated for this session:');
+  console.warn('⚠️  --> ' + DASHBOARD_PASSWORD + ' <--');
+  console.warn('⚠️  Please set DASHBOARD_PASSWORD in gui/backend/.env for a permanent password.');
+  console.warn('=============================================================\n');
+}
 const app = express();
 
 // Basic auth middleware for all /api routes
 app.use('/api', (req, res, next) => {
-  if (req.path === '/order/pending' || req.path === '/order/reasoning') return next();
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ ok: false, error: 'Unauthorized' });
   const token = authHeader.split(' ')[1];
-  if (token !== DASHBOARD_PASSWORD) return res.status(403).json({ ok: false, error: 'Forbidden' });
+  if (!token) return res.status(403).json({ ok: false, error: 'Forbidden' });
+
+  try {
+    const tokenBuffer = Buffer.from(token);
+    const passBuffer = Buffer.from(DASHBOARD_PASSWORD);
+    if (tokenBuffer.length !== passBuffer.length || !crypto.timingSafeEqual(tokenBuffer, passBuffer)) {
+      return res.status(403).json({ ok: false, error: 'Forbidden' });
+    }
+  } catch (e) {
+    return res.status(403).json({ ok: false, error: 'Forbidden' });
+  }
   next();
 });
 const path = require('path');
 
+
+
+
 const MCP_CCXT = process.env.MCP_CCXT || 'http://127.0.0.1:7001/mcp';
 const MCP_PORTFOLIO = process.env.MCP_PORTFOLIO || 'http://127.0.0.1:7004/mcp';
+const MCP_LLM = process.env.MCP_LLM || 'http://127.0.0.1:7015/mcp';
+const MCP_COINGECKO = process.env.MCP_COINGECKO || 'http://127.0.0.1:7010/mcp';
+const MCP_FREQTRADE = process.env.MCP_FREQTRADE || 'http://127.0.0.1:7002/mcp';
+const MCP_OCTOBOT = process.env.MCP_OCTOBOT || 'http://127.0.0.1:7003/mcp';
+const MCP_ONCHAIN = process.env.MCP_ONCHAIN || 'http://127.0.0.1:7007/mcp';
+const MCP_TA = process.env.MCP_TA || 'http://127.0.0.1:7005/mcp';
+const MCP_SUPERALGOS = process.env.MCP_SUPERALGOS || 'http://127.0.0.1:7006/mcp';
+const MCP_HUMMINGBOT = process.env.MCP_HUMMINGBOT || 'http://127.0.0.1:7014/mcp';
+const MCP_NOTIFIER = process.env.MCP_NOTIFIER || 'http://127.0.0.1:7016/mcp';
+
+const mcpUrls = {
+  MCP_CCXT,
+  MCP_PORTFOLIO,
+  MCP_LLM,
+  MCP_COINGECKO,
+  MCP_FREQTRADE,
+  MCP_OCTOBOT,
+  MCP_ONCHAIN,
+  MCP_TA,
+  MCP_SUPERALGOS,
+  MCP_HUMMINGBOT,
+  MCP_NOTIFIER
+};
 const PORT = parseInt(process.env.PORT || '4000', 10);
+
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -99,7 +146,7 @@ async function callMCP(mcpUrl, toolName, args = {}) {
 app.get('/api/portfolio', async (req, res) => {
   const exchanges = (req.query.exchanges || 'binance').split(',').map(s => s.trim());
   try {
-    const result = await callMCP(MCP_PORTFOLIO, 'portfolio_value', exchanges);
+    const result = await callMCP(mcpUrls.MCP_PORTFOLIO, 'portfolio_value', exchanges);
     res.json({ ok: true, data: result });
   } catch (err) {
     console.error('portfolio error', err.message || err);
@@ -108,10 +155,28 @@ app.get('/api/portfolio', async (req, res) => {
 });
 
 // GET /api/ticker
+
+// GET /api/mcp
+app.post('/api/mcp', async (req, res) => {
+  const { mcp, method, params } = req.body;
+  if (!mcp || !method) return res.status(400).json({ ok: false, error: 'Missing mcp or method' });
+
+  const mcpUrl = mcpUrls[mcp];
+  if (!mcpUrl) return res.status(400).json({ ok: false, error: 'Unknown MCP endpoint' });
+
+  try {
+    const result = await callMCP(mcpUrl, method, params || {});
+    res.json({ ok: true, data: result });
+  } catch (err) {
+    console.error('mcp error', err.message || err);
+    res.status(500).json({ ok: false, error: String(err.message || err) });
+  }
+});
+
 app.get('/api/ticker', async (req, res) => {
   const { exchange = 'binance', symbol = 'BTC/USDT' } = req.query;
   try {
-    const result = await callMCP(MCP_CCXT, 'get_ticker', { exchange, symbol });
+    const result = await callMCP(mcpUrls.MCP_CCXT, 'get_ticker', { exchange, symbol });
     res.json({ ok: true, data: result });
   } catch (err) {
     console.error('ticker error', err.message || err);
@@ -125,8 +190,16 @@ app.post('/api/order/dry_run', async (req, res) => {
   if (!exchange || !symbol || !side || !type || !amount) {
     return res.status(400).json({ ok:false, error: 'Missing required fields' });
   }
+  const numericAmount = Number(amount);
+  if (isNaN(numericAmount) || numericAmount <= 0) {
+    return res.status(400).json({ ok:false, error: 'Amount must be a positive number' });
+  }
+  const numericPrice = price !== undefined && price !== null ? Number(price) : null;
+  if (numericPrice !== null && (isNaN(numericPrice) || numericPrice <= 0)) {
+    return res.status(400).json({ ok:false, error: 'Price must be a positive number' });
+  }
   try {
-    const ticker = await callMCP(MCP_CCXT, 'get_ticker', { exchange, symbol });
+    const ticker = await callMCP(mcpUrls.MCP_CCXT, 'get_ticker', { exchange, symbol });
     const marketPrice = ticker && (ticker.last || ticker.close) ? (ticker.last || ticker.close) : null;
     const usedPrice = (price !== undefined && price !== null) ? price : marketPrice;
     const estimatedCost = (usedPrice && amount) ? (parseFloat(usedPrice) * parseFloat(amount)) : null;
@@ -154,6 +227,14 @@ app.post('/api/order/execute', async (req, res) => {
   if (!exchange || !symbol || !side || !type || !amount) {
     return res.status(400).json({ ok:false, error: 'Missing required fields' });
   }
+  const numericAmount = Number(amount);
+  if (isNaN(numericAmount) || numericAmount <= 0) {
+    return res.status(400).json({ ok:false, error: 'Amount must be a positive number' });
+  }
+  const numericPrice = price !== undefined && price !== null ? Number(price) : null;
+  if (numericPrice !== null && (isNaN(numericPrice) || numericPrice <= 0)) {
+    return res.status(400).json({ ok:false, error: 'Price must be a positive number' });
+  }
   try {
     if (!execute) {
       return res.status(400).json({ ok:false, error: 'execute flag not set. Set execute=true to place live order.' });
@@ -173,7 +254,7 @@ app.post('/api/order/execute', async (req, res) => {
       params: exchangeParams
     };
 
-    const orderResp = await callMCP(MCP_CCXT, 'create_order', orderArgs);
+    const orderResp = await callMCP(mcpUrls.MCP_CCXT, 'create_order', orderArgs);
 
     const stmt = db.prepare('INSERT INTO orders (exchange,symbol,side,type,amount,price,dry_run,status,response) VALUES (?,?,?,?,?,?,?,?)');
     stmt.run(exchange, symbol, side, type, amount, price || null, 0, 'placed', JSON.stringify(orderResp));
@@ -217,9 +298,30 @@ async function callAndEmit(mcpUrl, toolName, args, eventName) {
 }
 
 // Polling intervals
-setInterval(() => callAndEmit(MCP_PORTFOLIO, 'portfolio_value', ['binance'], 'portfolio'), 30000);
-setInterval(() => callAndEmit(MCP_CCXT, 'get_ticker', { exchange: 'binance', symbol: 'BTC/USDT' }, 'ticker'), 5000);
+setInterval(() => callAndEmit(mcpUrls.MCP_PORTFOLIO, 'portfolio_value', ['binance'], 'portfolio'), 30000);
+setInterval(() => callAndEmit(mcpUrls.MCP_CCXT, 'get_ticker', { exchange: 'binance', symbol: 'BTC/USDT' }, 'ticker'), 5000);
 
+// GET /api/strategies
+app.get("/api/strategies", (req, res) => {
+  db.all("SELECT * FROM strategies ORDER BY created_at DESC", [], (err, rows) => {
+    if (err) return res.status(500).json({ ok: false, error: err.message });
+    res.json({ ok: true, data: rows });
+  });
+});
+
+// POST /api/strategies
+app.post("/api/strategies", (req, res) => {
+  const { name, nodes, connections, active } = req.body || {};
+  if (!name || !nodes || !connections) {
+    return res.status(400).json({ ok: false, error: "Missing required fields" });
+  }
+  const stmt = db.prepare("INSERT INTO strategies (name, nodes, connections, active) VALUES (?, ?, ?, ?)");
+  stmt.run(name, JSON.stringify(nodes), JSON.stringify(connections), active ? 1 : 0, function(err) {
+    if (err) return res.status(500).json({ ok: false, error: err.message });
+    res.json({ ok: true, id: this.lastID });
+  });
+  stmt.finalize();
+});
 // Start server and handle errors (EADDRINUSE will be surfaced)
 server.listen(PORT, () => {
   console.log('Crypto MCP GUI backend listening on http://127.0.0.1:' + PORT);
@@ -246,6 +348,14 @@ app.post('/api/order/pending', (req, res) => {
   const { exchange, symbol, side, type, amount, price, params, estimated_usd } = req.body || {};
   if (!exchange || !symbol || !side || !type || !amount) {
     return res.status(400).json({ ok: false, error: 'Missing required fields' });
+  }
+  const numericAmount = Number(amount);
+  if (isNaN(numericAmount) || numericAmount <= 0) {
+    return res.status(400).json({ ok: false, error: 'Amount must be a positive number' });
+  }
+  const numericPrice = price !== undefined && price !== null ? Number(price) : null;
+  if (numericPrice !== null && (isNaN(numericPrice) || numericPrice <= 0)) {
+    return res.status(400).json({ ok: false, error: 'Price must be a positive number' });
   }
 
   try {
@@ -294,10 +404,10 @@ app.post('/api/order/approve', async (req, res) => {
         type: order.type,
         amount: Number(order.amount),
         price: order.price !== null ? Number(order.price) : null,
-        params: {}
+        params: { approval_token: DASHBOARD_PASSWORD }
       };
 
-      const orderResp = await callMCP(MCP_CCXT, 'execute_approved_order', orderArgs);
+      const orderResp = await callMCP(mcpUrls.MCP_CCXT, 'execute_approved_order', orderArgs);
 
       db.run('UPDATE orders SET status = ?, response = ?, dry_run = 0 WHERE id = ?', ['placed', JSON.stringify(orderResp), orderId]);
 

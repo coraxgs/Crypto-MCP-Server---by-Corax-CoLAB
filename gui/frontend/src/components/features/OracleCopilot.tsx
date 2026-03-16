@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Terminal, X, BrainCircuit } from 'lucide-react';
+import { callMcpEndpoint } from '../../api_mcp';
 
 export default function OracleCopilot() {
   const [isListening, setIsListening] = useState(false);
@@ -212,6 +212,7 @@ export default function OracleCopilot() {
               <span style={{ fontFamily: 'monospace', fontSize: '12px', color: '#60a5fa', fontWeight: 'bold' }}>ORACLE // LOG_STREAM</span>
             </div>
             <button
+              aria-label="Close Oracle Log Stream"
               onClick={() => setIsOpen(false)}
               style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', padding: 0 }}
             >

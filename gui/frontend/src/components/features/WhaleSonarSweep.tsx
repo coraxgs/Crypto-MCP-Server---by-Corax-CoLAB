@@ -1,16 +1,71 @@
 import React, { useRef, useState, useEffect } from 'react';
-
-const blipsData = [
-  { id: 1, angle: 45, distance: 0.8, size: 8, label: '10k BTC (Binance)', age: 0, severity: 'red' },
-  { id: 2, angle: 120, distance: 0.5, size: 5, label: '50M USDT (Curve)', age: 50, severity: 'yellow' },
-  { id: 3, angle: 260, distance: 0.3, size: 3, label: '2k ETH (Kraken)', age: 100, severity: 'green' },
-  { id: 4, angle: 330, distance: 0.9, size: 10, label: '15k BTC (Cold)', age: 10, severity: 'red' }
-];
+import { callMcpEndpoint } from '../../api_mcp';
 
 export default function WhaleSonarSweep() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [angle, setAngle] = useState(0);
-  const [blips, setBlips] = useState(blipsData);
+  const [blips, setBlips] = useState<any[]>([]);
+
+  // Fetch real data to create sonar blips
+  useEffect(() => {
+    let active = true;
+
+    const fetchSonarData = async () => {
+      try {
+        // We use CoinGecko trending as a proxy for market activity
+        const trendingData = await callMcpEndpoint('MCP_COINGECKO', 'trending', {});
+
+        if (!active) return;
+
+        if (trendingData && trendingData.coins) {
+          const newBlips = trendingData.coins.map((coinWrapper: any, index: number) => {
+            const coin = coinWrapper.item;
+
+            // Generate deterministic angle and distance so they don't jump around on every render
+            // Just spreading them out based on their ID string
+            let seed = 0;
+            for (let i = 0; i < coin.id.length; i++) {
+                seed += coin.id.charCodeAt(i);
+            }
+
+            const blipAngle = (seed % 360);
+            const distance = 0.2 + ((seed % 100) / 100) * 0.7; // Between 0.2 and 0.9
+
+            // Size based on market cap rank (smaller rank = bigger blip)
+            const rank = coin.market_cap_rank || 100;
+            const size = Math.max(3, 10 - (rank / 20));
+
+            // Color based on rank
+            let severity = 'green';
+            if (rank <= 10) severity = 'red'; // High impact
+            else if (rank <= 50) severity = 'yellow'; // Medium impact
+
+            return {
+              id: coin.id,
+              angle: blipAngle,
+              distance: distance,
+              size: size,
+              label: `${coin.symbol.toUpperCase()} #${rank}`,
+              age: 0,
+              severity: severity
+            };
+          });
+
+          setBlips(newBlips);
+        }
+      } catch (err) {
+        console.error("Sonar fetch error", err);
+      }
+    };
+
+    fetchSonarData();
+    const interval = setInterval(fetchSonarData, 60000); // refresh every minute
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
     let animationId: number;
@@ -127,7 +182,7 @@ export default function WhaleSonarSweep() {
   return (
     <div className="card interactive-element" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: '#020205', position: 'relative' }}>
       <div style={{ position: 'absolute', top: 10, left: 10, color: '#10b981', fontFamily: 'monospace', fontSize: '12px' }}>
-        WHALE SONAR ACTIVE
+        MARKET SONAR SWEEP ACTIVE
       </div>
       <canvas ref={canvasRef} width={300} height={300} style={{ background: 'transparent' }} />
     </div>

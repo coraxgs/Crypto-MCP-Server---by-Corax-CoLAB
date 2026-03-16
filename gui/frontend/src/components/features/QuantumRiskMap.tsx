@@ -1,8 +1,9 @@
-import React, { useRef, useMemo, useState } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { ShieldAlert, TrendingDown } from 'lucide-react';
+import { callMcpEndpoint } from '../../api_mcp';
 
 const Terrain = ({ stressLevel }: { stressLevel: number }) => {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -51,17 +52,72 @@ const Terrain = ({ stressLevel }: { stressLevel: number }) => {
     }
   });
 
-  const materialColor = stressLevel > 0 ? '#ef4444' : '#60a5fa'; // Red on stress, Blue normally
+  const materialColor = stressLevel > 0.5 ? '#ef4444' : stressLevel > 0.2 ? '#f59e0b' : '#60a5fa'; // Red on high stress, Amber med, Blue normally
 
   return (
     <mesh ref={meshRef} geometry={geometry}>
-      <meshStandardMaterial color={materialColor} wireframe emissive={materialColor} emissiveIntensity={stressLevel > 0 ? 1 : 0.2} roughness={0.8} />
+      <meshStandardMaterial color={materialColor} wireframe emissive={materialColor} emissiveIntensity={stressLevel > 0 ? 0.8 : 0.2} roughness={0.8} />
     </mesh>
   );
 };
 
 export default function QuantumRiskMap() {
   const [stress, setStress] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // Poll for actual risk parameters using TA
+  useEffect(() => {
+    let active = true;
+
+    const fetchRiskParams = async () => {
+      try {
+        setLoading(true);
+        // Using RSI and Volatility (Bollinger width) as risk proxies
+        const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'binance', symbol: 'BTC/USDT', timeframe: '1h' });
+
+        if (!active) return;
+
+        let currentStress = 0;
+
+        if (taData) {
+            // Extreme RSI implies high risk (overbought > 70, oversold < 30)
+            if (taData.rsi) {
+                if (taData.rsi > 70) currentStress += 0.3 * ((taData.rsi - 70) / 30);
+                if (taData.rsi < 30) currentStress += 0.5 * ((30 - taData.rsi) / 30); // Oversold usually feels more stressful
+            }
+
+            // High volatility implies higher stress
+            if (taData.bb_upper && taData.bb_lower && taData.close) {
+                const widthPercent = (taData.bb_upper - taData.bb_lower) / taData.close;
+                if (widthPercent > 0.05) { // 5% spread in 1h is volatile
+                    currentStress += Math.min(0.5, (widthPercent - 0.05) * 10);
+                }
+            }
+
+            // Sell signal implies risk
+            if (taData.signal === 'sell') {
+                currentStress += 0.2;
+            }
+
+            // Cap stress at 1.0
+            setStress(Math.min(1.0, currentStress));
+        }
+
+      } catch (err) {
+        console.error("Quantum Risk Map fetch error", err);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    fetchRiskParams();
+    const interval = setInterval(fetchRiskParams, 60000); // Check every minute
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   const simulateCrash = () => {
     setStress(1);
@@ -71,8 +127,13 @@ export default function QuantumRiskMap() {
   return (
     <div className="card interactive-element" style={{ height: '350px', position: 'relative', overflow: 'hidden', padding: 0 }}>
       <div style={{ position: 'absolute', top: 15, left: 15, zIndex: 10, display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <ShieldAlert size={20} className={stress > 0 ? 'text-red' : 'text-blue'} />
+        <ShieldAlert size={20} className={stress > 0.5 ? 'text-red' : stress > 0.2 ? 'text-amber' : 'text-blue'} />
         <h3 style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '1px' }}>Quantum Risk Topography</h3>
+      </div>
+
+      <div style={{ position: 'absolute', bottom: 15, left: 15, zIndex: 10, fontFamily: 'monospace', fontSize: '10px', color: '#94a3b8' }}>
+        <div>SYSTEM STRESS: {(stress * 100).toFixed(1)}%</div>
+        <div>STATUS: {loading ? 'SCANNING...' : stress > 0.5 ? 'CRITICAL' : stress > 0.2 ? 'ELEVATED' : 'NOMINAL'}</div>
       </div>
 
       <div style={{ position: 'absolute', bottom: 15, right: 15, zIndex: 10 }}>
@@ -81,20 +142,20 @@ export default function QuantumRiskMap() {
         </button>
       </div>
 
-      {stress > 0 && (
+      {stress > 0.8 && (
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 10, color: '#ef4444', fontFamily: 'monospace', fontSize: '24px', fontWeight: 'bold', textShadow: '0 0 10px #ef4444', animation: 'blink 0.5s infinite' }}>
-          LIQUIDATION CASCADE DETECTED
+          LIQUIDATION CASCADE IMMINENT
         </div>
       )}
 
       <Canvas camera={{ position: [0, 10, 20], fov: 45 }}>
         <color attach="background" args={['#020205']} />
         <ambientLight intensity={0.5} />
-        <pointLight position={[0, 10, 0]} intensity={stress > 0 ? 5 : 2} color={stress > 0 ? '#ef4444' : '#ffffff'} />
+        <pointLight position={[0, 10, 0]} intensity={stress > 0.5 ? 5 : 2} color={stress > 0.5 ? '#ef4444' : '#ffffff'} />
 
         <Terrain stressLevel={stress} />
 
-        <OrbitControls enablePan={false} maxPolarAngle={Math.PI / 2 - 0.1} autoRotate={stress === 0} autoRotateSpeed={0.5} />
+        <OrbitControls enablePan={false} maxPolarAngle={Math.PI / 2 - 0.1} autoRotate={stress < 0.2} autoRotateSpeed={0.5} />
       </Canvas>
       <style>{`
         @keyframes blink { 0% { opacity: 1 } 50% { opacity: 0 } 100% { opacity: 1 } }

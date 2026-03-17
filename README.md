@@ -82,7 +82,7 @@ The Crypto MCP Server now features advanced interactive elements and real-time A
 *   👁️ **System Overview:** A high-level visual summary of your entire crypto operation, including system status, active agents, and total equity.
 *   🧠 **Neural Net Liquidity:** Real-time visualization of market liquidity using a simulated neural network topography.
 *   📊 **Holo Topographic Order Book:** A 3D, holographic representation of the order book, now integrated with real-time live data from CCXT MCP endpoints.
-*   📰 **News Singularity:** An AI-curated feed of the most critical market news, sentiment-scored using live data endpoints via CoinGecko.
+*   📰 **News Singularity:** An AI-curated feed of the most critical market news, sentiment-scored using the dedicated News MCP and live CryptoPanic APIs.
 *   🛰️ **Orbital Portfolio:** A dynamic, physics-based 3D visualization of your actual asset allocation using live real-time portfolio MCP data.
 *   🐋 **Whale Constellations:** Real-time 3D mapping of trending coins and market sentiment based on live CoinGecko data endpoints.
 

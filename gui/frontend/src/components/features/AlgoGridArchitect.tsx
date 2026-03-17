@@ -119,13 +119,23 @@ export default function AlgoGridArchitect() {
     loadStrategies();
   }, []);
 
-  // Triggering the animation every few seconds to simulate a live strategy executing
+  // Trigger the animation on real order execution events via socket
   useEffect(() => {
-    const interval = setInterval(() => {
+    if (!(window as any).socket) return;
+    const socket = (window as any).socket;
+
+    const handleOrder = () => {
       setActivePath(true);
       setTimeout(() => setActivePath(false), 1500);
-    }, 4000);
-    return () => clearInterval(interval);
+    };
+
+    socket.on('order_placed', handleOrder);
+    socket.on('order_pending', handleOrder);
+
+    return () => {
+      socket.off('order_placed', handleOrder);
+      socket.off('order_pending', handleOrder);
+    };
   }, []);
 
   const addNode = () => {

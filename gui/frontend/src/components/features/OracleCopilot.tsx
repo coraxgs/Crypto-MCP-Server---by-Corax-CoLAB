@@ -33,7 +33,7 @@ export default function OracleCopilot() {
             const command = event.results[i][0].transcript.trim();
             if (command) {
               setLogs(prev => [...prev, { id: Date.now(), text: command, type: 'user' }]);
-              simulateAIResponse(command);
+              processAICommand(command);
             }
           } else {
             interimTranscript += event.results[i][0].transcript;
@@ -85,7 +85,7 @@ export default function OracleCopilot() {
     }
   };
 
-  const simulateAIResponse = async (command: string) => {
+  const processAICommand = async (command: string) => {
     setLogs(prev => [...prev, { id: Date.now(), text: "PROCESSING COMMAND...", type: 'system' }]);
 
     try {

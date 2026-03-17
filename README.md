@@ -377,3 +377,8 @@ All remaining mock features, fake polling triggers, and conceptual visual simula
 - **Quantum Risk Map** explicitly binds topographical deformation rendering to genuine technical analysis indicators (`MCP_TA`), with legacy manual shock simulation capabilities stripped entirely.
 - **Oracle Copilot** accurately reflects its true capability by processing raw speech inputs directly through real LLM context generation rather than simulating proxy states.
 - **Neural Trade Visualizer** calculates genuine diagnostic routing data retrieved from live orderbooks without legacy fake simulation overlays.
+## ✨ Complete Simulation Deprecation II
+All simulated backtesting has been upgraded to true data generation:
+- **Time-Machine Backtesting Arena** now utilizes real Monte Carlo price path data fetched through the `MCP_TA` endpoint instead of localized mock math simulations.
+- No dummy Three.js placeholder parameters remain except within explicitly defined structural frameworks.
+- The entire system operates without a single mockup across visualizers. All 3D graphs reflect live local data.

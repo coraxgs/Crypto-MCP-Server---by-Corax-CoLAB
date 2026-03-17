@@ -97,6 +97,17 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
 
 // Create orders table (safe)
 db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS strategies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    nodes TEXT,
+    connections TEXT,
+    active INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`, (err) => {
+    if (err) console.error('Error creating strategies table:', err);
+  });
+
   db.run(`CREATE TABLE IF NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

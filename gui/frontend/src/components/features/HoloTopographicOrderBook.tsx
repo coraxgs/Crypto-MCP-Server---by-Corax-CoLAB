@@ -1,5 +1,6 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { callMcpEndpoint } from '../../api_mcp';
+import { useActivePortfolioSymbol } from '../../hooks/useActivePortfolioSymbol';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -40,14 +41,18 @@ const Wall = ({ type, price, volume, maxVolume, index }: { type: 'bid' | 'ask', 
 export default function HoloTopographicOrderBook() {
   const [orderBook, setOrderBook] = useState({ bids: [], asks: [], maxVolume: 1 });
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
+  const { targetSymbol: activeSymbol } = useActivePortfolioSymbol();
 
   useEffect(() => {
     let active = true;
     const fetchOrderBook = async () => {
       try {
+        let targetExchange = 'binance';
+        let targetSymbol = activeSymbol;
+
         // Fetch real order book from CCXT
-        const obData = await callMcpEndpoint('MCP_CCXT', 'fetch_order_book', { exchange: 'binance', symbol: 'BTC/USDT', limit: 30 });
-        const tickerData = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: 'binance', symbol: 'BTC/USDT' });
+        const obData = await callMcpEndpoint('MCP_CCXT', 'fetch_order_book', { exchange: targetExchange, symbol: targetSymbol, limit: 30 });
+        const tickerData = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: targetExchange, symbol: targetSymbol });
 
         if (!active || !obData || !obData.bids || !obData.asks) return;
 
@@ -71,13 +76,13 @@ export default function HoloTopographicOrderBook() {
     fetchOrderBook();
     const interval = setInterval(fetchOrderBook, 10000); // Poll every 10s
     return () => { active = false; clearInterval(interval); };
-  }, []);
+  }, [activeSymbol]);
 
   return (
     <div className="card interactive-element" style={{ gridColumn: '1 / -1', minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
       <h3 style={{ margin: '0 0 15px 0', color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '2px', display: 'flex', alignItems: 'center', gap: '10px' }}>
         <div style={{ width: '8px', height: '8px', background: '#60a5fa', borderRadius: '50%', boxShadow: '0 0 10px #60a5fa' }}></div>
-        Holographic Liquidity Trench (BTC/USDT)
+        Holographic Liquidity Trench ({activeSymbol})
       </h3>
 
       <div style={{ width: '100%', height: '350px', background: '#050505', borderRadius: '8px', overflow: 'hidden', position: 'relative' }}>

@@ -368,6 +368,9 @@ The **Smart Routing Diagnostics** component within the Order Panel has been full
 The **Oracle Copilot** component has been fully integrated with the **LLM MCP**. Instead of returning static mocked responses, it now leverages the local LLM cluster to compute intelligent, authoritative responses based on live user voice or text commands, fully achieving 100% data integration with the MCP architecture.
 ## ✨ Robust Security Enhancements
 Auth bypass vulnerabilities via insecure `req.ip` validation on localhost have been successfully patched in the backend server API. `/api/order/pending` and `/api/order/reasoning` endpoints are now fully secured with `DASHBOARD_PASSWORD` verification, ensuring reliable operation without unauthorized cross-site invocations. `docker-compose.yml` has also been upgraded to pass rigid YAML validations for clean orchestration.
+## ✨ Visualizer Dynamics 100% Real Integration
+The final remaining static pair references in 3D visualizers have been completely removed. Features like the **Arbitrage Wormhole**, **Neural Net Liquidity**, **Quantum Risk Map**, and **Predictive Ghosting** now dynamically query the local `MCP_PORTFOLIO` node to determine your highest allocated assets (e.g., dynamically focusing on your actual portfolio holdings rather than hardcoding `BTC/USDT` and `binance`/`kraken`). If your top holdings change, the visualizers will adapt to scan arbitrage, risk, and price trajectory for your actual coins across dynamic exchange hubs.
+
 ## ✨ Complete Simulation Deprecation
 All remaining mock features, fake polling triggers, and conceptual visual simulations within the frontend components have been systematically deprecated. Visualizers now definitively rely entirely on live event subscriptions and authentic backend indicators:
 - **Algo Grid Architect** now pulses intelligently via reactive `order_placed` and `order_pending` Socket.io events instead of an artificial timed loop.

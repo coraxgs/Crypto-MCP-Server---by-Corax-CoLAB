@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { callMcpEndpoint } from '../../api_mcp';
+import { useActivePortfolioSymbol } from '../../hooks/useActivePortfolioSymbol';
 
 const Terrain = ({ waveHeight }: { waveHeight: number }) => {
   const mesh = useRef<THREE.Mesh>(null);
@@ -41,6 +42,7 @@ const Terrain = ({ waveHeight }: { waveHeight: number }) => {
 export default function VolatilityMatrix() {
   const [waveHeight, setWaveHeight] = useState(1.5);
   const [loading, setLoading] = useState(true);
+  const { targetSymbol: activeSymbol } = useActivePortfolioSymbol();
 
   useEffect(() => {
     let active = true;
@@ -48,8 +50,11 @@ export default function VolatilityMatrix() {
     const fetchVolatilityData = async () => {
       try {
         setLoading(true);
+        let targetExchange = 'binance';
+        let targetSymbol = activeSymbol;
+
         // Using Bollinger Bands width as proxy for 3D volatility surface height
-        const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'binance', symbol: 'BTC/USDT', timeframe: '1h' });
+        const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: targetExchange, symbol: targetSymbol, timeframe: '1h' });
 
         if (!active) return;
 
@@ -76,7 +81,7 @@ export default function VolatilityMatrix() {
       active = false;
       clearInterval(interval);
     };
-  }, []);
+  }, [activeSymbol]);
 
   return (
     <div className="card interactive-element" style={{ height: '300px', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
@@ -86,7 +91,7 @@ export default function VolatilityMatrix() {
       </div>
 
       <div style={{ position: 'absolute', bottom: 10, right: 10, zIndex: 10, fontSize: '10px', color: '#8b5cf6', fontFamily: 'monospace' }}>
-        STATE: {loading ? 'SCANNING...' : `WAVE TENSION ${(waveHeight * 10).toFixed(1)}`}
+        STATE: {loading ? "SCANNING..." : `WAVE TENSION ${(waveHeight * 10).toFixed(1)}`}
       </div>
 
       <div style={{ flex: 1, position: 'relative' }}>

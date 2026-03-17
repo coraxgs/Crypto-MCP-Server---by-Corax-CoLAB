@@ -4,6 +4,7 @@ import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { ShieldAlert, TrendingDown } from 'lucide-react';
 import { callMcpEndpoint } from '../../api_mcp';
+import { useActivePortfolioSymbol } from '../../hooks/useActivePortfolioSymbol';
 
 const Terrain = ({ stressLevel }: { stressLevel: number }) => {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -64,6 +65,7 @@ const Terrain = ({ stressLevel }: { stressLevel: number }) => {
 export default function QuantumRiskMap() {
   const [stress, setStress] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { targetSymbol: activeSymbol, targetExchange: activeExchange } = useActivePortfolioSymbol();
 
   // Poll for actual risk parameters using TA
   useEffect(() => {
@@ -72,18 +74,8 @@ export default function QuantumRiskMap() {
     const fetchRiskParams = async () => {
       try {
         setLoading(true);
-        // Using RSI and Volatility (Bollinger width) as risk proxies dynamically
-        let targetExchange = 'binance';
-        let targetSymbol = 'BTC/USDT';
-        try {
-            const portfolio = await callMcpEndpoint('MCP_PORTFOLIO', 'portfolio_value', { exchanges: ['binance'] });
-            if (portfolio && portfolio.portfolio) {
-                const coins = Object.keys(portfolio.portfolio);
-                if (coins.length > 0) {
-                    targetSymbol = `${coins[0].toUpperCase()}/USDT`;
-                }
-            }
-        } catch (pErr) {}
+        let targetExchange = activeExchange;
+        let targetSymbol = activeSymbol;
 
         const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: targetExchange, symbol: targetSymbol, timeframe: '1h' });
 
@@ -129,7 +121,7 @@ export default function QuantumRiskMap() {
       active = false;
       clearInterval(interval);
     };
-  }, []);
+  }, [activeSymbol, activeExchange]);
 
 
 

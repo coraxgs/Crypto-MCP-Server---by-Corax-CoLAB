@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Plotly from 'plotly.js-basic-dist';
 import { callMcpEndpoint } from '../../api_mcp';
+import { useActivePortfolioSymbol } from '../../hooks/useActivePortfolioSymbol';
 
 export default function PredictiveGhosting() {
   const [scrubberValue, setScrubberValue] = useState(0);
   const chartRef = useRef<HTMLDivElement>(null);
   const [plotData, setPlotData] = useState<any>(null);
+  const { targetSymbol: activeSymbolHook, targetExchange: activeExchange } = useActivePortfolioSymbol();
   const [activeSymbol, setActiveSymbol] = useState('BTC/USDT');
 
   useEffect(() => {
@@ -13,21 +15,8 @@ export default function PredictiveGhosting() {
 
     const fetchAndCalculate = async () => {
         try {
-            // First fetch top pair dynamically instead of hardcoding BTC/USDT kraken
-            let targetExchange = 'kraken';
-            let targetSymbol = 'BTC/USDT';
-            try {
-                const portfolio = await callMcpEndpoint('MCP_PORTFOLIO', 'portfolio_value', { exchanges: ['binance'] });
-                if (portfolio && portfolio.portfolio) {
-                    const coins = Object.keys(portfolio.portfolio);
-                    if (coins.length > 0) {
-                        targetSymbol = `${coins[0].toUpperCase()}/USDT`;
-                        targetExchange = 'binance';
-                    }
-                }
-            } catch (pErr) {
-                console.warn("Could not fetch portfolio for dynamic pair, using default", pErr);
-            }
+            let targetExchange = activeExchange;
+            let targetSymbol = activeSymbolHook;
 
             const ohlcvData = await callMcpEndpoint('MCP_CCXT', 'fetch_ohlcv', { exchange: targetExchange, symbol: targetSymbol, timeframe: '1h', limit: 50 });
 
@@ -111,7 +100,7 @@ export default function PredictiveGhosting() {
         active = false;
         clearInterval(interval);
     };
-  }, []);
+  }, [activeSymbolHook, activeExchange]);
 
   useEffect(() => {
     if (!plotData) return;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Network, Activity, Settings, Cpu, Save, Plus } from 'lucide-react';
 import { authenticatedFetch } from '../../auth';
 import { callMcpEndpoint } from '../../api_mcp';
+import { useActivePortfolioSymbol } from '../../hooks/useActivePortfolioSymbol';
 
 const Node = ({ type, title, position, active }: { type: 'source' | 'logic' | 'action', title: string, position: {x: number, y: number}, active: boolean }) => {
   const colors = {
@@ -71,6 +72,7 @@ export default function AlgoGridArchitect() {
   const [nodes, setNodes] = useState<{id: number, type: 'source'|'logic'|'action', title: string, pos: {x: number, y: number}}[]>([]);
   const [connections, setConnections] = useState<{start: {x: number, y: number}, end: {x: number, y: number}}[]>([]);
   const [loading, setLoading] = useState(false);
+  const { targetSymbol: activeSymbol } = useActivePortfolioSymbol();
 
   useEffect(() => {
     // Load strategies from backend or build dynamic default
@@ -90,10 +92,7 @@ export default function AlgoGridArchitect() {
             }
         }
 
-        // No saved strategies, build dynamic starting grid from live market data
-        const markets = await callMcpEndpoint('MCP_CCXT', 'fetch_markets', { exchange: 'binance' });
-        // Use first available pair as an example, defaults to BTC/USDT
-        const pair = markets && markets.length > 0 ? markets.find((m: any) => m.symbol.includes('USDT'))?.symbol || 'BTC/USDT' : 'BTC/USDT';
+        let pair = activeSymbol;
 
         const dynamicNodes = [
             { id: 1, type: 'source' as const, title: `CCXT: ${pair}`, pos: { x: 20, y: 50 } },
@@ -117,7 +116,7 @@ export default function AlgoGridArchitect() {
       }
     };
     loadStrategies();
-  }, []);
+  }, [activeSymbol]);
 
   // Trigger the animation on real order execution events via socket
   useEffect(() => {

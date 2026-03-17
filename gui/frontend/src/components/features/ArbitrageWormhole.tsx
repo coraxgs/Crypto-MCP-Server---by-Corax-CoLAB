@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text, Html, Line } from '@react-three/drei';
 import * as THREE from 'three';
 import { callMcpEndpoint } from '../../api_mcp';
+import { useActivePortfolioSymbol } from '../../hooks/useActivePortfolioSymbol';
 import { Network } from 'lucide-react';
 
 const WormholeTunnel = () => {
@@ -135,22 +136,14 @@ export default function ArbitrageWormhole() {
   const [opportunities, setOpportunities] = useState<any[]>([]);
 
 
+  const { targetSymbol: activeSymbol } = useActivePortfolioSymbol();
+
   useEffect(() => {
     let active = true;
     const fetchArbitrage = async () => {
       try {
-        let pair = 'BTC/USDT';
-        try {
-            const portfolio = await callMcpEndpoint('MCP_PORTFOLIO', 'portfolio_value', { exchanges: ['binance'] });
-            if (portfolio && portfolio.portfolio) {
-                const coins = Object.keys(portfolio.portfolio);
-                if (coins.length > 0) {
-                    pair = `${coins[0].toUpperCase()}/USDT`;
-                }
-            }
-        } catch (pErr) {
-            console.warn("Could not fetch portfolio for dynamic pair, using default", pErr);
-        }
+        let pair = activeSymbol;
+
         // Fetch tickers from different exchanges to compare spread
         const t1 = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: 'kraken', symbol: pair });
         const t2 = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: 'binance', symbol: pair });
@@ -179,7 +172,7 @@ export default function ArbitrageWormhole() {
     fetchArbitrage();
     const interval = setInterval(fetchArbitrage, 5000);
     return () => { active = false; clearInterval(interval); };
-  }, []);
+  }, [activeSymbol]);
 
 
   const sourcePos = new THREE.Vector3(-4, 0, 0);

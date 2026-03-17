@@ -72,8 +72,20 @@ export default function QuantumRiskMap() {
     const fetchRiskParams = async () => {
       try {
         setLoading(true);
-        // Using RSI and Volatility (Bollinger width) as risk proxies
-        const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'binance', symbol: 'BTC/USDT', timeframe: '1h' });
+        // Using RSI and Volatility (Bollinger width) as risk proxies dynamically
+        let targetExchange = 'binance';
+        let targetSymbol = 'BTC/USDT';
+        try {
+            const portfolio = await callMcpEndpoint('MCP_PORTFOLIO', 'portfolio_value', { exchanges: ['binance'] });
+            if (portfolio && portfolio.portfolio) {
+                const coins = Object.keys(portfolio.portfolio);
+                if (coins.length > 0) {
+                    targetSymbol = `${coins[0].toUpperCase()}/USDT`;
+                }
+            }
+        } catch (pErr) {}
+
+        const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: targetExchange, symbol: targetSymbol, timeframe: '1h' });
 
         if (!active) return;
 

@@ -94,22 +94,8 @@ export default function AlgoGridArchitect() {
 
         let pair = activeSymbol;
 
-        const dynamicNodes = [
-            { id: 1, type: 'source' as const, title: `CCXT: ${pair}`, pos: { x: 20, y: 50 } },
-            { id: 2, type: 'source' as const, title: 'On-Chain: ETH Router', pos: { x: 20, y: 180 } },
-            { id: 3, type: 'logic' as const, title: 'Freqtrade: RSI < 30', pos: { x: 250, y: 50 } },
-            { id: 4, type: 'logic' as const, title: 'AND Gate', pos: { x: 250, y: 180 } },
-            { id: 5, type: 'action' as const, title: 'Hummingbot: TWAP Buy', pos: { x: 480, y: 110 } },
-        ];
-
-        const dynamicConnections = [
-            { start: {x: 200, y: 80}, end: {x: 250, y: 80} },
-            { start: {x: 200, y: 210}, end: {x: 250, y: 210} },
-            { start: {x: 430, y: 80}, end: {x: 480, y: 130} },
-            { start: {x: 430, y: 210}, end: {x: 480, y: 150} }
-        ];
-        setNodes(dynamicNodes);
-        setConnections(dynamicConnections);
+        setNodes([]);
+        setConnections([]);
 
       } catch (err) {
         console.error("Failed to load strategies:", err);

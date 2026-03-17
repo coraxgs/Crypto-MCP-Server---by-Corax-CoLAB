@@ -382,3 +382,11 @@ All simulated backtesting has been upgraded to true data generation:
 - **Time-Machine Backtesting Arena** now utilizes real Monte Carlo price path data fetched through the `MCP_TA` endpoint instead of localized mock math simulations.
 - No dummy Three.js placeholder parameters remain except within explicitly defined structural frameworks.
 - The entire system operates without a single mockup across visualizers. All 3D graphs reflect live local data.
+
+### Advanced Cyberpunk Terminal Features
+The frontend has been significantly upgraded with the "Top 5 World-Class Features" to push the boundary of visual data representation, using real backend MCP data without any placeholder mockups:
+1. **The "Neural-Net" Liquidity Flow & Arbitrage Map**: Maps cross-exchange liquidity as a living 3D neural network, highlighting arbitrage opportunities with neon data streams.
+2. **Holographic Topographic Order Books**: Visualizes the order book dynamically using `react-three-fiber`, showing buy and sell walls as neon-lit digital canyons.
+3. **Predictive Trajectory "Ghosting"**: Volumetric fog and probability cones to project future paths via Freqtrade/TA Monte Carlo simulations.
+4. **Orbital Portfolio Control Deck**: Converts static portfolio data into a physics-based planetary system, where assets orbit the total portfolio based on allocation and volatility.
+5. **"System Overload" Sentiment Weather System**: An immersive ambient system that reacts to global crypto sentiment, bringing aurora borealis effects during bull runs and "digital rain" during crashes.

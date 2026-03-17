@@ -6,13 +6,30 @@ export default function PredictiveGhosting() {
   const [scrubberValue, setScrubberValue] = useState(0);
   const chartRef = useRef<HTMLDivElement>(null);
   const [plotData, setPlotData] = useState<any>(null);
+  const [activeSymbol, setActiveSymbol] = useState('BTC/USDT');
 
   useEffect(() => {
     let active = true;
 
     const fetchAndCalculate = async () => {
         try {
-            const ohlcvData = await callMcpEndpoint('MCP_CCXT', 'fetch_ohlcv', { exchange: 'kraken', symbol: 'BTC/USDT', timeframe: '1h', limit: 50 });
+            // First fetch top pair dynamically instead of hardcoding BTC/USDT kraken
+            let targetExchange = 'kraken';
+            let targetSymbol = 'BTC/USDT';
+            try {
+                const portfolio = await callMcpEndpoint('MCP_PORTFOLIO', 'portfolio_value', { exchanges: ['binance'] });
+                if (portfolio && portfolio.portfolio) {
+                    const coins = Object.keys(portfolio.portfolio);
+                    if (coins.length > 0) {
+                        targetSymbol = `${coins[0].toUpperCase()}/USDT`;
+                        targetExchange = 'binance';
+                    }
+                }
+            } catch (pErr) {
+                console.warn("Could not fetch portfolio for dynamic pair, using default", pErr);
+            }
+
+            const ohlcvData = await callMcpEndpoint('MCP_CCXT', 'fetch_ohlcv', { exchange: targetExchange, symbol: targetSymbol, timeframe: '1h', limit: 50 });
 
             if (!active) return;
             if (!ohlcvData || !Array.isArray(ohlcvData) || ohlcvData.length === 0) return;
@@ -29,7 +46,7 @@ export default function PredictiveGhosting() {
             let volatility = currentPrice * 0.01;
 
             try {
-                const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'kraken', symbol: 'BTC/USDT', timeframe: '1h' });
+                const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: targetExchange, symbol: targetSymbol, timeframe: '1h' });
                 if (active && taData) {
                     if (taData.signal === 'buy') trendFactor = 0.5;
                     if (taData.signal === 'sell') trendFactor = -0.5;
@@ -50,7 +67,7 @@ export default function PredictiveGhosting() {
 
             try {
                 // Call real Monte Carlo simulation from backend (ta_mcp)
-                const mcData = await callMcpEndpoint('MCP_TA', 'monte_carlo_simulation', { exchange: 'kraken', symbol: 'BTC/USDT', timeframe: '1h', limit: 100, future_steps: futureSteps, simulations: 1000 });
+                const mcData = await callMcpEndpoint('MCP_TA', 'monte_carlo_simulation', { exchange: targetExchange, symbol: targetSymbol, timeframe: '1h', limit: 100, future_steps: futureSteps, simulations: 1000 });
                 if (mcData && mcData.median_path && !mcData.error) {
                     // Remove the first element since it's the current price, to match futureX length
                     futureY = mcData.median_path.slice(1);
@@ -80,6 +97,7 @@ export default function PredictiveGhosting() {
             }
 
             setPlotData({ x, y, futureX, futureY, futureLower, futureUpper });
+            setActiveSymbol(targetSymbol);
 
         } catch (error) {
             console.error("Error generating predictive ghosting:", error);
@@ -105,7 +123,7 @@ export default function PredictiveGhosting() {
         y: y,
         type: 'scatter',
         mode: 'lines',
-        name: 'Historical (BTC/USDT 1h)',
+        name: `Historical (${activeSymbol} 1h)`,
         line: { color: '#60a5fa', width: 2 }
     };
 
@@ -171,7 +189,7 @@ export default function PredictiveGhosting() {
 
     Plotly.react('predictive-chart', traces as any, layout as any, {displayModeBar: false});
 
-  }, [plotData, scrubberValue]);
+  }, [plotData, scrubberValue, activeSymbol]);
 
   return (
     <div className="card glass-panel interactive-element" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', borderTop: '4px solid #10b981' }}>

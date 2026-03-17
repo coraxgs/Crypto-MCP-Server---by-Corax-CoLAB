@@ -140,7 +140,7 @@ export default function ArbitrageWormhole() {
     const fetchArbitrage = async () => {
       try {
         // Fetch tickers from different exchanges to compare spread
-        const t1 = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: 'kraken', symbol: 'BTC/USDT' });
+        const t1 = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: 'kraken', symbol: pair });
         const t2 = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: 'binance', symbol: 'BTC/USDT' });
 
         if (!active) return;

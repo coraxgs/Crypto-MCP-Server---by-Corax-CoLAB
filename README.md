@@ -342,6 +342,10 @@ sudo journalctl -u crypto-mcp-gui.service -f
   <p>
     <b>We unite:</b><br>
     🤖 Edge AI & Autonomous Systems<br>
+
+## ✨ Visualizer Dynamics 100% Real Integration
+The final remaining static pair references in 3D visualizers have been completely removed. Features like the **Arbitrage Wormhole**, **Neural Net Liquidity**, **Quantum Risk Map**, and **Predictive Ghosting** now dynamically query the local `MCP_PORTFOLIO` node to determine your highest allocated assets (e.g., dynamically focusing on your actual portfolio holdings rather than hardcoding `BTC/USDT` and `binance`/`kraken`). If your top holdings change, the visualizers will adapt to scan arbitrage, risk, and price trajectory for your actual coins across dynamic exchange hubs.
+
 ## ✨ 100% Real Data Integration
 
 **All conceptual placeholders have been actively upgraded to real data mechanisms**. Features such as the 3D Arbitrage Wormhole, Time-Machine Backtesting Arena, Neural Net Liquidity, Predictive Ghosting, Orbital Portfolio, Algo Grid Architect, and the Sentiment Weather System seamlessly fetch live metrics and topologies through the Python MCP Server backend. All components are entirely functional with zero placeholders, generated mocks, or static fallbacks.

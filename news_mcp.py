@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+"""
+news_mcp.py
+News MCP server for Crypto MCP Server – Produced by Corax CoLAB
+Exposes: get_latest_news, search_news
+"""
+import os
+import logging
+import requests
+from typing import Optional, List, Dict, Any
+from mcp.server.fastmcp import FastMCP
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path="/home/pelle/cryptomcpserver/.env")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("news_mcp")
+
+mcp = FastMCP(name="news", stateless_http=True, json_response=True, host="0.0.0.0", port=7017)
+
+@mcp.tool()
+def get_latest_news(limit: int = 10) -> dict:
+    """
+    Fetches the latest crypto news from CryptoPanic API.
+    Provides real data for the News Singularity feature.
+    """
+    try:
+        # CryptoPanic public API for recent news
+        url = "https://cryptopanic.com/api/v1/posts/?auth_token=public&public=true"
+        response = requests.get(url, timeout=10)
+
+        if response.status_code == 200:
+            data = response.json()
+            results = data.get('results', [])[:limit]
+
+            # Format the output for the frontend
+            formatted_news = []
+            for item in results:
+                # Basic sentiment approximation based on votes (bullish vs bearish)
+                votes = item.get('votes', {})
+                bullish = votes.get('positive', 0) + votes.get('important', 0) + votes.get('liked', 0)
+                bearish = votes.get('negative', 0) + votes.get('disliked', 0) + votes.get('toxic', 0)
+
+                sentiment = 'neutral'
+                if bullish > bearish * 1.5:
+                    sentiment = 'bullish'
+                elif bearish > bullish * 1.5:
+                    sentiment = 'bearish'
+
+                formatted_news.append({
+                    'id': item.get('id', str(len(formatted_news))),
+                    'title': item.get('title', ''),
+                    'domain': item.get('domain', ''),
+                    'url': item.get('url', ''),
+                    'published_at': item.get('published_at', ''),
+                    'sentiment': sentiment,
+                    'currencies': [c.get('code') for c in item.get('currencies', [])] if item.get('currencies') else []
+                })
+
+            return {"status": "success", "news": formatted_news}
+        else:
+            return {"error": f"CryptoPanic API error: {response.status_code}"}
+    except Exception as e:
+        logger.error(f"Error fetching news: {e}")
+        return {"error": str(e)}
+
+@mcp.tool()
+def search_news(query: str, limit: int = 10) -> dict:
+    """
+    Searches for specific crypto news.
+    """
+    try:
+        url = f"https://cryptopanic.com/api/v1/posts/?auth_token=public&public=true&currencies={query}"
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            return {"status": "success", "news": response.json().get('results', [])[:limit]}
+        else:
+            return {"error": f"CryptoPanic API error: {response.status_code}"}
+    except Exception as e:
+        return {"error": str(e)}
+
+if __name__ == "__main__":
+    print("Starting news_mcp on http://0.0.0.0:7017/mcp — Crypto MCP Server")
+    mcp.run("streamable-http")

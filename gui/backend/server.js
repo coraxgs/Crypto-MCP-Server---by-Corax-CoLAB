@@ -65,6 +65,7 @@ const MCP_TA = process.env.MCP_TA || 'http://127.0.0.1:7005/mcp';
 const MCP_SUPERALGOS = process.env.MCP_SUPERALGOS || 'http://127.0.0.1:7006/mcp';
 const MCP_HUMMINGBOT = process.env.MCP_HUMMINGBOT || 'http://127.0.0.1:7014/mcp';
 const MCP_NOTIFIER = process.env.MCP_NOTIFIER || 'http://127.0.0.1:7016/mcp';
+const MCP_NEWS = process.env.MCP_NEWS || 'http://127.0.0.1:7017/mcp';
 
 const mcpUrls = {
   MCP_CCXT,
@@ -77,7 +78,8 @@ const mcpUrls = {
   MCP_TA,
   MCP_SUPERALGOS,
   MCP_HUMMINGBOT,
-  MCP_NOTIFIER
+  MCP_NOTIFIER,
+  MCP_NEWS
 };
 const PORT = parseInt(process.env.PORT || '4000', 10);
 

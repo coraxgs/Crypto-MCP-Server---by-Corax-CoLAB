@@ -1,3 +1,4 @@
+import React, { useState, useRef, useEffect } from 'react';
 import { Mic, MicOff, Terminal, X, BrainCircuit } from 'lucide-react';
 import { callMcpEndpoint } from '../../api_mcp';
 
@@ -84,37 +85,35 @@ export default function OracleCopilot() {
     }
   };
 
-  const simulateAIResponse = (command: string) => {
-    const cmd = command.toLowerCase();
-    let response = '';
+  const simulateAIResponse = async (command: string) => {
+    setLogs(prev => [...prev, { id: Date.now(), text: "PROCESSING COMMAND...", type: 'system' }]);
 
-    if (cmd.includes('portfolio') || cmd.includes('balance')) {
-      response = "Analyzing portfolio. Exposure to major caps is optimal. Total value synced with MCP portfolio aggregator.";
-    } else if (cmd.includes('buy') || cmd.includes('execute')) {
-      response = "Executing dry-run analysis for requested asset. Awaiting manual confirmation in the Order Terminal before routing to CCXT MCP.";
-    } else if (cmd.includes('market') || cmd.includes('trend')) {
-      response = "Querying TA and On-chain MCPs. Detecting significant whale movement on Layer 1s. Volatility expected.";
-    } else {
-      response = "Command recognized. Running predictive models via Local MCP cluster. Output will be piped to standard visualizers.";
-    }
+    try {
+      const response = await callMcpEndpoint('MCP_LLM', 'generate_text', {
+        prompt: `As the Oracle AI of a trading dashboard, respond briefly and authoritatively to the following user command: ${command}`,
+        max_tokens: 150
+      });
 
-    // Simulate typing delay
-    setTimeout(() => {
-      setLogs(prev => [...prev, { id: Date.now(), text: response, type: 'ai' }]);
+      let aiText = "Neural connection degraded. Unable to compute response.";
+      if (response && response.response) {
+        aiText = response.response;
+      }
 
-      // Optional: Text to speech
+      setLogs(prev => [...prev, { id: Date.now(), text: aiText, type: 'ai' }]);
+
       if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(response);
+        const utterance = new SpeechSynthesisUtterance(aiText);
         utterance.rate = 1.1;
         utterance.pitch = 0.9;
-        // Find a suitable voice if possible
         const voices = window.speechSynthesis.getVoices();
         const techVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Siri') || v.lang === 'en-GB');
         if (techVoice) utterance.voice = techVoice;
-
         window.speechSynthesis.speak(utterance);
       }
-    }, 1000);
+    } catch (err) {
+      console.error("LLM MCP Error:", err);
+      setLogs(prev => [...prev, { id: Date.now(), text: "ERROR: Failed to establish uplink with LLM MCP.", type: 'system' }]);
+    }
   };
 
   return (

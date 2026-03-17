@@ -38,7 +38,7 @@ const Terrain = ({ stressLevel }: { stressLevel: number }) => {
         // Base terrain
         let y = Math.sin(x * 0.5 + time * 0.5) * Math.cos(z * 0.5 + time * 0.5) * 1;
 
-        // Apply stress deformation (simulate market crash)
+        // Apply stress deformation based on real market parameters
         if (stressLevel > 0) {
           const distanceToCenter = Math.sqrt(x*x + z*z);
           const impact = Math.exp(-distanceToCenter * 0.2) * stressLevel * 5;
@@ -119,10 +119,7 @@ export default function QuantumRiskMap() {
     };
   }, []);
 
-  const simulateCrash = () => {
-    setStress(1);
-    setTimeout(() => setStress(0), 3000);
-  };
+
 
   return (
     <div className="card interactive-element" style={{ height: '350px', position: 'relative', overflow: 'hidden', padding: 0 }}>
@@ -136,11 +133,7 @@ export default function QuantumRiskMap() {
         <div>STATUS: {loading ? 'SCANNING...' : stress > 0.5 ? 'CRITICAL' : stress > 0.2 ? 'ELEVATED' : 'NOMINAL'}</div>
       </div>
 
-      <div style={{ position: 'absolute', bottom: 15, right: 15, zIndex: 10 }}>
-        <button onClick={simulateCrash} className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '4px', borderColor: '#ef4444', color: '#ef4444' }}>
-          <TrendingDown size={14} /> SIMULATE -20% BTC SHOCK
-        </button>
-      </div>
+
 
       {stress > 0.8 && (
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 10, color: '#ef4444', fontFamily: 'monospace', fontSize: '24px', fontWeight: 'bold', textShadow: '0 0 10px #ef4444', animation: 'blink 0.5s infinite' }}>

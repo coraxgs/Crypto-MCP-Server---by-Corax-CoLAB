@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import ForceGraph3D from 'react-force-graph-3d';
 import { ShieldAlert, Activity, Wifi } from 'lucide-react';
 import { callMcpEndpoint } from '../../api_mcp';
+import { useActivePortfolioSymbol } from '../../hooks/useActivePortfolioSymbol';
 
 export default function RiskRadarPanel() {
   const [defcon, setDefcon] = useState<'GREEN' | 'YELLOW' | 'RED'>('GREEN');
   const [logs, setLogs] = useState<string[]>(['[SYS] Connecting to On-Chain MCP Node...']);
   const [data, setData] = useState({ nodes: [], links: [] });
   const [width, setWidth] = useState(600);
+  const { targetSymbol: activeSymbol } = useActivePortfolioSymbol();
 
   useEffect(() => {
     const handleResize = () => {
@@ -57,7 +59,8 @@ export default function RiskRadarPanel() {
 
         // Add a "Risk Node" representing market volatility
         try {
-            const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'binance', symbol: 'BTC/USDT', timeframe: '1h' });
+            let targetSymbol = activeSymbol;
+            const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'binance', symbol: targetSymbol, timeframe: '1h' });
             if (taData && taData.signal) {
                 let statusMsg = '[INFO] Market indicators normal.';
                 let newDefcon: 'GREEN' | 'YELLOW' | 'RED' = 'GREEN';
@@ -99,7 +102,7 @@ export default function RiskRadarPanel() {
     fetchData();
     const interval = setInterval(fetchData, 30000); // Check every 30s
     return () => { active = false; clearInterval(interval); };
-  }, [defcon]);
+  }, [defcon, activeSymbol]);
 
 
   return (

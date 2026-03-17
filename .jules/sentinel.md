@@ -14,3 +14,7 @@
 Vulnerability: Legacy files containing mock data arrays and Math.random() usage were co-existing with production features.
 Learning: Unused component files with mock data (`LiquidityFlowMap.tsx`, `PredictiveChart.tsx`) can create confusion. We must ensure only components driven by the MCP backend are utilized.
 Prevention: Perform routine codebase sweeps to prune `.orig` files and unused feature components that don't connect to backend endpoints via `callMcpEndpoint`.
+2026-03-17 - [Refactoring Repeated Frontend API Calls]
+Vulnerability: Copy-pasting the same portfolio fetch logic across 7 different components to make them dynamic causes maintainability issues and spam on the backend via multiple concurrent `setInterval` polls.
+Learning: Centralize repeated API polling into a shared custom React hook (e.g. `useActivePortfolioSymbol.ts`). This ensures the API call logic is written once and components can simply subscribe to the shared state.
+Prevention: Before duplicating complex `useEffect` fetching logic across multiple files to solve a systemic issue, always assess if a custom Hook or Context provider can abstract and optimize the workload.

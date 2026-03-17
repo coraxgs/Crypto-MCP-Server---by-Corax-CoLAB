@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { BrainCircuit, Activity, AlertTriangle, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { callMcpEndpoint } from '../../api_mcp';
+import { useActivePortfolioSymbol } from '../../hooks/useActivePortfolioSymbol';
 
 export default function MarketSentimentAnalyzer() {
   const [sentiment, setSentiment] = useState<'neutral' | 'bullish' | 'bearish' | 'loading'>('loading');
   const [analysis, setAnalysis] = useState<string>('Initializing AI analysis module...');
   const [confidence, setConfidence] = useState<number>(0);
+  const { targetSymbol: activeSymbol } = useActivePortfolioSymbol();
 
   useEffect(() => {
     const fetchSentiment = async () => {
@@ -13,11 +15,14 @@ export default function MarketSentimentAnalyzer() {
       setAnalysis('Querying LLM MCP for latest market data synthesis...');
 
       try {
-        const btcTickerResp = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: 'binance', symbol: 'BTC/USDT' });
+        let targetExchange = 'binance';
+        let targetSymbol = activeSymbol;
 
-        let tickerStr = "Current BTC/USDT price unavailable.";
+        const btcTickerResp = await callMcpEndpoint('MCP_CCXT', 'get_ticker', { exchange: targetExchange, symbol: targetSymbol });
+
+        let tickerStr = `Current ${targetSymbol} price unavailable.`;
         if (btcTickerResp && btcTickerResp.last) {
-            tickerStr = `Current BTC/USDT price is ${btcTickerResp.last}.`;
+            tickerStr = `Current ${targetSymbol} price is ${btcTickerResp.last}.`;
         }
 
         const prompt = `As an expert crypto AI, analyze the current market sentiment. ${tickerStr} Respond with ONLY a JSON object in this exact format, with no markdown or other text: {"sentiment": "bullish|bearish|neutral", "confidence": 0-100, "analysis": "A concise 2-sentence explanation."}`;
@@ -69,7 +74,7 @@ export default function MarketSentimentAnalyzer() {
     fetchSentiment();
     const interval = setInterval(fetchSentiment, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [activeSymbol]);
 
   const getStyleColor = () => {
     if (sentiment === 'bullish') return '#10b981';

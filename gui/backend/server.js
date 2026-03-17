@@ -28,6 +28,9 @@ if (!DASHBOARD_PASSWORD) {
 }
 const app = express();
 
+app.use(cors());
+app.use(bodyParser.json());
+
 // Basic auth middleware for all /api routes
 app.use('/api', (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -79,8 +82,7 @@ const mcpUrls = {
 const PORT = parseInt(process.env.PORT || '4000', 10);
 
 
-app.use(cors());
-app.use(bodyParser.json());
+
 
 // Initialize SQLite DB
 const DB_PATH = path.resolve(__dirname, 'orders.db');

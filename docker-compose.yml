@@ -49,9 +49,6 @@ services:
     ports:
       - "7004:7004"
 
-volumes:
-  db_data:
-
   octobot-mcp:
     build:
       context: .
@@ -104,3 +101,6 @@ volumes:
     restart: unless-stopped
     depends_on:
       - redis
+
+volumes:
+  db_data:

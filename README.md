@@ -356,3 +356,5 @@ The **Smart Routing Diagnostics** component within the Order Panel has been full
 **Order Panel Form Fields** have been refactored to replace `placeholder` text with robust `aria-label` tags, enhancing overall compliance and accessibility across the interface.
 ## ✨ Oracle Copilot Real LLM Integration
 The **Oracle Copilot** component has been fully integrated with the **LLM MCP**. Instead of returning static mocked responses, it now leverages the local LLM cluster to compute intelligent, authoritative responses based on live user voice or text commands, fully achieving 100% data integration with the MCP architecture.
+## ✨ Robust Security Enhancements
+Auth bypass vulnerabilities via insecure `req.ip` validation on localhost have been successfully patched in the backend server API. `/api/order/pending` and `/api/order/reasoning` endpoints are now fully secured with `DASHBOARD_PASSWORD` verification, ensuring reliable operation without unauthorized cross-site invocations. `docker-compose.yml` has also been upgraded to pass rigid YAML validations for clean orchestration.

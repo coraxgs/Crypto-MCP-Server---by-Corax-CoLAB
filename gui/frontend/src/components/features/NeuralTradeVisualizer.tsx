@@ -19,7 +19,7 @@ export default function NeuralTradeVisualizer({ active, exchange, symbol }: { ac
       }
 
       try {
-        // To simulate smart routing diagnostics, we'll fetch orderbook data from the exchange
+        // To process smart routing diagnostics, we'll fetch orderbook data from the exchange
         // to show liquidity depth nodes, creating a real representation of execution paths.
         const obData = await callMcpEndpoint('MCP_CCXT', 'fetch_order_book', { exchange: exchange, symbol: symbol, limit: 10 });
 

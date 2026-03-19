@@ -35,19 +35,19 @@ export default function NewsSingularity() {
 
         const fetchMarketDataAndCreateNews = async () => {
             try {
-                // Since there is no dedicated News MCP yet, we use CoinGecko trending as a proxy for "News" / "Hype"
-                const trendingData = await callMcpEndpoint('MCP_COINGECKO', 'trending', {});
+                // Fetches latest news from News MCP using CryptoPanic API
+                const trendingData = await callMcpEndpoint('MCP_NEWS', 'get_latest_news', {limit: 15});
 
                 if (!active) return;
 
-                if (trendingData && trendingData.coins) {
+                if (trendingData && trendingData.news) {
                     // Create nodes
-                    const newNodes = trendingData.coins.map((coinWrapper: any, index: number) => {
-                        const coin = coinWrapper.item;
+                    const newNodes = trendingData.news.map((coinWrapper: any, index: number) => {
+                        const coin = coinWrapper;
 
                         // Sentiment based on 24h price change
                         // In a real scenario, this would come from a sentiment analysis MCP
-                        const priceChange = coin.data?.price_change_percentage_24h?.usd;
+                        const priceChange = coin.sentiment === 'bullish' ? 6 : coin.sentiment === 'bearish' ? -6 : 0;
                         let sentiment = 'neutral';
                         if (priceChange > 5) sentiment = 'bullish';
                         else if (priceChange < -5) sentiment = 'bearish';
@@ -55,7 +55,7 @@ export default function NewsSingularity() {
 
                         return {
                             id: `${coin.id}-${index}`, // Unique identifier
-                            text: `Trending: ${coin.symbol.toUpperCase()} (${priceChange ? priceChange.toFixed(2) + '%' : 'N/A'})`,
+                            text: `News: ${coin.title}`,
                             sentiment: sentiment,
                             val: 1.5,
                             color: sentiment === 'bullish' ? '#10b981' : sentiment === 'bearish' ? '#ef4444' : '#6366f1'
@@ -121,7 +121,7 @@ export default function NewsSingularity() {
                     />
                 ) : (
                     <div style={{ padding: '20px', color: '#64748b', textAlign: 'center' }}>
-                        Establishing uplink to global sentiment nodes...
+                        Establishing uplink to global crypto news nodes...
                     </div>
                 )}
             </div>

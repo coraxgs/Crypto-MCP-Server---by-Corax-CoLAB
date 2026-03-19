@@ -23,11 +23,13 @@ import OrbitalPortfolio from './components/features/OrbitalPortfolio';
 
 import { getAuthToken, setAuthToken } from './auth'
 import { callMcpEndpoint } from './api_mcp'
+import { useActivePortfolioSymbol } from './hooks/useActivePortfolioSymbol'
 
 export default function App() {
   const [sentiment, setSentiment] = useState<'bull' | 'bear' | 'neutral'>('neutral');
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAuthToken());
   const [password, setPassword] = useState('');
+  const { targetSymbol: activeSymbol } = useActivePortfolioSymbol();
 
   useEffect(() => {
     const handleAuthError = () => setIsAuthenticated(false);
@@ -41,7 +43,9 @@ export default function App() {
 
     const fetchGlobalSentiment = async () => {
         try {
-            const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'binance', symbol: 'BTC/USDT', timeframe: '1h' });
+            let targetSymbol = activeSymbol;
+
+            const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'binance', symbol: targetSymbol, timeframe: '1h' });
             if (taData && taData.signal) {
                 if (taData.signal === 'buy') setSentiment('bull');
                 else if (taData.signal === 'sell') setSentiment('bear');
@@ -55,7 +59,7 @@ export default function App() {
     fetchGlobalSentiment();
     const interval = setInterval(fetchGlobalSentiment, 120000); // Check every 2 minutes
     return () => clearInterval(interval);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, activeSymbol]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();

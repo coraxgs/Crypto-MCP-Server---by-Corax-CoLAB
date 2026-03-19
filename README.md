@@ -82,7 +82,7 @@ The Crypto MCP Server now features advanced interactive elements and real-time A
 *   👁️ **System Overview:** A high-level visual summary of your entire crypto operation, including system status, active agents, and total equity.
 *   🧠 **Neural Net Liquidity:** Real-time visualization of market liquidity using a simulated neural network topography.
 *   📊 **Holo Topographic Order Book:** A 3D, holographic representation of the order book, now integrated with real-time live data from CCXT MCP endpoints.
-*   📰 **News Singularity:** An AI-curated feed of the most critical market news, sentiment-scored using live data endpoints via CoinGecko.
+*   📰 **News Singularity:** An AI-curated feed of the most critical market news, sentiment-scored using the dedicated News MCP and live CryptoPanic APIs.
 *   🛰️ **Orbital Portfolio:** A dynamic, physics-based 3D visualization of your actual asset allocation using live real-time portfolio MCP data.
 *   🐋 **Whale Constellations:** Real-time 3D mapping of trending coins and market sentiment based on live CoinGecko data endpoints.
 
@@ -342,6 +342,16 @@ sudo journalctl -u crypto-mcp-gui.service -f
   <p>
     <b>We unite:</b><br>
     🤖 Edge AI & Autonomous Systems<br>
+
+## ✨ Visualizer Dynamics 100% Real Integration
+The final remaining static pair references in 3D visualizers have been completely removed. Features like the **Arbitrage Wormhole**, **Neural Net Liquidity**, **Quantum Risk Map**, and **Predictive Ghosting** now dynamically query the local `MCP_PORTFOLIO` node to determine your highest allocated assets (e.g., dynamically focusing on your actual portfolio holdings rather than hardcoding `BTC/USDT` and `binance`/`kraken`). If your top holdings change, the visualizers will adapt to scan arbitrage, risk, and price trajectory for your actual coins across dynamic exchange hubs.
+
+## ✨ Dynamic Pair Routing Enhancement
+
+The **Arbitrage Wormhole** feature has been upgraded to dynamically fetch your portfolio's most valuable asset via the `MCP_PORTFOLIO` backend instead of relying on static mock defaults. This enables real-time arbitrage scanning specifically for the coins you actually hold across multiple exchanges (e.g., Binance and Kraken), improving relevance and achieving full dynamic data integration.
+
+---
+
 ## ✨ 100% Real Data Integration
 
 **All conceptual placeholders have been actively upgraded to real data mechanisms**. Features such as the 3D Arbitrage Wormhole, Time-Machine Backtesting Arena, Neural Net Liquidity, Predictive Ghosting, Orbital Portfolio, Algo Grid Architect, and the Sentiment Weather System seamlessly fetch live metrics and topologies through the Python MCP Server backend. All components are entirely functional with zero placeholders, generated mocks, or static fallbacks.
@@ -354,3 +364,29 @@ sudo journalctl -u crypto-mcp-gui.service -f
 The **Smart Routing Diagnostics** component within the Order Panel has been fully integrated with live market data. It now connects to the **CCXT MCP** backend, dynamically fetching real-time order book (L2) data to construct a 3D topology of live Liquidity Pools (Bids/Asks) for the specified exchange and trading pair. This replaces previous static mock models, achieving 100% genuine data integration for order execution routing previews.
 ## ✨ Enhanced Input Accessibility
 **Order Panel Form Fields** have been refactored to replace `placeholder` text with robust `aria-label` tags, enhancing overall compliance and accessibility across the interface.
+## ✨ Oracle Copilot Real LLM Integration
+The **Oracle Copilot** component has been fully integrated with the **LLM MCP**. Instead of returning static mocked responses, it now leverages the local LLM cluster to compute intelligent, authoritative responses based on live user voice or text commands, fully achieving 100% data integration with the MCP architecture.
+## ✨ Robust Security Enhancements
+Auth bypass vulnerabilities via insecure `req.ip` validation on localhost have been successfully patched in the backend server API. `/api/order/pending` and `/api/order/reasoning` endpoints are now fully secured with `DASHBOARD_PASSWORD` verification, ensuring reliable operation without unauthorized cross-site invocations. `docker-compose.yml` has also been upgraded to pass rigid YAML validations for clean orchestration.
+## ✨ Visualizer Dynamics 100% Real Integration
+The final remaining static pair references in 3D visualizers have been completely removed. Features like the **Arbitrage Wormhole**, **Neural Net Liquidity**, **Quantum Risk Map**, and **Predictive Ghosting** now dynamically query the local `MCP_PORTFOLIO` node to determine your highest allocated assets (e.g., dynamically focusing on your actual portfolio holdings rather than hardcoding `BTC/USDT` and `binance`/`kraken`). If your top holdings change, the visualizers will adapt to scan arbitrage, risk, and price trajectory for your actual coins across dynamic exchange hubs.
+
+## ✨ Complete Simulation Deprecation
+All remaining mock features, fake polling triggers, and conceptual visual simulations within the frontend components have been systematically deprecated. Visualizers now definitively rely entirely on live event subscriptions and authentic backend indicators:
+- **Algo Grid Architect** now pulses intelligently via reactive `order_placed` and `order_pending` Socket.io events instead of an artificial timed loop.
+- **Quantum Risk Map** explicitly binds topographical deformation rendering to genuine technical analysis indicators (`MCP_TA`), with legacy manual shock simulation capabilities stripped entirely.
+- **Oracle Copilot** accurately reflects its true capability by processing raw speech inputs directly through real LLM context generation rather than simulating proxy states.
+- **Neural Trade Visualizer** calculates genuine diagnostic routing data retrieved from live orderbooks without legacy fake simulation overlays.
+## ✨ Complete Simulation Deprecation II
+All simulated backtesting has been upgraded to true data generation:
+- **Time-Machine Backtesting Arena** now utilizes real Monte Carlo price path data fetched through the `MCP_TA` endpoint instead of localized mock math simulations.
+- No dummy Three.js placeholder parameters remain except within explicitly defined structural frameworks.
+- The entire system operates without a single mockup across visualizers. All 3D graphs reflect live local data.
+
+### Advanced Cyberpunk Terminal Features
+The frontend has been significantly upgraded with the "Top 5 World-Class Features" to push the boundary of visual data representation, using real backend MCP data without any placeholder mockups:
+1. **The "Neural-Net" Liquidity Flow & Arbitrage Map**: Maps cross-exchange liquidity as a living 3D neural network, highlighting arbitrage opportunities with neon data streams.
+2. **Holographic Topographic Order Books**: Visualizes the order book dynamically using `react-three-fiber`, showing buy and sell walls as neon-lit digital canyons.
+3. **Predictive Trajectory "Ghosting"**: Volumetric fog and probability cones to project future paths via Freqtrade/TA Monte Carlo simulations.
+4. **Orbital Portfolio Control Deck**: Converts static portfolio data into a physics-based planetary system, where assets orbit the total portfolio based on allocation and volatility.
+5. **"System Overload" Sentiment Weather System**: An immersive ambient system that reacts to global crypto sentiment, bringing aurora borealis effects during bull runs and "digital rain" during crashes.

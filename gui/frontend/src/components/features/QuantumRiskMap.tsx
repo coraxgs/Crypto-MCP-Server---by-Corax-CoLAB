@@ -4,6 +4,7 @@ import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { ShieldAlert, TrendingDown } from 'lucide-react';
 import { callMcpEndpoint } from '../../api_mcp';
+import { useActivePortfolioSymbol } from '../../hooks/useActivePortfolioSymbol';
 
 const Terrain = ({ stressLevel }: { stressLevel: number }) => {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -38,7 +39,7 @@ const Terrain = ({ stressLevel }: { stressLevel: number }) => {
         // Base terrain
         let y = Math.sin(x * 0.5 + time * 0.5) * Math.cos(z * 0.5 + time * 0.5) * 1;
 
-        // Apply stress deformation (simulate market crash)
+        // Apply stress deformation based on real market parameters
         if (stressLevel > 0) {
           const distanceToCenter = Math.sqrt(x*x + z*z);
           const impact = Math.exp(-distanceToCenter * 0.2) * stressLevel * 5;
@@ -64,6 +65,7 @@ const Terrain = ({ stressLevel }: { stressLevel: number }) => {
 export default function QuantumRiskMap() {
   const [stress, setStress] = useState(0);
   const [loading, setLoading] = useState(true);
+  const { targetSymbol: activeSymbol, targetExchange: activeExchange } = useActivePortfolioSymbol();
 
   // Poll for actual risk parameters using TA
   useEffect(() => {
@@ -72,8 +74,10 @@ export default function QuantumRiskMap() {
     const fetchRiskParams = async () => {
       try {
         setLoading(true);
-        // Using RSI and Volatility (Bollinger width) as risk proxies
-        const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'binance', symbol: 'BTC/USDT', timeframe: '1h' });
+        let targetExchange = activeExchange;
+        let targetSymbol = activeSymbol;
+
+        const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: targetExchange, symbol: targetSymbol, timeframe: '1h' });
 
         if (!active) return;
 
@@ -117,12 +121,9 @@ export default function QuantumRiskMap() {
       active = false;
       clearInterval(interval);
     };
-  }, []);
+  }, [activeSymbol, activeExchange]);
 
-  const simulateCrash = () => {
-    setStress(1);
-    setTimeout(() => setStress(0), 3000);
-  };
+
 
   return (
     <div className="card interactive-element" style={{ height: '350px', position: 'relative', overflow: 'hidden', padding: 0 }}>
@@ -136,11 +137,7 @@ export default function QuantumRiskMap() {
         <div>STATUS: {loading ? 'SCANNING...' : stress > 0.5 ? 'CRITICAL' : stress > 0.2 ? 'ELEVATED' : 'NOMINAL'}</div>
       </div>
 
-      <div style={{ position: 'absolute', bottom: 15, right: 15, zIndex: 10 }}>
-        <button onClick={simulateCrash} className="btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '4px', borderColor: '#ef4444', color: '#ef4444' }}>
-          <TrendingDown size={14} /> SIMULATE -20% BTC SHOCK
-        </button>
-      </div>
+
 
       {stress > 0.8 && (
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 10, color: '#ef4444', fontFamily: 'monospace', fontSize: '24px', fontWeight: 'bold', textShadow: '0 0 10px #ef4444', animation: 'blink 0.5s infinite' }}>

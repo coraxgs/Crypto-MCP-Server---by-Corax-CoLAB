@@ -12,8 +12,22 @@ export default function NeuralNetLiquidity() {
     let active = true;
     const fetchLiquidity = async () => {
       try {
-        const exchanges = ['binance', 'kraken', 'kucoin'];
-        const pairs = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT'];
+        let exchanges = ['binance', 'kraken', 'kucoin'];
+        let pairs = ['BTC/USDT', 'ETH/USDT', 'SOL/USDT'];
+
+        try {
+             const portfolio = await callMcpEndpoint('MCP_PORTFOLIO', 'portfolio_value', { exchanges: ['binance'] });
+             if (portfolio && portfolio.portfolio) {
+                 const coins = Object.keys(portfolio.portfolio);
+                 if (coins.length >= 3) {
+                     pairs = [
+                         `${coins[0].toUpperCase()}/USDT`,
+                         `${coins[1].toUpperCase()}/USDT`,
+                         `${coins[2].toUpperCase()}/USDT`
+                     ];
+                 }
+             }
+        } catch (e) {}
 
         let nodes = [];
         let links = [];

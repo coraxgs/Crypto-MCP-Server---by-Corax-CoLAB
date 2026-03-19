@@ -33,3 +33,20 @@ def test_create_order_pending_flow(mock_make_exchange, mock_post):
     assert "status" in res
     assert res["status"] == "pending_approval"
     mock_post.assert_called_once()
+
+@patch('ccxt_mcp.requests.post')
+def test_log_reasoning(mock_post):
+    import ccxt_mcp
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_post.return_value = mock_response
+
+    res = ccxt_mcp.log_reasoning("test_trade_id_123", "AI found a 5% dip and buying volume increasing.")
+
+    assert res["status"] == "success"
+    mock_post.assert_called_once()
+    args, kwargs = mock_post.call_args
+    assert "explanation" in kwargs["json"]
+    assert kwargs["json"]["explanation"] == "AI found a 5% dip and buying volume increasing."
+    assert "trade_id" in kwargs["json"]
+    assert kwargs["json"]["trade_id"] == "test_trade_id_123"

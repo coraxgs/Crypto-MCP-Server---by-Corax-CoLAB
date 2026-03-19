@@ -28,6 +28,9 @@ if (!DASHBOARD_PASSWORD) {
 }
 const app = express();
 
+app.use(cors());
+app.use(bodyParser.json());
+
 // Basic auth middleware for all /api routes
 app.use('/api', (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -62,6 +65,7 @@ const MCP_TA = process.env.MCP_TA || 'http://127.0.0.1:7005/mcp';
 const MCP_SUPERALGOS = process.env.MCP_SUPERALGOS || 'http://127.0.0.1:7006/mcp';
 const MCP_HUMMINGBOT = process.env.MCP_HUMMINGBOT || 'http://127.0.0.1:7014/mcp';
 const MCP_NOTIFIER = process.env.MCP_NOTIFIER || 'http://127.0.0.1:7016/mcp';
+const MCP_NEWS = process.env.MCP_NEWS || 'http://127.0.0.1:7017/mcp';
 
 const mcpUrls = {
   MCP_CCXT,
@@ -74,13 +78,13 @@ const mcpUrls = {
   MCP_TA,
   MCP_SUPERALGOS,
   MCP_HUMMINGBOT,
-  MCP_NOTIFIER
+  MCP_NOTIFIER,
+  MCP_NEWS
 };
 const PORT = parseInt(process.env.PORT || '4000', 10);
 
 
-app.use(cors());
-app.use(bodyParser.json());
+
 
 // Initialize SQLite DB
 const DB_PATH = path.resolve(__dirname, 'orders.db');
@@ -93,6 +97,17 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
 
 // Create orders table (safe)
 db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS strategies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    nodes TEXT,
+    connections TEXT,
+    active INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`, (err) => {
+    if (err) console.error('Error creating strategies table:', err);
+  });
+
   db.run(`CREATE TABLE IF NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

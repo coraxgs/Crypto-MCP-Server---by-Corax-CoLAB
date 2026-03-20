@@ -39,9 +39,9 @@ app.use('/api', (req, res, next) => {
   if (!token) return res.status(403).json({ ok: false, error: 'Forbidden' });
 
   try {
-    const tokenBuffer = Buffer.from(token);
-    const passBuffer = Buffer.from(DASHBOARD_PASSWORD);
-    if (tokenBuffer.length !== passBuffer.length || !crypto.timingSafeEqual(tokenBuffer, passBuffer)) {
+    const tokenHash = crypto.createHash('sha256').update(token).digest();
+    const passHash = crypto.createHash('sha256').update(DASHBOARD_PASSWORD).digest();
+    if (!crypto.timingSafeEqual(tokenHash, passHash)) {
       return res.status(403).json({ ok: false, error: 'Forbidden' });
     }
   } catch (e) {

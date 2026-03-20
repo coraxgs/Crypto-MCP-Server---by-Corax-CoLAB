@@ -35,10 +35,11 @@ const OrderRow = memo(({
         </td>
         <td>
           {order.status === 'pending' && (
-            <button className="btn-primary" onClick={() => onApprove(order.id)}>Approve</button>
+            <button aria-label={`Approve order ${order.id}`} className="btn-primary" onClick={() => onApprove(order.id)}>Approve</button>
           )}
           {order.reasoning && (
             <button
+              aria-label={`${isExpanded ? 'Hide' : 'View'} reasoning for order ${order.id}`}
               style={{ marginLeft: '8px', background: 'transparent', border: '1px solid #94a3b8', color: '#94a3b8', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}
               onClick={() => onToggleExpand(order.id)}
             >

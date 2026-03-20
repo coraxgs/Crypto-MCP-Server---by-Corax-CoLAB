@@ -20,21 +20,34 @@ logger = logging.getLogger("portfolio_mcp")
 mcp = FastMCP(name="portfolio", stateless_http=True, json_response=True, host="0.0.0.0", port=7004)
 cg = CoinGeckoAPI()
 
-_CACHE = {"prices": {}, "timestamp": 0}
+_CACHE = {"prices": {}, "timestamp": 0, "mapping": None, "mapping_timestamp": 0}
 CACHE_TTL = int(os.getenv("PORTFOLIO_CACHE_TTL", "30"))
+MAPPING_TTL = int(os.getenv("PORTFOLIO_MAPPING_TTL", "3600"))
 
 def _get_price_coingecko(symbol: str):
     now = time.time()
     if now - _CACHE["timestamp"] > CACHE_TTL:
         _CACHE["prices"] = {}
         _CACHE["timestamp"] = now
+
+    # ⚡ Bolt Optimization: Cache the CoinGecko ~14k coin mapping in memory for 1 hour.
+    # Previously, this was fetched for every uncached coin, causing severe HTTP 429
+    # rate limit errors and slowing down portfolio evaluation by >200ms per asset.
+    if _CACHE["mapping"] is None or (now - _CACHE["mapping_timestamp"] > MAPPING_TTL):
+        try:
+            coins = cg.get_coins_list()
+            _CACHE["mapping"] = {c["symbol"].upper(): c["id"] for c in coins}
+            _CACHE["mapping_timestamp"] = now
+        except Exception as e:
+            logger.debug("CoinGecko mapping lookup failed: %s", e)
+            if _CACHE["mapping"] is None:
+                return None
+
     key = symbol.upper()
     if key in _CACHE["prices"]:
         return _CACHE["prices"][key]
     try:
-        coins = cg.get_coins_list()
-        mapping = {c["symbol"].upper(): c["id"] for c in coins}
-        coin_id = mapping.get(key)
+        coin_id = _CACHE["mapping"].get(key)
         if coin_id:
             rp = cg.get_price(ids=coin_id, vs_currencies="usd")
             price = rp.get(coin_id, {}).get("usd")
@@ -42,7 +55,7 @@ def _get_price_coingecko(symbol: str):
                 _CACHE["prices"][key] = price
                 return price
     except Exception as e:
-        logger.debug("CoinGecko lookup failed: %s", e)
+        logger.debug("CoinGecko price lookup failed: %s", e)
     return None
 
 def _get_price_ccxt(exchange, symbol):

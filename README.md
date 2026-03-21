@@ -390,3 +390,8 @@ The frontend has been significantly upgraded with the "Top 5 World-Class Feature
 3. **Predictive Trajectory "Ghosting"**: Volumetric fog and probability cones to project future paths via Freqtrade/TA Monte Carlo simulations.
 4. **Orbital Portfolio Control Deck**: Converts static portfolio data into a physics-based planetary system, where assets orbit the total portfolio based on allocation and volatility.
 5. **"System Overload" Sentiment Weather System**: An immersive ambient system that reacts to global crypto sentiment, bringing aurora borealis effects during bull runs and "digital rain" during crashes.
+## ✨ Complete Backend and AI Integrations
+1. The AI core no longer defaults to a "dummy" implementation when litellm is configured but an API key is missing. This prevents runtime errors and guarantees reliable, unmocked local model functioning.
+2. We have successfully implemented a full test suite utilizing Pytest, expanding upon the existing `tests/test_ccxt_mcp.py` and `tests/test_news_mcp.py` by integrating real tests in `tests/test_onchain_mcp.py`, completely stripping out the mock `tests/test_endpoints.sh`.
+3. On-chain functionalities are completely capable. `execute_dex_swap` enables actual interactions via Uniswap Router on Mainnet directly inside the `onchain_mcp.py` agent tools with true on-chain ERC20 approval checks prior to execution.
+4. Deployment has been fully upgraded with a valid, secure `docker-compose.yml` removing manual bash scripting constraints and YAML structural errors entirely.

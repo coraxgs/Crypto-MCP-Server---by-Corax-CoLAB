@@ -195,3 +195,114 @@ def get_dex_quote(token_in: str, token_out: str, amount_in: float, rpc_url: Opti
     except Exception as e:
         logger.error(f"Error getting DEX quote: {e}")
         return {"error": str(e)}
+
+@mcp.tool()
+def execute_dex_swap(token_in: str, token_out: str, amount_in: float, slippage_tolerance: float = 0.5, rpc_url: Optional[str] = None) -> dict:
+    """
+    Executes a real on-chain swap using Uniswap V2 Router on Ethereum Mainnet.
+    Requires ETH_PRIVATE_KEY and ETH_PUBLIC_ADDRESS in .env.
+    """
+    try:
+        rpc = rpc_url or os.getenv("ETH_RPC_URL", "https://eth.llamarpc.com")
+        private_key = os.getenv("ETH_PRIVATE_KEY")
+        public_address = os.getenv("ETH_PUBLIC_ADDRESS")
+
+        if not private_key or not public_address:
+            return {"error": "ETH_PRIVATE_KEY and ETH_PUBLIC_ADDRESS must be set in .env to execute live swaps."}
+
+        w3 = Web3(Web3.HTTPProvider(rpc))
+        if not w3.is_connected():
+            return {"error": f"Failed to connect to Ethereum RPC: {rpc}"}
+
+        router_address = w3.to_checksum_address("0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D")
+        token_in_address = w3.to_checksum_address(token_in)
+        token_out_address = w3.to_checksum_address(token_out)
+        account = w3.to_checksum_address(public_address)
+
+        in_contract = w3.eth.contract(address=token_in_address, abi=ERC20_MINIMAL_ABI)
+        try:
+            in_decimals = in_contract.functions.decimals().call()
+        except Exception:
+            in_decimals = 18
+
+        amount_in_wei = int(amount_in * (10 ** in_decimals))
+
+        # We first need to get the expected out amount to calculate minimum out with slippage
+        router_contract = w3.eth.contract(address=router_address, abi=UNISWAP_V2_ROUTER_ABI)
+        WETH = w3.to_checksum_address("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2")
+
+        path = [token_in_address, token_out_address]
+        try:
+            amounts_out = router_contract.functions.getAmountsOut(amount_in_wei, path).call()
+        except Exception:
+            if token_in_address != WETH and token_out_address != WETH:
+                path = [token_in_address, WETH, token_out_address]
+                amounts_out = router_contract.functions.getAmountsOut(amount_in_wei, path).call()
+            else:
+                return {"error": "Could not fetch quote for this pair (no liquidity or invalid path)."}
+
+        expected_out_wei = amounts_out[-1]
+        amount_out_min = int(expected_out_wei * (1 - (slippage_tolerance / 100.0)))
+
+        deadline = w3.eth.get_block("latest")["timestamp"] + 60 * 10 # 10 minutes
+
+        # Check allowance and approve if necessary
+        allowance_abi = [
+            {"constant": True, "inputs": [{"name": "_owner", "type": "address"}, {"name": "_spender", "type": "address"}], "name": "allowance", "outputs": [{"name": "", "type": "uint256"}], "payable": False, "stateMutability": "view", "type": "function"},
+            {"constant": False, "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}], "name": "approve", "outputs": [{"name": "", "type": "bool"}], "payable": False, "stateMutability": "nonpayable", "type": "function"}
+        ]
+
+        token_contract = w3.eth.contract(address=token_in_address, abi=allowance_abi)
+        if token_in_address != WETH:
+            allowance = token_contract.functions.allowance(account, router_address).call()
+            if allowance < amount_in_wei:
+                # Need to approve
+                nonce = w3.eth.get_transaction_count(account)
+                approve_tx = token_contract.functions.approve(router_address, amount_in_wei).build_transaction({
+                    'from': account,
+                    'nonce': nonce,
+                    'gas': 100000,
+                    'gasPrice': w3.eth.gas_price
+                })
+                signed_approve = w3.eth.account.sign_transaction(approve_tx, private_key=private_key)
+                approve_hash = w3.eth.send_raw_transaction(signed_approve.rawTransaction)
+                w3.eth.wait_for_transaction_receipt(approve_hash) # wait for approval to mine
+
+        # Build transaction
+        swap_abi = [
+            {"inputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"},{"internalType":"uint256","name":"amountOutMin","type":"uint256"},{"internalType":"address[]","name":"path","type":"address[]"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"deadline","type":"uint256"}],"name":"swapExactTokensForTokens","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"nonpayable","type":"function"}
+        ]
+
+        router_swap_contract = w3.eth.contract(address=router_address, abi=swap_abi)
+
+        nonce = w3.eth.get_transaction_count(account)
+
+        tx = router_swap_contract.functions.swapExactTokensForTokens(
+            amount_in_wei,
+            amount_out_min,
+            path,
+            account,
+            deadline
+        ).build_transaction({
+            'from': account,
+            'nonce': nonce,
+            'gas': 200000,
+            'gasPrice': w3.eth.gas_price
+        })
+
+        # Sign transaction
+        signed_tx = w3.eth.account.sign_transaction(tx, private_key=private_key)
+
+        # Send transaction
+        tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+        return {
+            "status": "success",
+            "message": "Swap transaction submitted to the network.",
+            "tx_hash": w3.to_hex(tx_hash),
+            "explorer_url": f"https://etherscan.io/tx/{w3.to_hex(tx_hash)}"
+        }
+
+    except Exception as e:
+        logger.error(f"Error executing DEX swap: {e}")
+        return {"error": str(e)}

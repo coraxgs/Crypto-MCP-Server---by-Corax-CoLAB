@@ -6,6 +6,7 @@ import { callMcpEndpoint } from '../../api_mcp';
 export default function BacktestArenaPanel() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
   const [speed, setSpeed] = useState(1);
   const [strategy, setStrategy] = useState('Corax-AI-V1');
   const [historicalData, setHistoricalData] = useState<any[]>([]);
@@ -76,8 +77,9 @@ export default function BacktestArenaPanel() {
         });
 
         setHistoricalData(data);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Backtest fetch error", err);
+        setError(err.message || "Failed to fetch backtest data");
       }
     };
     fetchData();
@@ -235,6 +237,12 @@ export default function BacktestArenaPanel() {
         </div>
       </div>
 
+
+      {error && (
+        <div style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)', padding: '10px', borderRadius: '4px', border: '1px solid #ef4444', margin: '10px 0', fontSize: '12px' }}>
+          ⚠️ Backtesting Engine Error: {error}
+        </div>
+      )}
       {/* Stats Overlay */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
         <div style={{ background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '6px' }}>

@@ -28,7 +28,7 @@ except ImportError:
 LLM_MODEL = os.getenv("LLM_MODEL", "ollama/mistral")
 # The endpoint for the local AI supplier if needed (e.g. http://127.0.0.1:11434 for Ollama)
 LLM_API_BASE = os.getenv("LLM_API_BASE", "http://127.0.0.1:11434")
-LLM_API_KEY = os.getenv("LLM_API_KEY", "dummy")
+LLM_API_KEY = os.getenv("LLM_API_KEY", "")
 
 @mcp.tool()
 def ping() -> str:
@@ -56,7 +56,7 @@ def generate_text(prompt: str, model: Optional[str] = None, max_tokens: int = 50
         # Add api base if we're using a local provider like Ollama or vLLM
         if "ollama" in target_model or "vllm" in target_model:
             kwargs["api_base"] = LLM_API_BASE
-        if LLM_API_KEY and LLM_API_KEY != "dummy":
+        if LLM_API_KEY and LLM_API_KEY != "":
             kwargs["api_key"] = LLM_API_KEY
 
         response = completion(**kwargs)

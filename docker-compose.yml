@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build: ./gui/backend
@@ -9,18 +7,7 @@ services:
       - MCP_CCXT=http://mcp_ccxt:7001/mcp
       - MCP_PORTFOLIO=http://mcp_portfolio:7004/mcp
       - PORT=4000
-
-  mcp_news:
-    build:
-      context: .
-      dockerfile: Dockerfile.mcp
-    environment:
-      - DASHBOARD_API_URL=http://backend:4000
-    command: ["python3", "news_mcp.py"]
-    networks:
-      - crypto_net
-
-volumes:
+    volumes:
       - db_data:/app
     depends_on:
       - mcp_ccxt
@@ -32,6 +19,11 @@ volumes:
       - "80:80"
     depends_on:
       - backend
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
 
   mcp_ccxt:
     build:
@@ -113,7 +105,6 @@ volumes:
     depends_on:
       - redis
 
-
   mcp_news:
     build:
       context: .
@@ -121,8 +112,6 @@ volumes:
     environment:
       - DASHBOARD_API_URL=http://backend:4000
     command: ["python3", "news_mcp.py"]
-    networks:
-      - crypto_net
 
 volumes:
   db_data:

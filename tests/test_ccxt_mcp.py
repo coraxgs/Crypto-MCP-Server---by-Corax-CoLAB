@@ -35,6 +35,18 @@ def test_create_order_pending_flow(mock_make_exchange, mock_post):
     mock_post.assert_called_once()
 
 @patch('ccxt_mcp.requests.post')
+@patch('ccxt_mcp._make_exchange')
+def test_create_order_blocked_when_empty_allowed_pairs(mock_make_exchange, mock_post):
+    import ccxt_mcp
+    ccxt_mcp.ALLOWED_PAIRS = []
+
+    res = ccxt_mcp.create_order("binance", "BTC/USDT", "buy", "market", 1.0, None)
+
+    assert "error" in res
+    assert "not in ALLOWED_PAIRS list" in res["error"]
+    mock_post.assert_not_called()
+
+@patch('ccxt_mcp.requests.post')
 def test_log_reasoning(mock_post):
     import ccxt_mcp
     mock_response = MagicMock()

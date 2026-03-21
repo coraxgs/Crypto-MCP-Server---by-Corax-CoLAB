@@ -24,9 +24,9 @@ MAX_TRADE_USD = float(os.getenv("MAX_TRADE_USD", 100.0))
 ALLOWED_PAIRS_STR = os.getenv("ALLOWED_PAIRS", "")
 ALLOWED_PAIRS = [p.strip() for p in ALLOWED_PAIRS_STR.split(",")] if ALLOWED_PAIRS_STR else []
 # Example ALLOWED_PAIRS_STR="BTC/USDT,ETH/USDT"
-# If ALLOWED_PAIRS is empty, we allow all (for backward compatibility), but log a warning
+# If ALLOWED_PAIRS is empty, we block all trades by default for security
 if not ALLOWED_PAIRS:
-    logger.warning("No ALLOWED_PAIRS configured. AI can trade ANY pair!")
+    logger.error("No ALLOWED_PAIRS configured. AI trading is DISABLED for all pairs!")
 
 # Endpoint to dashboard for HITL (Human In The Loop) approval
 DASHBOARD_API_URL = os.getenv("DASHBOARD_API_URL", "http://backend:4000")
@@ -71,7 +71,7 @@ def create_order(exchange: str, symbol: str, side: str, type: str, amount: float
     Creates an order.
     IMPORTANT: This does NOT execute immediately. It sends a pending request to the dashboard for human approval.
     """
-    if ALLOWED_PAIRS and symbol not in ALLOWED_PAIRS:
+    if symbol not in ALLOWED_PAIRS:
         return {"error": f"Symbol {symbol} is not in ALLOWED_PAIRS list: {ALLOWED_PAIRS}"}
 
     try:

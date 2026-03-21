@@ -1,6 +1,6 @@
 import { authenticatedFetch } from "../auth"
 import React, { useEffect, useState } from 'react'
-import io from 'socket.io-client'
+import socket from '../socket'
 import HoloOrderFlow from './features/HoloOrderFlow'
 
 export default function TickerPanel(){
@@ -12,13 +12,16 @@ export default function TickerPanel(){
       if (j.ok) setTicker(j.data)
     }).catch(console.error)
 
-    const socket = io()
+
     socket.on('ticker', (data:any) => setTicker(data))
     return ()=>{ socket.disconnect() }
   }, [])
 
   return (
     <div className="card interactive-element">
+      {!ticker ? <CyberpunkLoader message="Listening to Orderbook..." /> :
+      <>
+
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center', marginBottom: '1rem'}}>
         <h3 style={{margin: 0}}>Tactical Market Overview</h3>
         <div className="small-muted" style={{textTransform: 'uppercase', letterSpacing: '1px'}}>Live Sync</div>
@@ -83,6 +86,8 @@ export default function TickerPanel(){
            <div style={{marginTop: '1rem', color: '#888', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem'}}>Initializing Tactical Stream...</div>
         </div>
       )}
+          </>
+      }
     </div>
   )
 }

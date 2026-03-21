@@ -4,7 +4,6 @@ coingecko_mcp.py
 CoinGecko MCP server for Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Blockchain
 Exposes: price, coin_info, market_chart, trending
 """
-import os
 import logging
 from typing import Any, Dict
 from pycoingecko import CoinGeckoAPI

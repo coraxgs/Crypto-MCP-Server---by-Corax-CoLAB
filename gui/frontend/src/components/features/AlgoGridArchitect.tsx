@@ -94,8 +94,18 @@ export default function AlgoGridArchitect() {
 
         let pair = activeSymbol;
 
-        setNodes([]);
-        setConnections([]);
+        setNodes([
+          { id: 1, type: 'source', title: 'Market Data Feed', pos: { x: 50, y: 150 } },
+          { id: 2, type: 'logic', title: 'RSI > 70', pos: { x: 300, y: 100 } },
+          { id: 3, type: 'logic', title: 'MACD Crossover', pos: { x: 300, y: 200 } },
+          { id: 4, type: 'action', title: 'Execute Sell', pos: { x: 550, y: 150 } }
+        ]);
+        setConnections([
+          { start: { x: 230, y: 180 }, end: { x: 300, y: 130 } },
+          { start: { x: 230, y: 180 }, end: { x: 300, y: 230 } },
+          { start: { x: 480, y: 130 }, end: { x: 550, y: 180 } },
+          { start: { x: 480, y: 230 }, end: { x: 550, y: 180 } }
+        ]);
 
       } catch (err) {
         console.error("Failed to load strategies:", err);

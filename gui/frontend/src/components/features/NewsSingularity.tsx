@@ -143,7 +143,20 @@ export default function NewsSingularity() {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis'
                  }}>
-                     LATEST ANOMALY: {news[0].text}
+                     <div className="ticker-content">LATEST ANOMALY: {news[0].text}</div>
+
+                 <style>{`
+                    .ticker-content {
+                        display: inline-block;
+                        white-space: nowrap;
+                        animation: ticker 15s linear infinite;
+                    }
+                    @keyframes ticker {
+                        0% { transform: translateX(100%); }
+                        100% { transform: translateX(-100%); }
+                    }
+                 `}</style>
+
                  </div>
             )}
         </div>

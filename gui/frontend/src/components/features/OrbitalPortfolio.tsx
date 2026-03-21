@@ -79,6 +79,38 @@ const Planet = ({ asset, onSelect, selected }: { asset: any, onSelect: any, sele
   );
 };
 
+
+const Starfield = () => {
+  const meshRef = useRef<THREE.Points>(null);
+  const count = 500;
+
+  const particles = useMemo(() => {
+    const temp = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      temp[i * 3] = (Math.random() - 0.5) * 50;
+      temp[i * 3 + 1] = (Math.random() - 0.5) * 50;
+      temp[i * 3 + 2] = (Math.random() - 0.5) * 50;
+    }
+    return temp;
+  }, [count]);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y = state.clock.elapsedTime * 0.05;
+      meshRef.current.rotation.x = state.clock.elapsedTime * 0.02;
+    }
+  });
+
+  return (
+    <points ref={meshRef}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={particles.length / 3} array={particles} itemSize={3} />
+      </bufferGeometry>
+      <pointsMaterial size={0.05} color="#cbd5e1" transparent opacity={0.6} sizeAttenuation={true} />
+    </points>
+  );
+};
+
 export default function OrbitalPortfolio() {
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
   const [assets, setAssets] = useState<any[]>([]);

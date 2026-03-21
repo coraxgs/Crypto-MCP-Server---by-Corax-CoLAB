@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { callMcpEndpoint } from '../api_mcp';
 
 export function useActivePortfolioSymbol(defaultSymbol = 'BTC/USDT', defaultExchange = 'binance') {
+    const [error, setError] = useState<string | null>(null);
     const [targetSymbol, setTargetSymbol] = useState(defaultSymbol);
     const [targetExchange, setTargetExchange] = useState(defaultExchange);
     const [loading, setLoading] = useState(true);
@@ -21,8 +22,9 @@ export function useActivePortfolioSymbol(defaultSymbol = 'BTC/USDT', defaultExch
                         setTargetExchange(defaultExchange);
                     }
                 }
-            } catch (err) {
+            } catch (err: any) {
                 console.warn("Could not fetch portfolio for dynamic pair, using default", err);
+                setError(err.message || 'Failed to fetch portfolio symbol');
             } finally {
                 if (active) setLoading(false);
             }
@@ -37,5 +39,5 @@ export function useActivePortfolioSymbol(defaultSymbol = 'BTC/USDT', defaultExch
         };
     }, [defaultExchange]);
 
-    return { targetSymbol, targetExchange, loading };
+    return { targetSymbol, targetExchange, loading, error };
 }

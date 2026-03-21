@@ -1,6 +1,7 @@
 import NeuralTradeVisualizer from './features/NeuralTradeVisualizer'
 import { authenticatedFetch } from "../auth"
 import React, { useState } from 'react'
+import { useToast } from './NeonToasts'
 
 export default function OrderPanel(){
   const [exchange,setExchange]=useState('binance')
@@ -17,7 +18,7 @@ export default function OrderPanel(){
     setRoutingActive(true)
     const resp = await authenticatedFetch('/api/order/dry_run', {method:'POST',headers:{'Content-Type':'application/json'}, body: JSON.stringify({exchange,symbol,side,type,amount,price})})
     const j = await resp.json()
-    if (j.ok) setPreview(j.data); else alert(j.error)
+    if (j.ok) setPreview(j.data); else addToast(j.error, 'info')
     setTimeout(() => setRoutingActive(false), 2000)
   }
 
@@ -26,7 +27,7 @@ export default function OrderPanel(){
     setRoutingActive(true)
     const resp = await authenticatedFetch('/api/order/execute', {method:'POST',headers:{'Content-Type':'application/json'}, body: JSON.stringify({exchange,symbol,side,type,amount,price,execute:true})})
     const j = await resp.json()
-    if (j.ok) { setResult(j.data); alert('Order placed') } else alert(j.error)
+    if (j.ok) { setResult(j.data); addToast('Order placed') } else alert(j.error, 'info')
     setTimeout(() => setRoutingActive(false), 2000)
   }
 

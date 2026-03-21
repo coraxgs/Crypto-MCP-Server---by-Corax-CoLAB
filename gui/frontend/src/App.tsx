@@ -47,9 +47,9 @@ export default function App() {
 
             const taData = await callMcpEndpoint('MCP_TA', 'compute_indicators', { exchange: 'binance', symbol: targetSymbol, timeframe: '1h' });
             if (taData && taData.signal) {
-                if (taData.signal === 'buy') setSentiment('bull');
-                else if (taData.signal === 'sell') setSentiment('bear');
-                else setSentiment('neutral');
+                if (taData.signal === 'buy') { setSentiment('bull'); document.body.setAttribute('data-sentiment', 'bull'); }
+                else if (taData.signal === 'sell') { setSentiment('bear'); document.body.setAttribute('data-sentiment', 'bear'); }
+                else { setSentiment('neutral'); document.body.setAttribute('data-sentiment', 'neutral'); }
             }
         } catch (err) {
             console.error("Failed to fetch TA for global sentiment", err);
@@ -105,9 +105,9 @@ export default function App() {
 
       {/* Sentiment Toggles (Manual override) */}
       <div style={{ position: 'absolute', top: 20, right: 20, zIndex: 9999, display: 'flex', gap: '10px' }}>
-        <button onClick={() => setSentiment('bull')} className="btn-outline" style={{ color: '#10b981', borderColor: sentiment === 'bull' ? '#10b981' : '#333' }}>BULL MODE</button>
-        <button onClick={() => setSentiment('neutral')} className="btn-outline" style={{ color: '#60a5fa', borderColor: sentiment === 'neutral' ? '#60a5fa' : '#333' }}>NEUTRAL</button>
-        <button onClick={() => setSentiment('bear')} className="btn-outline" style={{ color: '#ef4444', borderColor: sentiment === 'bear' ? '#ef4444' : '#333' }}>BEAR MODE</button>
+        <button onClick={() => { setSentiment('bull'); document.body.setAttribute('data-sentiment', 'bull'); }} className="btn-outline" style={{ color: '#10b981', borderColor: sentiment === 'bull' ? '#10b981' : '#333' }}>BULL MODE</button>
+        <button onClick={() => { setSentiment('neutral'); document.body.setAttribute('data-sentiment', 'neutral'); }} className="btn-outline" style={{ color: '#60a5fa', borderColor: sentiment === 'neutral' ? '#60a5fa' : '#333' }}>NEUTRAL</button>
+        <button onClick={() => { setSentiment('bear'); document.body.setAttribute('data-sentiment', 'bear'); }} className="btn-outline" style={{ color: '#ef4444', borderColor: sentiment === 'bear' ? '#ef4444' : '#333' }}>BEAR MODE</button>
       </div>
 
       <div className="main-grid" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', padding: '20px', maxWidth: '1600px', margin: '0 auto' }}>

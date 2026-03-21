@@ -301,3 +301,81 @@ input:focus, select:focus {
   background-color: rgba(59, 130, 246, 0.1);
   transition: background-color 0.2s ease;
 }
+
+/* Cyberpunk Animations */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.lucide-spin {
+  animation: spin 2s linear infinite;
+}
+
+.table-row-hover:hover {
+  background: rgba(16, 185, 129, 0.1);
+  box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.2);
+}
+
+/* Toast Animations */
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Glitch Effect on Change */
+.glitch-update {
+  animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both;
+}
+
+@keyframes glitch-anim {
+  0% { transform: translate(0) }
+  20% { transform: translate(-2px, 2px) }
+  40% { transform: translate(-2px, -2px) }
+  60% { transform: translate(2px, 2px) }
+  80% { transform: translate(2px, -2px) }
+  100% { transform: translate(0) }
+}
+
+/* Dynamic Theme Overrides */
+:root {
+  --primary-glow: rgba(16, 185, 129, 0.6);
+  --primary-border: #10b981;
+}
+
+body[data-sentiment='bull'] {
+  --primary-glow: rgba(16, 185, 129, 0.8);
+  --primary-border: #10b981;
+}
+
+body[data-sentiment='bear'] {
+  --primary-glow: rgba(239, 68, 68, 0.6);
+  --primary-border: #ef4444;
+}
+
+body[data-sentiment='neutral'] {
+  --primary-glow: rgba(96, 165, 250, 0.6);
+  --primary-border: #60a5fa;
+}
+
+.card {
+  box-shadow: 0 0 15px var(--primary-glow);
+  border: 1px solid var(--primary-border) !important;
+  transition: box-shadow 0.5s ease, border 0.5s ease;
+}
+
+h2 {
+  color: var(--primary-border) !important;
+  transition: color 0.5s ease;
+}

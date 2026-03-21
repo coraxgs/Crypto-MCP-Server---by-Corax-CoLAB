@@ -7,11 +7,12 @@ For Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Bloc
 import os
 import logging
 from typing import Dict, Any, List
-import ccxt
+import ccxt.async_support as ccxt_async
 from pycoingecko import CoinGeckoAPI
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 import time
+import asyncio
 
 load_dotenv(dotenv_path="/home/pelle/cryptomcpserver/.env")
 logging.basicConfig(level=logging.INFO)
@@ -30,9 +31,6 @@ def _get_price_coingecko(symbol: str):
         _CACHE["prices"] = {}
         _CACHE["timestamp"] = now
 
-    # ⚡ Bolt Optimization: Cache the CoinGecko ~14k coin mapping in memory for 1 hour.
-    # Previously, this was fetched for every uncached coin, causing severe HTTP 429
-    # rate limit errors and slowing down portfolio evaluation by >200ms per asset.
     if _CACHE["mapping"] is None or (now - _CACHE["mapping_timestamp"] > MAPPING_TTL):
         try:
             coins = cg.get_coins_list()
@@ -58,46 +56,79 @@ def _get_price_coingecko(symbol: str):
         logger.debug("CoinGecko price lookup failed: %s", e)
     return None
 
-def _get_price_ccxt(exchange, symbol):
+async def _get_price_ccxt(exchange, symbol):
     pair = f"{symbol}/USDT"
     try:
-        t = exchange.fetch_ticker(pair)
+        t = await exchange.fetch_ticker(pair)
         return t.get("last")
     except Exception:
         return None
 
-@mcp.tool()
-def portfolio_value(exchanges: List[str]) -> Dict[str, Any]:
-    total_usd = 0.0
+async def fetch_exchange_balance(exch_low: str):
+    if exch_low not in ccxt_async.exchanges:
+        return []
+
+    cls = getattr(ccxt_async, exch_low)
+    opts = {"enableRateLimit": True}
+    api_key = os.getenv(f"{exch_low.upper()}_API_KEY")
+    api_secret = os.getenv(f"{exch_low.upper()}_API_SECRET")
+    if api_key and api_secret:
+        opts.update({"apiKey": api_key, "secret": api_secret})
+
+    ex = cls(opts)
     details = []
-    for exch in exchanges:
-        exch_low = exch.lower()
-        if exch_low not in ccxt.exchanges:
-            continue
-        cls = getattr(ccxt, exch_low)
-        opts = {"enableRateLimit": True}
-        api_key = os.getenv(f"{exch_low.upper()}_API_KEY")
-        api_secret = os.getenv(f"{exch_low.upper()}_API_SECRET")
-        if api_key and api_secret:
-            opts.update({"apiKey": api_key, "secret": api_secret})
-        ex = cls(opts)
-        try:
-            bal = ex.fetch_balance()
-        except Exception as e:
-            logger.warning("fetch_balance failed for %s: %s", exch_low, e)
-            continue
+
+    try:
+        bal = await ex.fetch_balance()
         for coin, amount in bal.get("total", {}).items():
             if not amount or amount == 0:
                 continue
+
+            # Note: Coingecko API used here is synchronous, but could be run in an executor or kept as is
+            # since it is cached and quick for the most part.
             price = _get_price_coingecko(coin)
             if price is None:
-                price = _get_price_ccxt(ex, coin)
+                price = await _get_price_ccxt(ex, coin)
+
             value = amount * (price or 0.0)
-            total_usd += value
-            details.append({"exchange": exch_low, "asset": coin, "amount": amount, "price_usd": price, "value_usd": value})
-    return {"total_usd": total_usd, "details": details, "cache_ttl": CACHE_TTL, "cached_at": _CACHE["timestamp"]}
+            details.append({
+                "exchange": exch_low,
+                "asset": coin,
+                "amount": amount,
+                "price_usd": price,
+                "value_usd": value
+            })
+    except Exception as e:
+        logger.warning("fetch_balance failed for %s: %s", exch_low, e)
+    finally:
+        await ex.close()
+
+    return details
+
+@mcp.tool()
+async def portfolio_value(exchanges: List[str]) -> Dict[str, Any]:
+    tasks = []
+    for exch in exchanges:
+        exch_low = exch.lower()
+        tasks.append(fetch_exchange_balance(exch_low))
+
+    results = await asyncio.gather(*tasks)
+
+    total_usd = 0.0
+    details = []
+
+    for exch_details in results:
+        for detail in exch_details:
+            total_usd += detail["value_usd"]
+            details.append(detail)
+
+    return {
+        "total_usd": total_usd,
+        "details": details,
+        "cache_ttl": CACHE_TTL,
+        "cached_at": _CACHE["timestamp"]
+    }
 
 if __name__ == "__main__":
     print("Starting portfolio_mcp on http://127.0.0.1:7004/mcp — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
-    # transport, bind (address:port), mount_path
     mcp.run("streamable-http")

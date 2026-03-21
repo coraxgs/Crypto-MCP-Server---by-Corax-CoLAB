@@ -19,17 +19,25 @@ logger = logging.getLogger("onchain_mcp")
 
 mcp = FastMCP(name="onchain", stateless_http=True, json_response=True, host="0.0.0.0", port=7002)
 
+# Global cache for Web3 instances to reuse underlying HTTP sessions
+_w3_instances = {}
+
 def _get_web3(rpc_url: Optional[str] = None) -> Web3:
-    rpc_url = rpc_url or os.getenv("ETH_RPC_URL")
-    if not rpc_url:
-        raise RuntimeError("ETH_RPC_URL måste vara satt i .env")
+    rpc_url = rpc_url or os.getenv("ETH_RPC_URL", "https://eth.llamarpc.com")
+
+    if rpc_url in _w3_instances:
+        return _w3_instances[rpc_url]
+
     w3 = Web3(Web3.HTTPProvider(rpc_url))
     try:
         w3.middleware_onion.inject(ExtraDataToPOAMiddleware, layer=0)
     except Exception:
         pass
+
     if not w3.is_connected():
         raise RuntimeError(f"Kan inte koppla till RPC: {rpc_url}")
+
+    _w3_instances[rpc_url] = w3
     return w3
 
 @mcp.tool()
@@ -127,10 +135,7 @@ def get_dex_quote(token_in: str, token_out: str, amount_in: float, rpc_url: Opti
     """
     try:
         # Default to public Ankr RPC if none provided, to ensure it works without API keys
-        rpc = rpc_url or os.getenv("ETH_RPC_URL", "https://eth.llamarpc.com")
-        w3 = Web3(Web3.HTTPProvider(rpc))
-        if not w3.is_connected():
-            return {"error": f"Failed to connect to Ethereum RPC: {rpc}"}
+        w3 = _get_web3(rpc_url)
 
         # Uniswap V2 Router on Mainnet
         router_address = w3.to_checksum_address("0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D")
@@ -203,16 +208,13 @@ def execute_dex_swap(token_in: str, token_out: str, amount_in: float, slippage_t
     Requires ETH_PRIVATE_KEY and ETH_PUBLIC_ADDRESS in .env.
     """
     try:
-        rpc = rpc_url or os.getenv("ETH_RPC_URL", "https://eth.llamarpc.com")
         private_key = os.getenv("ETH_PRIVATE_KEY")
         public_address = os.getenv("ETH_PUBLIC_ADDRESS")
 
         if not private_key or not public_address:
             return {"error": "ETH_PRIVATE_KEY and ETH_PUBLIC_ADDRESS must be set in .env to execute live swaps."}
 
-        w3 = Web3(Web3.HTTPProvider(rpc))
-        if not w3.is_connected():
-            return {"error": f"Failed to connect to Ethereum RPC: {rpc}"}
+        w3 = _get_web3(rpc_url)
 
         router_address = w3.to_checksum_address("0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D")
         token_in_address = w3.to_checksum_address(token_in)

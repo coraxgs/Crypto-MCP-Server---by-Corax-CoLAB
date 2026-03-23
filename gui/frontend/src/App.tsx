@@ -93,7 +93,7 @@ export default function App() {
 
 
           </div>
-          <p className="small-muted" style={{textAlign: 'center', fontFamily: 'monospace'}}>Corax CoLAB - Edge AI Protocol</p>
+          <p className="small-muted" style={{textAlign: 'center', fontFamily: 'monospace'}}><a href="https://coraxcolab.com" target="_blank" style={{color: 'inherit', textDecoration: 'none'}}>Corax CoLAB</a> | <a href="https://pellenybe.github.io" target="_blank" style={{color: 'inherit', textDecoration: 'none'}}>Pelle Nyberg</a> (<a href="https://github.com/PelleNybe" target="_blank" style={{color: 'inherit', textDecoration: 'none'}}>GitHub</a>) | <a href="https://cryptop.coraxcolab.com" target="_blank" style={{color: 'inherit', textDecoration: 'none'}}>Crypto P's Crypto Circus</a></p>
           <input
             type="password"
             value={password}

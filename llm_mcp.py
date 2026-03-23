@@ -7,7 +7,7 @@ For Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Bloc
 """
 import os
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 

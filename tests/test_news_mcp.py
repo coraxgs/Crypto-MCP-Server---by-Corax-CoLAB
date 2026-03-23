@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch, MagicMock
 from news_mcp import get_latest_news
 

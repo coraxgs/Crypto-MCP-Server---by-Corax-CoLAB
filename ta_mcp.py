@@ -4,7 +4,6 @@ ta_mcp.py
 Technical analysis MCP server for Crypto MCP Server – Produced by Corax CoLAB - The Future of Edge AI & Blockchain
 Exposes: compute_indicators (RSI, MACD, SMA50, BB)
 """
-import os
 import logging
 from typing import Dict, Any
 import pandas as pd

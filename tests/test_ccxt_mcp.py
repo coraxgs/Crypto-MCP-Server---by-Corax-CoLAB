@@ -1,6 +1,5 @@
-import pytest
 from unittest.mock import patch, MagicMock
-from ccxt_mcp import get_ticker, create_order
+from ccxt_mcp import get_ticker
 
 @patch('ccxt_mcp._make_exchange')
 def test_get_ticker(mock_make_exchange):

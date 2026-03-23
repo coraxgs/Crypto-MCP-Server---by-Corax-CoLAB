@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch, MagicMock
 from onchain_mcp import eth_balance, gas_price
 

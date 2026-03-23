@@ -196,12 +196,14 @@ If you prefer to do everything yourself:
    sudo apt install -y nodejs
    ```
 
-3. **Backend:**
+3. **Backend & Global Config:**
    ```bash
-   cd $HOME/cryptomcpserver/gui/backend
-   npm install
+   cd $HOME/cryptomcpserver
    cp .env.example .env
-   # edit .env if needed
+   # edit .env to add your passwords, keys, and allowed pairs
+
+   cd gui/backend
+   npm install
    ```
 
 4. **Frontend (dev):**
@@ -220,15 +222,22 @@ If you prefer to do everything yourself:
 
 ---
 
-## ⚙️ Configuration: .env (backend)
+## ⚙️ Configuration: .env (global & backend)
 
-Copy and edit `$HOME/cryptomcpserver/gui/backend/.env.example` → `.env`:
+The system uses a centralized `.env` file located at the root of the project to manage both Python MCP servers and the Node.js backend.
+
+Copy and edit `$HOME/cryptomcpserver/.env.example` → `.env`:
 
 ```env
-MCP_CCXT=http://127.0.0.1:7001/mcp
-MCP_PORTFOLIO=http://127.0.0.1:7004/mcp
+# Essential configuration
 PORT=4000
-DASHBOARD_PASSWORD=your_secure_password # Added for robust security
+DASHBOARD_PASSWORD=your_secure_password # Required for trading and AI reasoning
+ALLOWED_PAIRS=BTC/USDT,SOL/USDT # Fail-closed security: only these pairs are allowed
+MAX_TRADE_USD=100.0 # Maximum allowed trade amount per transaction
+
+# API Keys
+BINANCE_API_KEY=your_key
+BINANCE_API_SECRET=your_secret
 ```
 
 ---

@@ -20,6 +20,12 @@ import SystemOverview from './components/features/SystemOverview'
 import NeuralNetLiquidity from './components/features/NeuralNetLiquidity';
 import HoloTopographicOrderBook from './components/features/HoloTopographicOrderBook';
 import OrbitalPortfolio from './components/features/OrbitalPortfolio';
+import DarkPoolSonar from './components/features/DarkPoolSonar'
+import FlashCrashMatrix from './components/features/FlashCrashMatrix'
+import GalaxyView from './components/features/GalaxyView'
+import SentimentWordCloud from './components/features/SentimentWordCloud'
+import GasHologram from './components/features/GasHologram'
+
 
 import { getAuthToken, setAuthToken } from './auth'
 import { callMcpEndpoint } from './api_mcp'
@@ -123,6 +129,14 @@ export default function App() {
 
 
         {/* Feature 1: Arbitrage Wormhole (Spans full width) */}
+
+        {/* NEW WORLD CLASS FEATURES */}
+        <DarkPoolSonar />
+        <FlashCrashMatrix />
+        <GalaxyView />
+        <SentimentWordCloud />
+        <GasHologram />
+
         <ArbitrageWormhole />
 
         {/* Feature 3: Algo Grid Architect (Spans full width) */}

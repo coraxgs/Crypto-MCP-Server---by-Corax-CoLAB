@@ -187,7 +187,7 @@ def get_dex_quote(token_in: str, token_out: str, amount_in: float, rpc_url: Opti
 
         return {
             "status": "success",
-            "message": f"Real on-chain quote from Uniswap V2.",
+            "message": "Real on-chain quote from Uniswap V2.",
             "token_in": token_in,
             "token_out": token_out,
             "amount_in": amount_in,

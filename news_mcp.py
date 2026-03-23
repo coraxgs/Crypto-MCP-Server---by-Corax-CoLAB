@@ -4,10 +4,8 @@ news_mcp.py
 News MCP server for Crypto MCP Server – Produced by Corax CoLAB
 Exposes: get_latest_news, search_news
 """
-import os
 import logging
 import requests
-from typing import Optional, List, Dict, Any
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 

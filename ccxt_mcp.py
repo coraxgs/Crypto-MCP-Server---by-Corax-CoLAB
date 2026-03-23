@@ -7,7 +7,7 @@ Run via systemd or: python3 ccxt_mcp.py
 """
 import os
 import logging
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Any
 import ccxt
 import requests
 from mcp.server.fastmcp import FastMCP
@@ -174,3 +174,14 @@ def fetch_order_book(exchange: str, symbol: str, limit: int = 20) -> dict:
         return ex.fetch_order_book(symbol, limit)
     except Exception as e:
         return {"error": str(e)}
+
+@mcp.tool()
+def fetch_trades(exchange: str, symbol: str, limit: int = 50) -> list:
+    """
+    Fetch the list of recent trades for a given symbol.
+    """
+    try:
+        ex = _make_exchange(exchange)
+        return ex.fetch_trades(symbol, limit=limit)
+    except Exception as e:
+        return [{"error": str(e)}]

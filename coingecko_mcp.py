@@ -48,3 +48,14 @@ if __name__ == "__main__":
     print("Starting coingecko_mcp on http://127.0.0.1:7010/mcp — Crypto MCP Server (Corax CoLAB - The Future of Edge AI & Blockchain)")
     # transport + bind (address:port/path)
     mcp.run("streamable-http")
+
+@mcp.tool()
+def get_coins_markets(vs_currency: str = "usd", limit: int = 50) -> list:
+    """
+    Fetch the list of coin markets sorted by market cap.
+    """
+    try:
+        res = cg.get_coins_markets(vs_currency=vs_currency, per_page=limit)
+        return res
+    except Exception as e:
+        return [{"error": str(e)}]

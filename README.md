@@ -55,7 +55,7 @@
 
   <p>
     <a href="https://cryptop.coraxcolab.com">
-      <img src="https://img.shields.io/badge/CrypTop-Live_Demo-8A2BE2?style=for-the-badge&logo=rocket&logoColor=white" alt="CrypTop Live" />
+      <img src="https://img.shields.io/badge/Crypto P's Crypto Circus-Live_Demo-8A2BE2?style=for-the-badge&logo=rocket&logoColor=white" alt="Crypto P's Crypto Circus Live" />
     </a>
     <a href="https://coraxcolab.com">
       <img src="https://img.shields.io/badge/Corax_CoLAB-Website-10B981?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Corax CoLAB" />
@@ -82,6 +82,7 @@
 8. **Enhanced Orders Table**: The `OrdersLogPanel` is upgraded with pagination, neon-color-coded status badges, and interactive hover effects.
 9. **Glitch Effects**: Critical data changes trigger subtle CSS glitch animations, enhancing the cyberpunk aesthetic.
 10. **Dynamic Theme Colors**: The entire dashboard reacts to global market sentiment, shifting its neon glowing borders based on whether the market is bullish or bearish.
+
 
 
 ## 🌌 100% Real Data Integration & Visualizer Dynamics (Upgraded v3.0)

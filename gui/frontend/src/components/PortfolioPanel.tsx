@@ -33,6 +33,12 @@ export default function PortfolioPanel() {
       {!data ? <CyberpunkLoader message="Syncing Assets..." /> :
       <>
 
+      {!data ? <CyberpunkLoader message="Syncing Assets..." /> :
+      <>
+
+      {!data ? <CyberpunkLoader message="Syncing Assets..." /> :
+      <>
+
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center', marginBottom: '1rem'}}>
         <h3 style={{margin: 0}}>Asset Universe</h3>
         <div style={{display:'flex', gap: '0.5rem'}}>
@@ -86,6 +92,10 @@ export default function PortfolioPanel() {
           </table>
         </div>
       )}
+          </>
+      }
+          </>
+      }
           </>
       }
     </div>

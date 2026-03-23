@@ -141,6 +141,8 @@ async function callMCP(mcpUrl, toolName, args = {}) {
   const res = await axios.post(mcpUrl, payload, {
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json,text/event-stream' },
     timeout: parseInt(process.env.MCP_TIMEOUT) || 8000,
+    signal: AbortSignal.timeout(parseInt(process.env.MCP_TIMEOUT) || 8000),
+    signal: AbortSignal.timeout(parseInt(process.env.MCP_TIMEOUT) || 8000),
     signal: AbortSignal.timeout(parseInt(process.env.MCP_TIMEOUT) || 8000)
   });
   if (res.data && res.data.result) {
@@ -215,6 +217,54 @@ app.post('/api/order/dry_run', async (req, res) => {
   const numericPrice = price !== undefined && price !== null ? Number(price) : null;
   if (numericPrice !== null && (isNaN(numericPrice) || numericPrice <= 0)) {
     return res.status(400).json({ ok:false, error: 'Price must be a positive number' });
+  }
+  const allowedSides = ['buy', 'sell'];
+  const allowedTypes = ['market', 'limit'];
+  if (!allowedSides.includes(side.toLowerCase())) {
+      return res.status(400).json({ ok:false, error: 'Invalid order side (must be buy or sell)' });
+  }
+  if (!allowedTypes.includes(type.toLowerCase())) {
+      return res.status(400).json({ ok:false, error: 'Invalid order type (must be market or limit)' });
+  }
+  const symbolRegex = /^[A-Z0-9-]+/[A-Z0-9-]+$/i;
+  if (!symbolRegex.test(symbol)) {
+      return res.status(400).json({ ok:false, error: 'Invalid symbol format (expected e.g. BTC/USDT)' });
+  }
+  const allowedSides = ['buy', 'sell'];
+  const allowedTypes = ['market', 'limit'];
+  if (!allowedSides.includes(side.toLowerCase())) {
+      return res.status(400).json({ ok:false, error: 'Invalid order side (must be buy or sell)' });
+  }
+  if (!allowedTypes.includes(type.toLowerCase())) {
+      return res.status(400).json({ ok:false, error: 'Invalid order type (must be market or limit)' });
+  }
+  const symbolRegex = /^[A-Z0-9-]+/[A-Z0-9-]+$/i;
+  if (!symbolRegex.test(symbol)) {
+      return res.status(400).json({ ok:false, error: 'Invalid symbol format (expected e.g. BTC/USDT)' });
+  }
+  const allowedSides = ['buy', 'sell'];
+  const allowedTypes = ['market', 'limit'];
+  if (!allowedSides.includes(side.toLowerCase())) {
+      return res.status(400).json({ ok:false, error: 'Invalid order side (must be buy or sell)' });
+  }
+  if (!allowedTypes.includes(type.toLowerCase())) {
+      return res.status(400).json({ ok:false, error: 'Invalid order type (must be market or limit)' });
+  }
+  const symbolRegex = /^[A-Z0-9-]+/[A-Z0-9-]+$/i;
+  if (!symbolRegex.test(symbol)) {
+      return res.status(400).json({ ok:false, error: 'Invalid symbol format (expected e.g. BTC/USDT)' });
+  }
+  const allowedSides = ['buy', 'sell'];
+  const allowedTypes = ['market', 'limit'];
+  if (!allowedSides.includes(side.toLowerCase())) {
+      return res.status(400).json({ ok:false, error: 'Invalid order side (must be buy or sell)' });
+  }
+  if (!allowedTypes.includes(type.toLowerCase())) {
+      return res.status(400).json({ ok:false, error: 'Invalid order type (must be market or limit)' });
+  }
+  const symbolRegex = /^[A-Z0-9-]+/[A-Z0-9-]+$/i;
+  if (!symbolRegex.test(symbol)) {
+      return res.status(400).json({ ok:false, error: 'Invalid symbol format (expected e.g. BTC/USDT)' });
   }
   const allowedSides = ['buy', 'sell'];
   const allowedTypes = ['market', 'limit'];
@@ -386,6 +436,30 @@ app.post('/api/order/pending', (req, res) => {
   const numericPrice = price !== undefined && price !== null ? Number(price) : null;
   if (numericPrice !== null && (isNaN(numericPrice) || numericPrice <= 0)) {
     return res.status(400).json({ ok: false, error: 'Price must be a positive number' });
+  }
+  const allowedSides = ['buy', 'sell'];
+  const allowedTypes = ['market', 'limit'];
+  if (!allowedSides.includes(side.toLowerCase())) {
+      return res.status(400).json({ ok: false, error: 'Invalid order side (must be buy or sell)' });
+  }
+  if (!allowedTypes.includes(type.toLowerCase())) {
+      return res.status(400).json({ ok: false, error: 'Invalid order type (must be market or limit)' });
+  }
+  const symbolRegex = /^[A-Z0-9-]+/[A-Z0-9-]+$/i;
+  if (!symbolRegex.test(symbol)) {
+      return res.status(400).json({ ok: false, error: 'Invalid symbol format (expected e.g. BTC/USDT)' });
+  }
+  const allowedSides = ['buy', 'sell'];
+  const allowedTypes = ['market', 'limit'];
+  if (!allowedSides.includes(side.toLowerCase())) {
+      return res.status(400).json({ ok: false, error: 'Invalid order side (must be buy or sell)' });
+  }
+  if (!allowedTypes.includes(type.toLowerCase())) {
+      return res.status(400).json({ ok: false, error: 'Invalid order type (must be market or limit)' });
+  }
+  const symbolRegex = /^[A-Z0-9-]+/[A-Z0-9-]+$/i;
+  if (!symbolRegex.test(symbol)) {
+      return res.status(400).json({ ok: false, error: 'Invalid symbol format (expected e.g. BTC/USDT)' });
   }
   const allowedSides = ['buy', 'sell'];
   const allowedTypes = ['market', 'limit'];

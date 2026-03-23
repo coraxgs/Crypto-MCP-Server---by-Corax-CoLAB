@@ -20,11 +20,13 @@ import SystemOverview from './components/features/SystemOverview'
 import NeuralNetLiquidity from './components/features/NeuralNetLiquidity';
 import HoloTopographicOrderBook from './components/features/HoloTopographicOrderBook';
 import OrbitalPortfolio from './components/features/OrbitalPortfolio';
-import DarkPoolSonar from './components/features/DarkPoolSonar'
-import FlashCrashMatrix from './components/features/FlashCrashMatrix'
-import GalaxyView from './components/features/GalaxyView'
-import SentimentWordCloud from './components/features/SentimentWordCloud'
-import GasHologram from './components/features/GasHologram'
+
+import DarkPoolSonar from "./components/features/DarkPoolSonar"
+import FlashCrashMatrix from "./components/features/FlashCrashMatrix"
+import GalaxyView from "./components/features/GalaxyView"
+import SentimentWordCloud from "./components/features/SentimentWordCloud"
+
+import GasHologram from "./components/features/GasHologram"
 
 
 import { getAuthToken, setAuthToken } from './auth'
@@ -78,8 +80,18 @@ export default function App() {
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #000 100%)' }}>
         <form onSubmit={handleLogin} className="card interactive-element" style={{ width: 350, display: 'flex', flexDirection: 'column', gap: 16, border: '1px solid #334155', boxShadow: '0 0 30px rgba(16, 185, 129, 0.1)' }}>
           <div style={{display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'center'}}>
+
+
+
+
+
             <div style={{width: '20px', height: '20px', background: '#10b981', borderRadius: '50%', boxShadow: '0 0 10px #10b981'}}></div>
             <h3 style={{ margin: 0, textTransform: 'uppercase', letterSpacing: '2px', color: '#fff' }}>SYSTEM AUTHENTICATION</h3>
+
+
+
+
+
           </div>
           <p className="small-muted" style={{textAlign: 'center', fontFamily: 'monospace'}}>Corax CoLAB - Edge AI Protocol</p>
           <input
@@ -93,6 +105,11 @@ export default function App() {
           />
           <button type="submit" className="btn-primary" style={{fontFamily: 'monospace', letterSpacing: '2px'}}>INITIALIZE LINK</button>
         </form>
+
+
+
+
+
       </div>
     );
   }
@@ -107,6 +124,11 @@ export default function App() {
         backgroundSize: '30px 30px',
         zIndex: 0,
         pointerEvents: 'none'
+
+
+
+
+
       }}></div>
 
       {/* Sentiment Toggles (Manual override) */}
@@ -114,6 +136,11 @@ export default function App() {
         <button onClick={() => { setSentiment('bull'); document.body.setAttribute('data-sentiment', 'bull'); }} className="btn-outline" style={{ color: '#10b981', borderColor: sentiment === 'bull' ? '#10b981' : '#333' }}>BULL MODE</button>
         <button onClick={() => { setSentiment('neutral'); document.body.setAttribute('data-sentiment', 'neutral'); }} className="btn-outline" style={{ color: '#60a5fa', borderColor: sentiment === 'neutral' ? '#60a5fa' : '#333' }}>NEUTRAL</button>
         <button onClick={() => { setSentiment('bear'); document.body.setAttribute('data-sentiment', 'bear'); }} className="btn-outline" style={{ color: '#ef4444', borderColor: sentiment === 'bear' ? '#ef4444' : '#333' }}>BEAR MODE</button>
+
+
+
+
+
       </div>
 
       <div className="main-grid" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', padding: '20px', maxWidth: '1600px', margin: '0 auto' }}>
@@ -131,11 +158,12 @@ export default function App() {
         {/* Feature 1: Arbitrage Wormhole (Spans full width) */}
 
         {/* NEW WORLD CLASS FEATURES */}
-        <DarkPoolSonar />
-        <FlashCrashMatrix />
-        <GalaxyView />
-        <SentimentWordCloud />
-        <GasHologram />
+
+
+        {/* NEW WORLD CLASS FEATURES */}
+
+
+        {/* NEW WORLD CLASS FEATURES */}
 
         <ArbitrageWormhole />
 
@@ -154,6 +182,11 @@ export default function App() {
 
           <BacktestArenaPanel />
           <WhaleSonarSweep />
+
+
+
+
+
         </div>
 
         {/* Right Column */}
@@ -167,11 +200,26 @@ export default function App() {
           <OrderPanel />
           <OrdersLogPanel />
         </aside>
+
+
+
+
+
       </div>
 
       {/* Original Co-Pilot */}
-      <MarketSentimentAnalyzer />
+      <DarkPoolSonar />
+<FlashCrashMatrix />
+<GalaxyView />
+<SentimentWordCloud />
+<GasHologram />
+<MarketSentimentAnalyzer />
       <OracleCopilot />
+
+
+
+
+
 
     </div>
   )

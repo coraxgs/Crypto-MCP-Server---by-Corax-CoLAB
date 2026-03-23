@@ -22,6 +22,12 @@ export default function TickerPanel(){
       {!ticker ? <CyberpunkLoader message="Listening to Orderbook..." /> :
       <>
 
+      {!ticker ? <CyberpunkLoader message="Listening to Orderbook..." /> :
+      <>
+
+      {!ticker ? <CyberpunkLoader message="Listening to Orderbook..." /> :
+      <>
+
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center', marginBottom: '1rem'}}>
         <h3 style={{margin: 0}}>Tactical Market Overview</h3>
         <div className="small-muted" style={{textTransform: 'uppercase', letterSpacing: '1px'}}>Live Sync</div>
@@ -86,6 +92,10 @@ export default function TickerPanel(){
            <div style={{marginTop: '1rem', color: '#888', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem'}}>Initializing Tactical Stream...</div>
         </div>
       )}
+          </>
+      }
+          </>
+      }
           </>
       }
     </div>

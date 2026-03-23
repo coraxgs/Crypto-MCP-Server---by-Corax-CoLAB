@@ -25,7 +25,7 @@ const Particles = ({ sentiment }: { sentiment: 'bull' | 'bear' | 'neutral' }) =>
     return temp;
   }, [count]);
 
-  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const matrixHelper = useMemo(() => new THREE.Object3D(), []);
   const color = useMemo(() => new THREE.Color(), []);
 
   useFrame((state) => {
@@ -54,17 +54,17 @@ const Particles = ({ sentiment }: { sentiment: 'bull' | 'bear' | 'neutral' }) =>
       particle.y = y;
       particle.x = x;
 
-      dummy.position.set(x, y, z);
+      matrixHelper.position.set(x, y, z);
 
       // Stretch particles if bear market (rain)
       if (sentiment === 'bear') {
-          dummy.scale.set(0.1, 1.5, 0.1);
+          matrixHelper.scale.set(0.1, 1.5, 0.1);
       } else {
-          dummy.scale.set(0.3, 0.3, 0.3);
+          matrixHelper.scale.set(0.3, 0.3, 0.3);
       }
 
-      dummy.updateMatrix();
-      mesh.current!.setMatrixAt(i, dummy.matrix);
+      matrixHelper.updateMatrix();
+      mesh.current!.setMatrixAt(i, matrixHelper.matrix);
 
       // Set color
       color.set(targetColor);
